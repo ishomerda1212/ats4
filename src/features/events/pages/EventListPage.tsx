@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Calendar, Clock, MapPin, Users, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EventCard } from '../components/EventCard';
 import { useEvents } from '../hooks/useEvents';
 import { Event } from '../types/event';
+import { formatDateTime } from '@/shared/utils/date';
 
 export function EventListPage() {
   const {
@@ -14,7 +15,7 @@ export function EventListPage() {
     loading,
     getEventSessions,
     getEventParticipantCount,
-    deleteEvent
+    getSessionParticipants
   } = useEvents();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,11 +25,15 @@ export function EventListPage() {
     event.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDeleteEvent = (event: Event) => {
-    if (window.confirm(`「${event.name}」を削除しますか？`)) {
-      deleteEvent(event.id);
-    }
-  };
+  // すべてのセッションを取得
+  const allSessions = events.flatMap(event => {
+    const sessions = getEventSessions(event.id);
+    return sessions.map(session => ({
+      ...session,
+      eventName: event.name,
+      eventId: event.id
+    }));
+  });
 
   return (
     <div className="space-y-6">
@@ -63,36 +68,114 @@ export function EventListPage() {
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-muted-foreground">
-          {filteredEvents.length}件のイベント
-        </span>
+      {/* イベント一覧セクション */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold">イベント一覧</h2>
+          <span className="text-sm text-muted-foreground">
+            {filteredEvents.length}件のイベント
+          </span>
+        </div>
+
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin h-8 w-8 border-b-2 border-blue-600 rounded-full mx-auto"></div>
+            <p className="mt-2 text-muted-foreground">読み込み中...</p>
+          </div>
+        ) : filteredEvents.length === 0 ? (
+          <Card>
+            <CardContent className="text-center py-8">
+              <p className="text-muted-foreground">
+                {searchTerm ? '条件に一致するイベントが見つかりませんでした。' : 'イベントがありません。'}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredEvents.map((event) => (
+              <EventCard
+                key={event.id}
+                event={event}
+                participantCount={getEventParticipantCount(event.id)}
+                sessionCount={getEventSessions(event.id).length}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {loading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin h-8 w-8 border-b-2 border-blue-600 rounded-full mx-auto"></div>
-          <p className="mt-2 text-muted-foreground">読み込み中...</p>
-        </div>
-      ) : filteredEvents.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-8">
-            <p className="text-muted-foreground">
-              {searchTerm ? '条件に一致するイベントが見つかりませんでした。' : 'イベントがありません。'}
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event) => (
-            <EventCard
-              key={event.id}
-              event={event}
-              participantCount={getEventParticipantCount(event.id)}
-              sessionCount={getEventSessions(event.id).length}
-              onDelete={handleDeleteEvent}
-            />
-          ))}
+      {/* セッション一覧セクション */}
+      {allSessions.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold">セッション一覧</h2>
+            <span className="text-sm text-muted-foreground">
+              {allSessions.length}件のセッション
+            </span>
+          </div>
+
+          <Card>
+            <CardContent className="p-0">
+              <div className="space-y-3 p-4">
+                {allSessions.map((session) => {
+                  const participantCount = getSessionParticipants(session.id).length;
+                  return (
+                    <div key={session.id} className="flex items-center justify-between p-4 border rounded-lg hover:shadow-sm transition-shadow">
+                      <div className="flex items-center space-x-6 flex-1">
+                        {/* イベント名 */}
+                        <div className="flex items-center space-x-2 min-w-[200px]">
+                          <span className="font-medium text-sm">{session.eventName}</span>
+                        </div>
+                        
+                        {/* 日時 */}
+                        <div className="flex items-center space-x-2 min-w-[180px]">
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-medium">{formatDateTime(session.startDateTime)}</span>
+                        </div>
+                        
+                        {/* 時間 */}
+                        <div className="flex items-center space-x-2 min-w-[120px]">
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">
+                            {formatDateTime(session.endDateTime)}
+                          </span>
+                        </div>
+                        
+                        {/* 場所 */}
+                        <div className="flex items-center space-x-2 min-w-[150px]">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">{session.venue}</span>
+                        </div>
+                        
+                        {/* 参加者数 */}
+                        <div className="flex items-center space-x-2 min-w-[80px]">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">{participantCount}名</span>
+                        </div>
+                        
+                        {/* 備考 */}
+                        {session.notes && (
+                          <div className="flex-1">
+                            <span className="text-sm text-muted-foreground">{session.notes}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* アクションボタン */}
+                      <div className="flex items-center space-x-2 ml-4">
+                        <Link to={`/events/${session.eventId}/sessions/${session.id}`}>
+                          <Button size="sm" variant="outline">
+                            <Eye className="h-3 w-3 mr-1" />
+                            詳細
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

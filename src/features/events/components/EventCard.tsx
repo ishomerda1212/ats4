@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Users, Eye, Edit, Trash2 } from 'lucide-react';
+import { Calendar, MapPin, Users, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Event } from '../types/event';
 import { StatusBadge } from '@/shared/components/common/StatusBadge';
@@ -11,11 +11,9 @@ interface EventCardProps {
   event: Event;
   participantCount: number;
   sessionCount: number;
-  onEdit?: (event: Event) => void;
-  onDelete?: (event: Event) => void;
 }
 
-export function EventCard({ event, participantCount, sessionCount, onEdit, onDelete }: EventCardProps) {
+export function EventCard({ event, participantCount, sessionCount }: EventCardProps) {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
@@ -54,24 +52,6 @@ export function EventCard({ event, participantCount, sessionCount, onEdit, onDel
                 詳細
               </Button>
             </Link>
-            {onEdit && (
-              <Button size="sm" variant="outline" onClick={() => onEdit(event)}>
-                <Edit className="h-3 w-3 mr-1" />
-                編集
-              </Button>
-            )}
-            <Link to={`/events/${event.id}/edit`}>
-              <Button size="sm" variant="outline">
-                <Edit className="h-3 w-3 mr-1" />
-                編集
-              </Button>
-            </Link>
-            {onDelete && (
-              <Button size="sm" variant="outline" onClick={() => onDelete(event)}>
-                <Trash2 className="h-3 w-3 mr-1" />
-                削除
-              </Button>
-            )}
           </div>
         </div>
       </CardContent>

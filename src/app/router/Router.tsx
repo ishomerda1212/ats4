@@ -11,6 +11,7 @@ import { EventDetailPage } from '@/features/events/pages/EventDetailPage';
 import { EventCreatePage } from '@/features/events/pages/EventCreatePage';
 import { EventEditPage } from '@/features/events/pages/EventEditPage';
 import { EventRegistrationPage } from '@/features/events/pages/EventRegistrationPage';
+import { EventSessionDetailPage } from '@/features/events/pages/EventSessionDetailPage';
 import { EventSessionParticipantsPage } from '@/features/events/pages/EventSessionParticipantsPage';
 import { StageManagementPage } from '@/features/selection-stages/pages/StageManagementPage';
 import { EmailTemplateManagementPage } from '@/features/tasks/pages/EmailTemplateManagementPage';
@@ -31,8 +32,9 @@ export function Router() {
           <Route path="events/create" element={<EventCreatePage />} />
           <Route path="events/:id" element={<EventDetailPage />} />
           <Route path="events/:id/edit" element={<EventEditPage />} />
-          <Route path="reports" element={<div>レポート（実装予定）</div>} />
+          <Route path="events/:eventId/sessions/:sessionId" element={<EventSessionDetailPage />} />
           <Route path="events/:eventId/sessions/:sessionId/participants" element={<EventSessionParticipantsPage />} />
+          <Route path="reports" element={<div>レポート（実装予定）</div>} />
           <Route path="stages" element={<StageManagementPage />} />
           <Route path="email-templates" element={<EmailTemplateManagementPage />} />
         </Route>

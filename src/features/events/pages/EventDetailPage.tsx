@@ -7,12 +7,11 @@ import { ArrowLeft, Plus, Edit, Calendar, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EventSessionCard } from '../components/EventSessionCard';
 import { EventSessionForm } from '../components/EventSessionForm';
-import { ParticipantList } from '../components/ParticipantList';
 import { useEvents } from '../hooks/useEvents';
 import { useApplicants } from '@/features/applicants/hooks/useApplicants';
 import { StatusBadge } from '@/shared/components/common/StatusBadge';
 import { formatDate } from '@/shared/utils/date';
-import { EventSession, ParticipationStatus } from '../types/event';
+import { EventSession } from '../types/event';
 
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -20,13 +19,11 @@ export function EventDetailPage() {
     events,
     getEventSessions,
     getSessionParticipants,
-    updateParticipantStatus,
     deleteEventSession,
     loading
   } = useEvents();
   
   const { applicants } = useApplicants();
-  const [selectedSession, setSelectedSession] = useState<EventSession | null>(null);
   const [showSessionForm, setShowSessionForm] = useState(false);
   const [editingSession, setEditingSession] = useState<EventSession | null>(null);
 
@@ -59,9 +56,6 @@ export function EventDetailPage() {
   const handleDeleteSession = (session: EventSession) => {
     if (window.confirm('この日時を削除しますか？')) {
       deleteEventSession(session.id);
-      if (selectedSession?.id === session.id) {
-        setSelectedSession(null);
-      }
     }
   };
 
@@ -83,10 +77,6 @@ export function EventDetailPage() {
   const handleSessionFormCancel = () => {
     setShowSessionForm(false);
     setEditingSession(null);
-  };
-
-  const handleStatusChange = (participantId: string, status: ParticipationStatus) => {
-    updateParticipantStatus(participantId, status);
   };
 
   const totalParticipants = sessions.reduce((total, session) => {
@@ -153,84 +143,47 @@ export function EventDetailPage() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 日時一覧 */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>開催日時 ({sessions.length}回)</CardTitle>
-              <Button size="sm" onClick={handleAddSession}>
-                <Plus className="h-4 w-4 mr-2" />
-                日時追加
-              </Button>
+      {/* 日時一覧 */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>開催日時 ({sessions.length}回)</CardTitle>
+            <Button size="sm" onClick={handleAddSession}>
+              <Plus className="h-4 w-4 mr-2" />
+              日時追加
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {showSessionForm && (
+            <div className="mb-4">
+              <EventSessionForm
+                eventId={event.id}
+                session={editingSession || undefined}
+                mode={editingSession ? 'edit' : 'create'}
+                onCancel={handleSessionFormCancel}
+                onSuccess={handleSessionFormSuccess}
+              />
             </div>
-          </CardHeader>
-          <CardContent>
-            {showSessionForm && (
-              <div className="mb-4">
-                <EventSessionForm
-                  eventId={event.id}
-                  session={editingSession || undefined}
-                  mode={editingSession ? 'edit' : 'create'}
-                  onCancel={handleSessionFormCancel}
-                  onSuccess={handleSessionFormSuccess}
-                />
-              </div>
-            )}
-            
-            {sessions.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                開催日時が設定されていません
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {sessions.map((session) => (
-                  <div key={session.id} className="space-y-2">
-                    <EventSessionCard
-                      session={session}
-                      participantCount={getSessionParticipants(session.id).length}
-                      onEdit={handleEditSession}
-                      onDelete={handleDeleteSession}
-                      onViewParticipants={setSelectedSession}
-                    />
-                    
-                    <div>
-                      <Link to={`/events/${event.id}/sessions/${session.id}/participants`}>
-                        <Button variant="outline">
-                          <Users className="h-4 w-4 mr-2" />
-                          評定表管理
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* 参加者一覧 */}
-        <div>
-          {selectedSession ? (
-            <ParticipantList
-              participants={getSessionParticipants(selectedSession.id)}
-              applicants={applicants}
-              onStatusChange={handleStatusChange}
-            />
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>参加者一覧</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-center text-muted-foreground py-8">
-                  日時を選択して参加者を表示
-                </p>
-              </CardContent>
-            </Card>
           )}
-        </div>
-      </div>
+          
+          {sessions.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">
+              開催日時が設定されていません
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {sessions.map((session) => (
+                <EventSessionCard
+                  key={session.id}
+                  session={session}
+                  participantCount={getSessionParticipants(session.id).length}
+                />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
