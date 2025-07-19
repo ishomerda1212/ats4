@@ -1,0 +1,80 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, MapPin, Users, Eye, Edit, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Event } from '../types/event';
+import { StatusBadge } from '@/shared/components/common/StatusBadge';
+import { formatDate } from '@/shared/utils/date';
+
+interface EventCardProps {
+  event: Event;
+  participantCount: number;
+  sessionCount: number;
+  onEdit?: (event: Event) => void;
+  onDelete?: (event: Event) => void;
+}
+
+export function EventCard({ event, participantCount, sessionCount, onEdit, onDelete }: EventCardProps) {
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-lg">{event.name}</CardTitle>
+            <StatusBadge stage={event.stage} />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Badge variant="outline" className="flex items-center space-x-1">
+              <Calendar className="h-3 w-3" />
+              <span>{sessionCount}回</span>
+            </Badge>
+            <Badge variant="outline" className="flex items-center space-x-1">
+              <Users className="h-3 w-3" />
+              <span>{participantCount}名</span>
+            </Badge>
+          </div>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="space-y-4">
+        <p className="text-sm text-muted-foreground line-clamp-2">
+          {event.description}
+        </p>
+        
+        <div className="flex items-center justify-between pt-2">
+          <div className="text-xs text-muted-foreground">
+            作成日: {formatDate(event.createdAt)}
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Link to={`/events/${event.id}`}>
+              <Button size="sm" variant="outline">
+                <Eye className="h-3 w-3 mr-1" />
+                詳細
+              </Button>
+            </Link>
+            {onEdit && (
+              <Button size="sm" variant="outline" onClick={() => onEdit(event)}>
+                <Edit className="h-3 w-3 mr-1" />
+                編集
+              </Button>
+            )}
+            <Link to={`/events/${event.id}/edit`}>
+              <Button size="sm" variant="outline">
+                <Edit className="h-3 w-3 mr-1" />
+                編集
+              </Button>
+            </Link>
+            {onDelete && (
+              <Button size="sm" variant="outline" onClick={() => onDelete(event)}>
+                <Trash2 className="h-3 w-3 mr-1" />
+                削除
+              </Button>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
