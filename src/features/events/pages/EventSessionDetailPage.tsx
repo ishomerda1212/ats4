@@ -3,12 +3,15 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, FileText } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, FileText, UserCheck, ClipboardList } from 'lucide-react';
 import { EventSessionForm } from '../components/EventSessionForm';
 import { ParticipantList } from '../components/ParticipantList';
 import { useEvents } from '../hooks/useEvents';
 import { useApplicants } from '@/features/applicants/hooks/useApplicants';
-import { formatDateTime } from '@/shared/utils/date';
+import { formatDateTime, formatDate } from '@/shared/utils/date';
 import { EventSession } from '../types/event';
 
 export function EventSessionDetailPage() {
@@ -19,6 +22,7 @@ export function EventSessionDetailPage() {
     getSessionParticipants,
     updateParticipantStatus,
     deleteEventSession,
+    updateEventSession,
     loading
   } = useEvents();
   
@@ -30,6 +34,10 @@ export function EventSessionDetailPage() {
   const sessions = event ? getEventSessions(event.id) : [];
   const session = sessions.find(s => s.id === sessionId);
   const participants = session ? getSessionParticipants(session.id) : [];
+
+  // 参加者数のカウント
+  const registrationCount = participants.filter(p => p.status === '申込').length;
+  const participationCount = participants.filter(p => p.status === '参加').length;
 
   if (loading) {
     return (
@@ -79,6 +87,28 @@ export function EventSessionDetailPage() {
 
   const handleStatusChange = (participantId: string, status: any) => {
     updateParticipantStatus(participantId, status);
+  };
+
+  const handleReportReminderChange = (checked: boolean) => {
+    if (checked && !session.reportReminderDate) {
+      updateEventSession(session.id, {
+        reportReminderDate: new Date().toISOString()
+      });
+    }
+  };
+
+  const handleParticipantReportChange = (checked: boolean) => {
+    if (checked && !session.participantReportDate) {
+      updateEventSession(session.id, {
+        participantReportDate: new Date().toISOString()
+      });
+    }
+  };
+
+  const handleRecruiterChange = (value: string) => {
+    updateEventSession(session.id, {
+      recruiter: value
+    });
   };
 
   return (
@@ -170,6 +200,88 @@ export function EventSessionDetailPage() {
               <p className="text-muted-foreground">{session.notes}</p>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* 管理情報 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ClipboardList className="h-5 w-5" />
+            管理情報
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* リクルーター */}
+          <div className="space-y-2">
+            <Label htmlFor="recruiter">リクルーター</Label>
+            <Input
+              id="recruiter"
+              value={session.recruiter || ''}
+              onChange={(e) => handleRecruiterChange(e.target.value)}
+              placeholder="リクルーター名を入力してください"
+            />
+          </div>
+
+          {/* チェックボックス */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="reportReminder"
+                checked={!!session.reportReminderDate}
+                onCheckedChange={handleReportReminderChange}
+              />
+              <div className="flex-1">
+                <Label htmlFor="reportReminder" className="text-base font-medium">
+                  開催報告とリマインド
+                </Label>
+                {session.reportReminderDate && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    完了日: {formatDate(session.reportReminderDate)}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="participantReport"
+                checked={!!session.participantReportDate}
+                onCheckedChange={handleParticipantReportChange}
+              />
+              <div className="flex-1">
+                <Label htmlFor="participantReport" className="text-base font-medium">
+                  人数報告
+                </Label>
+                {session.participantReportDate && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    完了日: {formatDate(session.participantReportDate)}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* 参加者数統計 */}
+          <div className="pt-4 border-t">
+            <h3 className="font-medium mb-3">参加者数統計</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-3 p-3 border rounded-lg">
+                <UserCheck className="h-5 w-5 text-blue-600" />
+                <div>
+                  <p className="text-sm text-muted-foreground">予約数（申込数）</p>
+                  <p className="text-2xl font-bold text-blue-600">{registrationCount}名</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 p-3 border rounded-lg">
+                <Users className="h-5 w-5 text-green-600" />
+                <div>
+                  <p className="text-sm text-muted-foreground">参加数</p>
+                  <p className="text-2xl font-bold text-green-600">{participationCount}名</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

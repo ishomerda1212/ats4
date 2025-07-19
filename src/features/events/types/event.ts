@@ -13,6 +13,10 @@ export interface EventSession extends BaseEntity {
   endDateTime: string;
   venue: string;
   notes?: string;
+  // 新しいフィールド
+  reportReminderDate?: string; // 開催報告とリマインドの日付
+  participantReportDate?: string; // 人数報告の日付
+  recruiter?: string; // リクルーター
 }
 
 export type ParticipationStatus = '申込' | '参加' | '欠席';
