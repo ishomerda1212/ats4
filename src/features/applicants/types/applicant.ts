@@ -5,12 +5,15 @@ export type Source = 'マイナビ' | '学情' | 'オファーボックス' | '�
 
 export type SelectionStage = 
   | 'エントリー'
+  | '書類選考'
   | '会社説明会'
   | '適性検査'
   | '職場見学'
-  | '社長セミナー'
+  | '仕事体験'
+  | '個別面接'
+  | '集団面接'
+  | 'CEOセミナー'
   | '人事面接'
-  | 'グループ面接'
   | '最終選考'
   | '内定'
   | '不採用';
@@ -62,7 +65,10 @@ export interface Task extends BaseEntity {
   title: string;
   description: string;
   status: TaskStatus;
+  priority?: '低' | '中' | '高';
   assignee?: string;
   dueDate?: string;
   completedAt?: string;
+  type?: 'general' | 'email' | 'document' | 'interview' | 'evaluation';
+  emailTemplateId?: string;
 }

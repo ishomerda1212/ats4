@@ -12,16 +12,22 @@ import { SelectionHistory, Evaluation } from '@/features/applicants/types/applic
 import { Applicant } from '@/features/applicants/types/applicant';
 import { formatDateTime } from '@/shared/utils/date';
 import { Link } from 'react-router-dom';
-import { TaskList } from './TaskList';
 import { EvaluationCard } from '@/features/evaluations/components/EvaluationCard';
+import { StageDisplayFactory } from './StageDisplayFactory';
 
 interface SelectionStageAccordionProps {
   applicant: Applicant;
   history: SelectionHistory[];
   evaluations: Evaluation[];
+  stageDetails?: Record<string, Record<string, unknown>>;
 }
 
-export function SelectionStageAccordion({ applicant, history, evaluations }: SelectionStageAccordionProps) {
+export function SelectionStageAccordion({ 
+  applicant, 
+  history, 
+  evaluations,
+  stageDetails = {}
+}: SelectionStageAccordionProps) {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case '完了':
@@ -57,6 +63,7 @@ export function SelectionStageAccordion({ applicant, history, evaluations }: Sel
           <Accordion type="multiple" className="space-y-2">
             {history.map((item, index) => {
               const stageEvaluations = getStageEvaluations(item.id);
+              const currentStageData = stageDetails[item.id];
               
               return (
                 <AccordionItem key={item.id} value={item.id} className="border rounded-lg">
@@ -84,20 +91,30 @@ export function SelectionStageAccordion({ applicant, history, evaluations }: Sel
                             評価 {stageEvaluations.length}件
                           </Badge>
                         )}
+                        {currentStageData && Object.keys(currentStageData).length > 0 && (
+                          <Badge variant="outline" className="text-green-600">
+                            データ入力済み
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="px-4 pb-4">
-                    <div className="space-y-4">
-                      {item.notes && (
-                        <div>
-                          <h4 className="text-sm font-medium mb-1">備考</h4>
-                          <p className="text-sm text-gray-600">{item.notes}</p>
-                        </div>
-                      )}
-                      
+                    <div className="space-y-6">
+                      {/* 1. 段階詳細情報 */}
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-medium">段階詳細情報</h4>
+                        
+                        {/* 選考段階固有の表示 */}
+                        <StageDisplayFactory 
+                          stageType={item.stage as any}
+                          data={currentStageData}
+                        />
+                      </div>
+
+                      {/* 2. 評定表 */}
                       <div>
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between mb-3">
                           <h4 className="text-sm font-medium">評定表 ({stageEvaluations.length}件)</h4>
                           <Link to={`/applicants/${applicant.id}/evaluation?historyId=${item.id}`}>
                             <Button size="sm" variant="outline">
@@ -121,13 +138,14 @@ export function SelectionStageAccordion({ applicant, history, evaluations }: Sel
                           <p className="text-sm text-muted-foreground">評定表がありません</p>
                         )}
                       </div>
-                      
-                      <div>
-                        <TaskList 
-                          selectionHistoryId={item.id}
-                          applicant={applicant}
-                        />
-                      </div>
+
+                      {/* 3. 備考 */}
+                      {item.notes && (
+                        <div>
+                          <h4 className="text-sm font-medium mb-2">備考</h4>
+                          <p className="text-sm text-gray-600">{item.notes}</p>
+                        </div>
+                      )}
                     </div>
                   </AccordionContent>
                 </AccordionItem>

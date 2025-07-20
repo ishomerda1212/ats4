@@ -8,7 +8,7 @@ import { useApplicantDetail } from '../hooks/useApplicantDetail';
 
 export function ApplicantDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { applicant, history, evaluations, tasks, loading } = useApplicantDetail(id!);
+  const { applicant, history, evaluations, tasks, stageDetails, loading } = useApplicantDetail(id!);
 
   if (loading) {
     return (
@@ -54,6 +54,7 @@ export function ApplicantDetailPage() {
         applicant={applicant}
         history={history} 
         evaluations={evaluations}
+        stageDetails={stageDetails}
       />
     </div>
   );

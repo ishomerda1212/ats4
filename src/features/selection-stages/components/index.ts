@@ -1,13 +1,30 @@
-// 選考段階コンポーネント
-export { StageEntry } from './StageEntry';
-export { StageCompanyInfo } from './StageCompanyInfo';
-export { StageAptitudeTest } from './StageAptitudeTest';
-export { StageWorkplaceVisit } from './StageWorkplaceVisit';
-export { StageCEOSeminar } from './StageCEOSeminar';
-export { StageHRInterview } from './StageHRInterview';
-export { StageGroupInterview } from './StageGroupInterview';
-export { StageFinal } from './StageFinal';
-export { StageOffer } from './StageOffer';
+// 選考段階フォームコンポーネント（後で作成予定）
+// export { StageEntryForm } from './StageEntryForm';
+// export { StageDocumentScreeningForm } from './StageDocumentScreeningForm';
+// export { StageCompanyInfoForm } from './StageCompanyInfoForm';
+// export { StageAptitudeTestForm } from './StageAptitudeTestForm';
+// export { StageWorkplaceVisitForm } from './StageWorkplaceVisitForm';
+// export { StageJobExperienceForm } from './StageJobExperienceForm';
+// export { StageIndividualInterviewForm } from './StageIndividualInterviewForm';
+// export { StageGroupInterviewForm } from './StageGroupInterviewForm';
+// export { StageCEOSeminarForm } from './StageCEOSeminarForm';
+// export { StageHRInterviewForm } from './StageHRInterviewForm';
+// export { StageFinalForm } from './StageFinalForm';
+// export { StageOfferForm } from './StageOfferForm';
+
+// 選考段階表示コンポーネント
+export { StageEntryDisplay } from './StageEntryDisplay';
+export { StageDocumentScreeningDisplay } from './StageDocumentScreeningDisplay';
+export { StageCompanyInfoDisplay } from './StageCompanyInfoDisplay';
+export { StageAptitudeTestDisplay } from './StageAptitudeTestDisplay';
+export { StageWorkplaceVisitDisplay } from './StageWorkplaceVisitDisplay';
+export { StageJobExperienceDisplay } from './StageJobExperienceDisplay';
+export { StageIndividualInterviewDisplay } from './StageIndividualInterviewDisplay';
+export { StageGroupInterviewDisplay } from './StageGroupInterviewDisplay';
+export { StageFinalSelectionDisplay } from './StageFinalSelectionDisplay';
+export { StageInterviewDisplay } from './StageInterviewDisplay';
+export { StageCEOSeminarDisplay } from './StageCEOSeminarDisplay';
+export { StageDisplayFactory } from './StageDisplayFactory';
 
 // 既存のコンポーネント
 export { SelectionStageAccordion } from './SelectionStageAccordion';
