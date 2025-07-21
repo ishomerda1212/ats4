@@ -5,20 +5,11 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { useState } from 'react';
 
-interface StageFinalSelectionDisplayProps {
-  data?: {
-    candidateDates?: string[];
-    result?: '合格' | '不合格' | '保留';
-    resultDate?: string;
-    evaluator?: string;
-    comments?: string;
-    notes?: string;
-    tasks?: {
-      detailedContact?: { completed: boolean; completedAt?: string };
-      documentCollection?: { completed: boolean; completedAt?: string };
-      resultNotification?: { completed: boolean; completedAt?: string };
-    };
-  };
+export interface StageFinalSelectionDisplayProps {
+  data?: any;
+  applicantId?: string;
+  applicantName?: string;
+  applicantEmail?: string;
   onTaskChange?: (taskName: string, completed: boolean) => void;
 }
 

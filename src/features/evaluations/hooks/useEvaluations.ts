@@ -5,7 +5,7 @@ import { mockEvaluations } from '@/shared/data/mockData';
 
 export function useEvaluations(applicantId?: string, selectionHistoryId?: string) {
   const [evaluations] = useLocalStorage<Evaluation[]>('evaluations', mockEvaluations);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   const filteredEvaluations = evaluations.filter(evaluation => {
     if (applicantId && evaluation.applicantId !== applicantId) return false;

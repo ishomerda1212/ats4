@@ -1,24 +1,15 @@
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, Users, CheckCircle, Clock } from 'lucide-react';
+import { Calendar, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { useState } from 'react';
 
-interface StageCEOSeminarDisplayProps {
-  data?: {
-    sessionDate?: string;
-    sessionName?: string;
-    eventName?: string;
-    reservationStatus?: string;
-    attendanceStatus?: string;
-    impression?: string;
-    notes?: string;
-    tasks?: {
-      detailedContact?: { completed: boolean; completedAt?: string };
-      reminder?: { completed: boolean; completedAt?: string };
-    };
-  };
+export interface StageCEOSeminarDisplayProps {
+  data?: any;
+  applicantId?: string;
+  applicantName?: string;
+  applicantEmail?: string;
   onTaskChange?: (taskName: string, completed: boolean) => void;
 }
 

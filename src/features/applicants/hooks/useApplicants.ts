@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Applicant, SelectionStage } from '../types/applicant';
 import { mockApplicants } from '@/shared/data/mockData';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 
 export function useApplicants() {
   const [applicants, setApplicants] = useLocalStorage<Applicant[]>('applicants', mockApplicants);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStage, setSelectedStage] = useState<SelectionStage | 'all'>('all');
 

@@ -1,10 +1,5 @@
 import { Applicant, SelectionHistory, Evaluation } from '@/features/applicants/types/applicant';
 import { Task } from '@/features/applicants/types/applicant';
-import { generateId } from '@/shared/utils/date';
-import { STAGE_TASKS } from '@/shared/utils/constants';
-
-// 固定IDを使用してモックデータを作成
-const createMockId = (prefix: string) => `${prefix}-${Date.now()}`;
 
 export const mockApplicants: Applicant[] = [
   {

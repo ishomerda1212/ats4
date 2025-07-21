@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Settings, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, Edit, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 import { StageTemplateForm } from '../components/StageTemplateForm';
 import { DefaultTaskForm } from '../components/DefaultTaskForm';
 import { useSelectionStages } from '../hooks/useSelectionStages';

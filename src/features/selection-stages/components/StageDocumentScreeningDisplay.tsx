@@ -1,26 +1,28 @@
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { CheckCircle, XCircle, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { useState } from 'react';
+import { EmailTaskButton } from '@/features/email';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
-interface StageDocumentScreeningDisplayProps {
-  data?: {
-    result?: '合格' | '不合格' | '保留';
-    resultDate?: string;
-    evaluator?: string;
-    evaluationNotes?: string;
-    notes?: string;
-    tasks?: {
-      detailedContact?: { completed: boolean; completedAt?: string };
-      resultNotification?: { completed: boolean; completedAt?: string };
-    };
-  };
+export interface StageDocumentScreeningDisplayProps {
+  data?: any;
+  applicantId?: string;
+  applicantName?: string;
+  applicantEmail?: string;
   onTaskChange?: (taskName: string, completed: boolean) => void;
 }
 
-export function StageDocumentScreeningDisplay({ data, onTaskChange }: StageDocumentScreeningDisplayProps) {
+export function StageDocumentScreeningDisplay({ 
+  data, 
+  onTaskChange, 
+  applicantId, 
+  applicantName, 
+  applicantEmail 
+}: StageDocumentScreeningDisplayProps) {
   const [tasks, setTasks] = useState(data?.tasks || {
     detailedContact: { completed: false },
     resultNotification: { completed: false }
@@ -37,6 +39,11 @@ export function StageDocumentScreeningDisplay({ data, onTaskChange }: StageDocum
     
     setTasks(newTasks);
     onTaskChange?.(taskName, checked);
+  };
+
+  const handleEmailSent = (taskName: string) => {
+    // メール送信後にタスクを完了としてマーク
+    handleTaskChange(taskName, true);
   };
 
   const getResultBadge = (result?: string) => {
@@ -78,8 +85,8 @@ export function StageDocumentScreeningDisplay({ data, onTaskChange }: StageDocum
         ========================================
       */}
       
-      {/* 合否情報（データがある場合のみ表示） */}
-      {data && (data.result || data.resultDate || data.evaluator) && (
+      {/* 合否（データがある場合のみ表示） */}
+      {data && (data.result || data.resultDate) && (
         <div className="space-y-4">
           <h5 className="font-medium">合否</h5>
           
@@ -103,16 +110,19 @@ export function StageDocumentScreeningDisplay({ data, onTaskChange }: StageDocum
           </div>
 
           {data.evaluator && (
-            <div>
-              <h6 className="font-medium">選考担当者</h6>
-              <p className="text-sm text-muted-foreground">{data.evaluator}</p>
+            <div className="flex items-center space-x-3">
+              <User className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <h6 className="font-medium">評価者</h6>
+                <p className="text-sm text-muted-foreground">{data.evaluator}</p>
+              </div>
             </div>
           )}
 
-          {data.evaluationNotes && (
+          {data.comments && (
             <div>
-              <h6 className="font-medium">選考コメント</h6>
-              <p className="text-sm text-muted-foreground mt-1">{data.evaluationNotes}</p>
+              <h6 className="font-medium">評価コメント</h6>
+              <p className="text-sm text-muted-foreground mt-1">{data.comments}</p>
             </div>
           )}
 
@@ -129,46 +139,63 @@ export function StageDocumentScreeningDisplay({ data, onTaskChange }: StageDocum
       <div>
         <h5 className="font-medium mb-3">タスク</h5>
         <div className="space-y-3">
-          <div className="flex items-center space-x-3">
-            <Checkbox
-              id="detailedContact"
-              checked={tasks.detailedContact?.completed || false}
-              onCheckedChange={(checked: boolean | 'indeterminate') => handleTaskChange('detailedContact', checked === true)}
-            />
-            <div className="flex-1">
-              <label htmlFor="detailedContact" className="text-sm font-medium">
-                詳細連絡
-              </label>
-              {tasks.detailedContact?.completed && tasks.detailedContact?.completedAt && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  完了日: {format(new Date(tasks.detailedContact.completedAt), 'PPP', { locale: ja })}
-                </p>
+          <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="detailedContact"
+                checked={tasks.detailedContact?.completed || false}
+                onCheckedChange={(checked: boolean | 'indeterminate') => handleTaskChange('detailedContact', checked === true)}
+              />
+              <div className="flex-1">
+                <label htmlFor="detailedContact" className="text-sm font-medium">
+                  詳細連絡
+                </label>
+                {tasks.detailedContact?.completed && tasks.detailedContact?.completedAt && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    完了日: {format(new Date(tasks.detailedContact.completedAt), 'PPP', { locale: ja })}
+                  </p>
+                )}
+              </div>
+              {tasks.detailedContact?.completed && (
+                <CheckCircle className="h-4 w-4 text-green-600" />
               )}
             </div>
-            {tasks.detailedContact?.completed && (
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            )}
+            <Link to={`/applicants/${applicantId}/mail?stage=書類選考&historyId=${data?.id || ''}`}>
+              <Button variant="outline" size="sm">メール送信</Button>
+            </Link>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <Checkbox
-              id="resultNotification"
-              checked={tasks.resultNotification?.completed || false}
-              onCheckedChange={(checked: boolean | 'indeterminate') => handleTaskChange('resultNotification', checked === true)}
-            />
-            <div className="flex-1">
-              <label htmlFor="resultNotification" className="text-sm font-medium">
-                結果連絡
-              </label>
-              {tasks.resultNotification?.completed && tasks.resultNotification?.completedAt && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  完了日: {format(new Date(tasks.resultNotification.completedAt), 'PPP', { locale: ja })}
-                </p>
+          <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="resultNotification"
+                checked={tasks.resultNotification?.completed || false}
+                onCheckedChange={(checked: boolean | 'indeterminate') => handleTaskChange('resultNotification', checked === true)}
+              />
+              <div className="flex-1">
+                <label htmlFor="resultNotification" className="text-sm font-medium">
+                  結果連絡
+                </label>
+                {tasks.resultNotification?.completed && tasks.resultNotification?.completedAt && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    完了日: {format(new Date(tasks.resultNotification.completedAt), 'PPP', { locale: ja })}
+                  </p>
+                )}
+              </div>
+              {tasks.resultNotification?.completed && (
+                <CheckCircle className="h-4 w-4 text-green-600" />
               )}
             </div>
-            {tasks.resultNotification?.completed && (
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            )}
+            <EmailTaskButton
+              taskName="結果連絡"
+              applicantId={applicantId}
+              applicantName={applicantName}
+              applicantEmail={applicantEmail}
+              stage="書類選考"
+              onEmailSent={() => handleEmailSent('resultNotification')}
+              variant="outline"
+              size="sm"
+            />
           </div>
         </div>
       </div>

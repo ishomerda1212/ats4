@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import { EventSessionCard } from '../components/EventSessionCard';
 import { EventSessionForm } from '../components/EventSessionForm';
 import { useEvents } from '../hooks/useEvents';
-import { useApplicants } from '@/features/applicants/hooks/useApplicants';
 import { StatusBadge } from '@/shared/components/common/StatusBadge';
 import { formatDate } from '@/shared/utils/date';
 import { EventSession } from '../types/event';
@@ -23,7 +22,6 @@ export function EventDetailPage() {
     loading
   } = useEvents();
   
-  const { applicants } = useApplicants();
   const [showSessionForm, setShowSessionForm] = useState(false);
   const [editingSession, setEditingSession] = useState<EventSession | null>(null);
 
@@ -52,17 +50,6 @@ export function EventDetailPage() {
       </div>
     );
   }
-
-  const handleDeleteSession = (session: EventSession) => {
-    if (window.confirm('この日時を削除しますか？')) {
-      deleteEventSession(session.id);
-    }
-  };
-
-  const handleEditSession = (session: EventSession) => {
-    setEditingSession(session);
-    setShowSessionForm(true);
-  };
 
   const handleAddSession = () => {
     setEditingSession(null);

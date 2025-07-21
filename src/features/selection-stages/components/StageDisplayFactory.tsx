@@ -25,57 +25,39 @@ type StageType =
   | '最終選考'
   | '内定';
 
-// 選考段階データの型定義
-interface StageData {
-  id: string;
-  stage: StageType;
-  data: Record<string, unknown>;
-  isCompleted: boolean;
-  completedAt?: string;
-}
-
 interface StageDisplayFactoryProps {
   stageType: StageType;
   data?: Record<string, unknown>;
+  applicantId?: string;
+  applicantName?: string;
+  applicantEmail?: string;
 }
 
-export function StageDisplayFactory({ stageType, data }: StageDisplayFactoryProps) {
+export function StageDisplayFactory({ stageType, data, applicantId, applicantName, applicantEmail }: StageDisplayFactoryProps) {
   switch (stageType) {
     case 'エントリー':
-      return <StageEntryDisplay data={data as any} />;
-    
+      return <StageEntryDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
     case '書類選考':
-      return <StageDocumentScreeningDisplay data={data as any} />;
-    
+      return <StageDocumentScreeningDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
     case '会社説明会':
-      return <StageCompanyInfoDisplay data={data as any} />;
-    
+      return <StageCompanyInfoDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
     case '適性検査':
-      return <StageAptitudeTestDisplay data={data as any} />;
-    
+      return <StageAptitudeTestDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
     case '職場見学':
-      return <StageWorkplaceVisitDisplay data={data as any} />;
-    
+      return <StageWorkplaceVisitDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
     case '仕事体験':
-      return <StageJobExperienceDisplay data={data as any} />;
-    
+      return <StageJobExperienceDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
     case '個別面接':
-      return <StageIndividualInterviewDisplay data={data as any} />;
-    
+      return <StageIndividualInterviewDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
     case '集団面接':
-      return <StageGroupInterviewDisplay data={data as any} />;
-    
+      return <StageGroupInterviewDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
     case '人事面接':
-      return <StageInterviewDisplay stageType={stageType} data={data as any} />;
-    
+      return <StageInterviewDisplay stageType={stageType} data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
     case '最終選考':
-      return <StageFinalSelectionDisplay data={data as any} />;
-    
+      return <StageFinalSelectionDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
     case 'CEOセミナー':
-      return <StageCEOSeminarDisplay data={data as any} />;
-    
+      return <StageCEOSeminarDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
     case '内定':
-      // これらの段階の表示コンポーネントは後で作成
       return (
         <div className="p-4 border rounded-lg bg-gray-50">
           <h4 className="font-medium text-lg">{stageType}情報</h4>
@@ -92,7 +74,6 @@ export function StageDisplayFactory({ stageType, data }: StageDisplayFactoryProp
           )}
         </div>
       );
-    
     default:
       return (
         <div className="p-4 border rounded-lg bg-gray-50">

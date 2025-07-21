@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { SelectionStageTemplate, DefaultTask, SelectionStageProgress } from '../types/selectionStage';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 import { generateId } from '@/shared/utils/date';
@@ -72,8 +71,7 @@ const defaultStageTemplates: SelectionStageTemplate[] = [
 
 export function useSelectionStages() {
   const [stageTemplates, setStageTemplates] = useLocalStorage<SelectionStageTemplate[]>('stageTemplates', defaultStageTemplates);
-  const [stageProgress, setStageProgress] = useLocalStorage<SelectionStageProgress[]>('stageProgress', []);
-  const [loading, setLoading] = useState(false);
+  const [stageProgress, setStageProgress] = useLocalStorage<SelectionStageProgress>('stageProgress', []);
 
   const addStageTemplate = (template: Omit<SelectionStageTemplate, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newTemplate: SelectionStageTemplate = {

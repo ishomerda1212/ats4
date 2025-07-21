@@ -8,7 +8,7 @@ import { useApplicantDetail } from '../hooks/useApplicantDetail';
 
 export function ApplicantDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { applicant, history, evaluations, tasks, stageDetails, loading } = useApplicantDetail(id!);
+  const { applicant, history, evaluations, stageDetails, loading } = useApplicantDetail(id!);
 
   if (loading) {
     return (

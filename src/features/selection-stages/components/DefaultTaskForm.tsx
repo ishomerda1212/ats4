@@ -69,14 +69,14 @@ export function DefaultTaskForm({ stageId, task, onCancel, onSuccess }: DefaultT
       if (task) {
         updateDefaultTask(stageId, task.id, {
           ...data,
-          type: data.type as any,
-          priority: data.priority as any,
+          type: data.type as TaskType,
+          priority: data.priority as TaskPriority,
         });
       } else {
         addDefaultTask(stageId, {
           ...data,
-          type: data.type as any,
-          priority: data.priority as any,
+          type: data.type as TaskType,
+          priority: data.priority as TaskPriority,
         });
       }
       onSuccess();

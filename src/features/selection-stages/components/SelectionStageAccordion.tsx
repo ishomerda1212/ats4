@@ -61,7 +61,7 @@ export function SelectionStageAccordion({
           <p className="text-gray-600 text-center py-8">選考履歴がありません。</p>
         ) : (
           <Accordion type="multiple" className="space-y-2">
-            {history.map((item, index) => {
+            {history.map((item) => {
               const stageEvaluations = getStageEvaluations(item.id);
               const currentStageData = stageDetails[item.id];
               
@@ -107,8 +107,11 @@ export function SelectionStageAccordion({
                         
                         {/* 選考段階固有の表示 */}
                         <StageDisplayFactory 
-                          stageType={item.stage as any}
+                          stageType={item.stage} as SelectionStage
                           data={currentStageData}
+                          applicantId={applicant.id}
+                          applicantName={applicant.name}
+                          applicantEmail={applicant.email}
                         />
                       </div>
 

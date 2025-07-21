@@ -20,7 +20,7 @@ export function useApplicantDetail(applicantId: string) {
   const [evaluations] = useLocalStorage<Evaluation[]>('evaluations', mockEvaluations);
   const [tasks] = useLocalStorage<Task[]>('tasks', mockTasks);
   
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   const applicant = applicants.find(a => a.id === applicantId);
   const history = selectionHistory.filter(h => h.applicantId === applicantId);
@@ -36,7 +36,7 @@ export function useApplicantDetail(applicantId: string) {
       acc[stage.id] = details;
     }
     return acc;
-  }, {} as Record<string, any>);
+  }, {} as Record<string, unknown>);
 
   return {
     applicant,

@@ -30,7 +30,7 @@ export function useEventSessionForm(
   mode: 'create' | 'edit' = 'create',
   onSuccess?: () => void
 ) {
-  const [eventSessions, setEventSessions] = useLocalStorage<EventSession[]>('eventSessions', mockEventSessions);
+  const [, setEventSessions] = useLocalStorage<EventSession[]>('eventSessions', mockEventSessions);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<EventSessionFormData>({

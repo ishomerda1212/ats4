@@ -18,7 +18,7 @@ const eventSchema = z.object({
 type EventFormData = z.infer<typeof eventSchema>;
 
 export function useEventForm(event?: Event, mode: 'create' | 'edit' = 'create') {
-  const [events, setEvents] = useLocalStorage<Event[]>('events', mockEvents);
+  const [, setEvents] = useLocalStorage<Event[]>('events', mockEvents);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 

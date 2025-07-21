@@ -7,7 +7,7 @@ export function useEvents() {
   const [events, setEvents] = useLocalStorage<Event[]>('events', mockEvents);
   const [eventSessions, setEventSessions] = useLocalStorage<EventSession[]>('eventSessions', mockEventSessions);
   const [eventParticipants, setEventParticipants] = useLocalStorage<EventParticipant[]>('eventParticipants', mockEventParticipants);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   const getEventSessions = (eventId: string) => {
     return eventSessions.filter(session => session.eventId === eventId);

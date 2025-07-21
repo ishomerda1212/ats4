@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Users, Eye } from 'lucide-react';
+import { Calendar, Users, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Event } from '../types/event';
 import { StatusBadge } from '@/shared/components/common/StatusBadge';

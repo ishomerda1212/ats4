@@ -2,7 +2,6 @@ import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -85,7 +84,7 @@ export function EventSessionDetailPage() {
     setEditingSession(null);
   };
 
-  const handleStatusChange = (participantId: string, status: any) => {
+  const handleStatusChange = (participantId: string, status: unknown) => {
     updateParticipantStatus(participantId, status);
   };
 

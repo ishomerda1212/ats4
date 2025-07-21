@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Grid, List, Plus } from 'lucide-react';
 import { ApplicantSearchFilter } from '../components/ApplicantSearchFilter';
 import { ApplicantCard } from '../components/ApplicantCard';

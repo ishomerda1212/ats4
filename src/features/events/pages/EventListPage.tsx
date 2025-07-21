@@ -6,7 +6,6 @@ import { Plus, Search, Calendar, Clock, MapPin, Users, Eye } from 'lucide-react'
 import { Link } from 'react-router-dom';
 import { EventCard } from '../components/EventCard';
 import { useEvents } from '../hooks/useEvents';
-import { Event } from '../types/event';
 import { formatDateTime } from '@/shared/utils/date';
 
 export function EventListPage() {

@@ -15,6 +15,7 @@ import { EventSessionDetailPage } from '@/features/events/pages/EventSessionDeta
 import { EventSessionParticipantsPage } from '@/features/events/pages/EventSessionParticipantsPage';
 import { StageManagementPage } from '@/features/selection-stages/pages/StageManagementPage';
 import { EmailTemplateManagementPage } from '@/features/tasks/pages/EmailTemplateManagementPage';
+import { ApplicantMailPage } from '@/features/email/pages/ApplicantMailPage';
 
 export function Router() {
   return (
@@ -28,6 +29,7 @@ export function Router() {
           <Route path="applicants/:id/edit" element={<ApplicantEditPage />} />
           <Route path="applicants/:id/evaluation" element={<EvaluationPage />} />
           <Route path="applicants/:id/evaluation/view" element={<EvaluationViewPage />} />
+          <Route path="applicants/:id/mail" element={<ApplicantMailPage />} />
           <Route path="events" element={<EventListPage />} />
           <Route path="events/create" element={<EventCreatePage />} />
           <Route path="events/:id" element={<EventDetailPage />} />

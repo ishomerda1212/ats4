@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Users, User, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
@@ -41,19 +41,6 @@ export function StageInterviewDisplay({ stageType, data }: StageInterviewDisplay
         return 'secondary' as const;
       default:
         return 'secondary' as const;
-    }
-  };
-
-  const getStageIcon = () => {
-    switch (stageType) {
-      case '人事面接':
-        return <User className="h-4 w-4" />;
-      case 'グループ面接':
-        return <Users className="h-4 w-4" />;
-      case '最終面接':
-        return <Users className="h-4 w-4" />;
-      default:
-        return <Users className="h-4 w-4" />;
     }
   };
 

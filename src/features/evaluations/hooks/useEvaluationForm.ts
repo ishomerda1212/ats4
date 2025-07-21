@@ -22,7 +22,7 @@ const evaluationSchema = z.object({
 });
 
 export function useEvaluationForm(applicantId: string, selectionHistoryId: string) {
-  const [evaluations, setEvaluations] = useLocalStorage<Evaluation[]>('evaluations', mockEvaluations);
+  const [, setEvaluations] = useLocalStorage<Evaluation[]>('evaluations', mockEvaluations);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -61,7 +61,7 @@ export function useEvaluationForm(applicantId: string, selectionHistoryId: strin
       });
 
       navigate(`/applicants/${applicantId}`);
-    } catch (error) {
+    } catch {
       toast({
         title: "エラーが発生しました",
         description: "評定表の保存に失敗しました。",

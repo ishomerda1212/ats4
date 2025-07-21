@@ -17,7 +17,7 @@ export interface Task extends BaseEntity {
   dueDate?: string;
   completedAt?: string;
   emailTemplateId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface EmailTemplate extends BaseEntity {

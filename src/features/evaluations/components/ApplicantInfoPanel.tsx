@@ -1,18 +1,32 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Mail, Phone, MapPin, School, User } from 'lucide-react';
+import { Calendar, Mail, Phone, MapPin, School, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Applicant, SelectionHistory } from '@/features/applicants/types/applicant';
-import { StatusBadge } from '@/shared/components/common/StatusBadge';
-import { formatDate, formatDateTime } from '@/shared/utils/date';
+import { formatDateTime } from '@/shared/utils/date';
 
 interface ApplicantInfoPanelProps {
   applicant: Applicant;
   selectionHistory?: SelectionHistory;
+  history?: SelectionHistory[];
 }
 
-export function ApplicantInfoPanel({ applicant, selectionHistory }: ApplicantInfoPanelProps) {
+export function ApplicantInfoPanel({ applicant, selectionHistory, history = [] }: ApplicantInfoPanelProps) {
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case '完了':
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case '進行中':
+        return <Clock className="h-4 w-4 text-yellow-600" />;
+      case '不採用':
+        return <XCircle className="h-4 w-4 text-red-600" />;
+      default:
+        return <Clock className="h-4 w-4 text-gray-400" />;
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* 応募者基本情報 */}
       <Card>
         <CardHeader>
           <CardTitle>応募者情報</CardTitle>
@@ -63,53 +77,60 @@ export function ApplicantInfoPanel({ applicant, selectionHistory }: ApplicantInf
         </CardContent>
       </Card>
 
+      {/* 選考履歴 */}
       <Card>
         <CardHeader>
-          <CardTitle>現在の選考段階</CardTitle>
+          <CardTitle>選考履歴</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            <StatusBadge stage={applicant.currentStage} />
-            
-            {selectionHistory && (
-              <div className="space-y-2">
-                <div>
-                  <p className="text-sm font-medium">{selectionHistory.stage}</p>
-                  <p className="text-xs text-muted-foreground">
-                    開始: {formatDateTime(selectionHistory.startDate)}
-                  </p>
-                  {selectionHistory.endDate && (
-                    <p className="text-xs text-muted-foreground">
-                      完了: {formatDateTime(selectionHistory.endDate)}
-                    </p>
+          {history.length === 0 ? (
+            <p className="text-gray-600 text-center py-4">選考履歴がありません。</p>
+          ) : (
+            <div className="space-y-3">
+              {history.map((item) => (
+                <div 
+                  key={item.id} 
+                  className={`p-3 border rounded-lg ${
+                    selectionHistory?.id === item.id 
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20' 
+                      : 'border-gray-200 dark:border-gray-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      {getStatusIcon(item.status)}
+                      <div className="flex-1">
+                        <h4 className="font-medium text-sm">{item.stage}</h4>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDateTime(item.startDate)}
+                          {item.endDate && ` 〜 ${formatDateTime(item.endDate)}`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant={
+                        item.status === '完了' ? 'default' :
+                        item.status === '進行中' ? 'secondary' : 'destructive'
+                      }>
+                        {item.status}
+                      </Badge>
+                      {selectionHistory?.id === item.id && (
+                        <Badge variant="outline" className="text-blue-600 border-blue-600">
+                          現在
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {item.notes && (
+                    <div className="mt-2">
+                      <p className="text-xs text-muted-foreground">{item.notes}</p>
+                    </div>
                   )}
                 </div>
-                
-                {selectionHistory.notes && (
-                  <div>
-                    <p className="text-sm font-medium">備考</p>
-                    <p className="text-sm text-muted-foreground">{selectionHistory.notes}</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>登録情報</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="text-sm">
-            <span className="text-muted-foreground">登録日: </span>
-            <span>{formatDate(applicant.createdAt)}</span>
-          </div>
-          <div className="text-sm">
-            <span className="text-muted-foreground">最終更新: </span>
-            <span>{formatDate(applicant.updatedAt)}</span>
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

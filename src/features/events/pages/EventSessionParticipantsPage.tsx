@@ -1,4 +1,4 @@
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,11 +18,10 @@ import { EvaluationForm } from '@/features/evaluations/components/EvaluationForm
 export function EventSessionParticipantsPage() {
   const { eventId, sessionId } = useParams<{ eventId: string; sessionId: string }>();
   
-  const { events, eventSessions, getSessionParticipants, updateParticipantStatus, loading } = useEvents();
+  const { events, eventSessions, getSessionParticipants, loading } = useEvents();
   const { applicants } = useApplicants();
   
   const [selectedParticipants, setSelectedParticipants] = useState<Set<string>>(new Set());
-  const [currentApplicant, setCurrentApplicant] = useState<Applicant | null>(null);
   const [autoSave, setAutoSave] = useState(true);
 
   const event = events.find(e => e.id === eventId);

@@ -3,8 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Applicant } from '../types/applicant';
-import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
-import { mockApplicants } from '@/shared/data/mockData';
 import { generateId } from '@/shared/utils/date';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
@@ -27,7 +25,6 @@ const applicantSchema = z.object({
 type ApplicantFormData = z.infer<typeof applicantSchema>;
 
 export function useApplicantForm(applicant?: Applicant, mode: 'create' | 'edit' = 'create') {
-  const [applicants, setApplicants] = useLocalStorage<Applicant[]>('applicants', mockApplicants);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -66,29 +63,25 @@ export function useApplicantForm(applicant?: Applicant, mode: 'create' | 'edit' 
     setLoading(true);
     try {
       if (mode === 'create') {
-        const newApplicant: Applicant = {
-          id: generateId(),
-          ...data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        setApplicants(current => [...current, newApplicant]);
+        // const newApplicant: Applicant = {
+        //   id: generateId(),
+        //   ...data,
+        //   createdAt: new Date().toISOString(),
+        //   updatedAt: new Date().toISOString(),
+        // };
         
         toast({
           title: "応募者を登録しました",
           description: `${data.name}さんの情報が正常に登録されました。`,
         });
 
-        navigate('/applicants');
+        navigate();
       } else if (applicant) {
-        const updatedApplicant: Applicant = {
-          ...applicant,
-          ...data,
-          updatedAt: new Date().toISOString(),
-        };
-        setApplicants(current => 
-          current.map(a => a.id === applicant.id ? updatedApplicant : a)
-        );
+        // const updatedApplicant: Applicant = {
+        //   ...applicant,
+        //   ...data,
+        //   updatedAt: new Date().toISOString(),
+        // };
         
         toast({
           title: "応募者情報を更新しました",

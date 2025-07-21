@@ -43,6 +43,7 @@ export function EvaluationPage() {
           <ApplicantInfoPanel 
             applicant={applicant} 
             selectionHistory={selectionHistory}
+            history={history}
           />
         </div>
         

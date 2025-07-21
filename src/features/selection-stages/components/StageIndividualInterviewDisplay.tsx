@@ -1,23 +1,17 @@
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, Users, CheckCircle, Clock, MapPin } from 'lucide-react';
+import { Calendar, CheckCircle, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
-interface StageIndividualInterviewDisplayProps {
-  data?: {
-    interviewDate?: string;
-    interviewTime?: string;
-    location?: string;
-    attendanceStatus?: string;
-    interviewer?: string;
-    impression?: string;
-    notes?: string;
-    tasks?: {
-      detailedContact?: { completed: boolean; completedAt?: string };
-    };
-  };
+export interface StageIndividualInterviewDisplayProps {
+  data?: any;
+  applicantId?: string;
+  applicantName?: string;
+  applicantEmail?: string;
   onTaskChange?: (taskName: string, completed: boolean) => void;
 }
 
@@ -126,25 +120,30 @@ export function StageIndividualInterviewDisplay({ data, onTaskChange }: StageInd
       <div>
         <h5 className="font-medium mb-3">タスク</h5>
         <div className="space-y-3">
-          <div className="flex items-center space-x-3">
-            <Checkbox
-              id="detailedContact"
-              checked={tasks.detailedContact?.completed || false}
-              onCheckedChange={(checked: boolean | 'indeterminate') => handleTaskChange('detailedContact', checked === true)}
-            />
-            <div className="flex-1">
-              <label htmlFor="detailedContact" className="text-sm font-medium">
-                詳細連絡
-              </label>
-              {tasks.detailedContact?.completed && tasks.detailedContact?.completedAt && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  完了日: {format(new Date(tasks.detailedContact.completedAt), 'PPP', { locale: ja })}
-                </p>
+          <div className="flex items-center justify-between p-3 border rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Checkbox
+                id="detailedContact"
+                checked={tasks.detailedContact?.completed || false}
+                onCheckedChange={(checked: boolean | 'indeterminate') => handleTaskChange('detailedContact', checked === true)}
+              />
+              <div className="flex-1">
+                <label htmlFor="detailedContact" className="text-sm font-medium">
+                  詳細連絡
+                </label>
+                {tasks.detailedContact?.completed && tasks.detailedContact?.completedAt && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    完了日: {format(new Date(tasks.detailedContact.completedAt), 'PPP', { locale: ja })}
+                  </p>
+                )}
+              </div>
+              {tasks.detailedContact?.completed && (
+                <CheckCircle className="h-4 w-4 text-green-600" />
               )}
             </div>
-            {tasks.detailedContact?.completed && (
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            )}
+            <Link to={`/applicants/${data?.applicantId}/mail?stage=個別面接&historyId=${data?.id || ''}`}>
+              <Button variant="outline" size="sm">メール送信</Button>
+            </Link>
           </div>
         </div>
       </div>
