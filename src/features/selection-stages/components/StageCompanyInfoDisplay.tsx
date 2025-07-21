@@ -6,7 +6,20 @@ import { ja } from 'date-fns/locale';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { CompanyInfoStageData } from '@/types/companyInfo';
+
+export interface CompanyInfoStageData {
+  id?: string;
+  sessionDate?: string;
+  sessionName?: string;
+  eventName?: string;
+  attendanceStatus?: string;
+  location?: string;
+  impression?: string;
+  notes?: string;
+  tasks?: {
+    detailedContact?: { completed: boolean; completedAt?: string };
+  };
+}
 
 export interface StageCompanyInfoDisplayProps {
   data?: CompanyInfoStageData;
@@ -37,15 +50,15 @@ export function StageCompanyInfoDisplay({ data, onTaskChange, applicantId }: Sta
   const getAttendanceStatusBadge = (status?: string) => {
     switch (status) {
       case '参加':
-        return <Badge variant="default">参加</Badge>;
+        return <Badge className="bg-green-100 text-green-800">参加</Badge>;
       case '欠席':
-        return <Badge variant="destructive">欠席</Badge>;
+        return <Badge className="bg-red-100 text-red-800">欠席</Badge>;
       case '遅刻':
-        return <Badge variant="secondary">遅刻</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">遅刻</Badge>;
       case '早退':
-        return <Badge variant="secondary">早退</Badge>;
+        return <Badge className="bg-purple-100 text-purple-800">早退</Badge>;
       default:
-        return <Badge variant="outline">未定</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">未定</Badge>;
     }
   };
 

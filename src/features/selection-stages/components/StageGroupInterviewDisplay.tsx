@@ -8,6 +8,26 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { GroupInterviewStageData } from '@/types/selection-stages';
 
+export interface GroupInterviewStageData {
+  id?: string;
+  applicantId?: string;
+  sessionDate?: string;
+  sessionName?: string;
+  eventName?: string;
+  attendanceStatus?: string;
+  groupSize?: number;
+  evaluator?: string;
+  impression?: string;
+  notes?: string;
+  candidateDates?: string[];
+  result?: string;
+  resultDate?: string;
+  tasks?: {
+    detailedContact?: { completed: boolean; completedAt?: string };
+    resultNotification?: { completed: boolean; completedAt?: string };
+  };
+}
+
 export interface StageGroupInterviewDisplayProps {
   data?: GroupInterviewStageData;
   applicantId?: string;
@@ -38,28 +58,28 @@ export function StageGroupInterviewDisplay({ data, onTaskChange, applicantId }: 
   const getAttendanceStatusBadge = (status?: string) => {
     switch (status) {
       case '参加':
-        return <Badge variant="default">参加</Badge>;
+        return <Badge className="bg-green-100 text-green-800">参加</Badge>;
       case '欠席':
-        return <Badge variant="destructive">欠席</Badge>;
+        return <Badge className="bg-red-100 text-red-800">欠席</Badge>;
       case '遅刻':
-        return <Badge variant="secondary">遅刻</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">遅刻</Badge>;
       case '早退':
-        return <Badge variant="secondary">早退</Badge>;
+        return <Badge className="bg-purple-100 text-purple-800">早退</Badge>;
       default:
-        return <Badge variant="outline">未定</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">未定</Badge>;
     }
   };
 
   const getResultBadge = (result?: string) => {
     switch (result) {
       case '合格':
-        return <Badge variant="default" className="bg-green-100 text-green-800">合格</Badge>;
+        return <Badge className="bg-green-100 text-green-800">合格</Badge>;
       case '不合格':
-        return <Badge variant="destructive">不合格</Badge>;
+        return <Badge className="bg-red-100 text-red-800">不合格</Badge>;
       case '保留':
-        return <Badge variant="secondary">保留</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">保留</Badge>;
       default:
-        return <Badge variant="outline">未定</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">未定</Badge>;
     }
   };
 

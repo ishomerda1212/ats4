@@ -5,8 +5,22 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { useState } from 'react';
 
+export interface CEOSeminarStageData {
+  sessionDate?: string;
+  sessionName?: string;
+  eventName?: string;
+  reservationStatus?: string;
+  attendanceStatus?: string;
+  impression?: string;
+  notes?: string;
+  tasks?: {
+    detailedContact?: { completed: boolean; completedAt?: string };
+    reminder?: { completed: boolean; completedAt?: string };
+  };
+}
+
 export interface StageCEOSeminarDisplayProps {
-  data?: any;
+  data?: CEOSeminarStageData;
   applicantId?: string;
   applicantName?: string;
   applicantEmail?: string;
@@ -35,26 +49,26 @@ export function StageCEOSeminarDisplay({ data, onTaskChange }: StageCEOSeminarDi
   const getReservationStatusBadge = (status?: string) => {
     switch (status) {
       case '予約済み':
-        return <Badge variant="default">予約済み</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800">予約済み</Badge>;
       case 'キャンセル':
-        return <Badge variant="destructive">キャンセル</Badge>;
+        return <Badge className="bg-red-100 text-red-800">キャンセル</Badge>;
       case '待機中':
-        return <Badge variant="secondary">待機中</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">待機中</Badge>;
       default:
-        return <Badge variant="outline">未予約</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">未予約</Badge>;
     }
   };
 
   const getAttendanceStatusBadge = (status?: string) => {
     switch (status) {
       case '参加':
-        return <Badge variant="default">参加</Badge>;
+        return <Badge className="bg-green-100 text-green-800">参加</Badge>;
       case '欠席':
-        return <Badge variant="destructive">欠席</Badge>;
+        return <Badge className="bg-red-100 text-red-800">欠席</Badge>;
       case '遅刻':
-        return <Badge variant="secondary">遅刻</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">遅刻</Badge>;
       default:
-        return <Badge variant="outline">未定</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">未定</Badge>;
     }
   };
 

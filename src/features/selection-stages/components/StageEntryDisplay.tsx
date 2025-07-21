@@ -4,12 +4,25 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { useState } from 'react';
 
+export interface EntryStageData {
+  entryDate?: string;
+  source?: string;
+  approaches?: {
+    approach1?: { completed: boolean; completedAt?: string };
+    approach2?: { completed: boolean; completedAt?: string };
+    approach3?: { completed: boolean; completedAt?: string };
+    approach4?: { completed: boolean; completedAt?: string };
+    approach5?: { completed: boolean; completedAt?: string };
+  };
+}
+
 export interface StageEntryDisplayProps {
-  data?: any;
+  data?: EntryStageData;
   applicantId?: string;
   applicantName?: string;
   applicantEmail?: string;
   onTaskChange?: (taskName: string, completed: boolean) => void;
+  onApproachChange?: (approachNumber: number, completed: boolean) => void;
 }
 
 export function StageEntryDisplay({ data, onApproachChange }: StageEntryDisplayProps) {

@@ -5,8 +5,22 @@ import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { useState } from 'react';
 
+export interface FinalSelectionStageData {
+  candidateDates?: string[];
+  result?: string;
+  resultDate?: string;
+  evaluator?: string;
+  comments?: string;
+  notes?: string;
+  tasks?: {
+    detailedContact?: { completed: boolean; completedAt?: string };
+    documentCollection?: { completed: boolean; completedAt?: string };
+    resultNotification?: { completed: boolean; completedAt?: string };
+  };
+}
+
 export interface StageFinalSelectionDisplayProps {
-  data?: any;
+  data?: FinalSelectionStageData;
   applicantId?: string;
   applicantName?: string;
   applicantEmail?: string;
@@ -36,13 +50,13 @@ export function StageFinalSelectionDisplay({ data, onTaskChange }: StageFinalSel
   const getResultBadge = (result?: string) => {
     switch (result) {
       case '合格':
-        return <Badge variant="default" className="bg-green-100 text-green-800">合格</Badge>;
+        return <Badge className="bg-green-100 text-green-800">合格</Badge>;
       case '不合格':
-        return <Badge variant="destructive">不合格</Badge>;
+        return <Badge className="bg-red-100 text-red-800">不合格</Badge>;
       case '保留':
-        return <Badge variant="secondary">保留</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">保留</Badge>;
       default:
-        return <Badge variant="outline">未定</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">未定</Badge>;
     }
   };
 
@@ -78,7 +92,7 @@ export function StageFinalSelectionDisplay({ data, onTaskChange }: StageFinalSel
         <div className="space-y-4">
           <h5 className="font-medium">候補日程</h5>
           <div className="space-y-2">
-            {data.candidateDates.map((date, index) => (
+            {data.candidateDates.map((date: string, index: number) => (
               <div key={index} className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
@@ -91,7 +105,7 @@ export function StageFinalSelectionDisplay({ data, onTaskChange }: StageFinalSel
       )}
 
       {/* 合否（データがある場合のみ表示） */}
-      {data && (data.result || data.resultDate) && (
+      {data && data.result && data.resultDate && (
         <div className="space-y-4">
           <h5 className="font-medium">合否</h5>
           

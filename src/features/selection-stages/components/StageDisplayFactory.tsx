@@ -9,6 +9,16 @@ import { StageIndividualInterviewDisplay } from './StageIndividualInterviewDispl
 import { StageDocumentScreeningDisplay } from './StageDocumentScreeningDisplay';
 import { StageGroupInterviewDisplay } from './StageGroupInterviewDisplay';
 import { StageFinalSelectionDisplay } from './StageFinalSelectionDisplay';
+import { EntryStageData } from './StageEntryDisplay';
+import { FinalSelectionStageData } from './StageFinalSelectionDisplay';
+import { CEOSeminarStageData } from './StageCEOSeminarDisplay';
+import { DocumentScreeningStageData } from './StageDocumentScreeningDisplay';
+import { CompanyInfoStageData } from './StageCompanyInfoDisplay';
+import { AptitudeTestStageData } from './StageAptitudeTestDisplay';
+import { WorkplaceVisitStageData } from './StageWorkplaceVisitDisplay';
+import { JobExperienceStageData } from './StageJobExperienceDisplay';
+import { IndividualInterviewStageData } from './StageIndividualInterviewDisplay';
+import { GroupInterviewStageData } from './StageGroupInterviewDisplay';
 
 // 選考段階の型定義
 type StageType = 
@@ -27,7 +37,7 @@ type StageType =
 
 interface StageDisplayFactoryProps {
   stageType: StageType;
-  data?: Record<string, unknown>;
+  data?: EntryStageData | FinalSelectionStageData | CEOSeminarStageData | DocumentScreeningStageData | CompanyInfoStageData | AptitudeTestStageData | WorkplaceVisitStageData | JobExperienceStageData | IndividualInterviewStageData | GroupInterviewStageData;
   applicantId?: string;
   applicantName?: string;
   applicantEmail?: string;
@@ -36,27 +46,27 @@ interface StageDisplayFactoryProps {
 export function StageDisplayFactory({ stageType, data, applicantId, applicantName, applicantEmail }: StageDisplayFactoryProps) {
   switch (stageType) {
     case 'エントリー':
-      return <StageEntryDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
+      return <StageEntryDisplay data={data as EntryStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '書類選考':
-      return <StageDocumentScreeningDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
+      return <StageDocumentScreeningDisplay data={data as DocumentScreeningStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '会社説明会':
-      return <StageCompanyInfoDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
+      return <StageCompanyInfoDisplay data={data as CompanyInfoStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '適性検査':
-      return <StageAptitudeTestDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
+      return <StageAptitudeTestDisplay data={data as AptitudeTestStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '職場見学':
-      return <StageWorkplaceVisitDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
+      return <StageWorkplaceVisitDisplay data={data as WorkplaceVisitStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '仕事体験':
-      return <StageJobExperienceDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
+      return <StageJobExperienceDisplay data={data as JobExperienceStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '個別面接':
-      return <StageIndividualInterviewDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
+      return <StageIndividualInterviewDisplay data={data as IndividualInterviewStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '集団面接':
-      return <StageGroupInterviewDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
+      return <StageGroupInterviewDisplay data={data as GroupInterviewStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '人事面接':
-      return <StageInterviewDisplay stageType={stageType} data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
+      return <StageInterviewDisplay stageType={stageType} data={data} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '最終選考':
-      return <StageFinalSelectionDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
+      return <StageFinalSelectionDisplay data={data as FinalSelectionStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case 'CEOセミナー':
-      return <StageCEOSeminarDisplay data={data as any} applicantId={applicantId ?? ''} applicantName={applicantName ?? ''} applicantEmail={applicantEmail ?? ''} />;
+      return <StageCEOSeminarDisplay data={data as CEOSeminarStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '内定':
       return (
         <div className="p-4 border rounded-lg bg-gray-50">

@@ -53,7 +53,7 @@ export function EventRegistrationPage() {
         title: "参加申し込み完了",
         description: "イベントへの参加申し込みが完了しました。",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "エラーが発生しました",
         description: "参加申し込みに失敗しました。",

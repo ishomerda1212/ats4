@@ -6,7 +6,21 @@ import { ja } from 'date-fns/locale';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { AptitudeTestStageData } from '@/types/selection';
+
+export interface AptitudeTestStageData {
+  id?: string;
+  applicantId?: string;
+  sessionDate?: string;
+  sessionName?: string;
+  eventName?: string;
+  testType?: string;
+  score?: number;
+  result?: string;
+  notes?: string;
+  tasks?: {
+    detailedContact?: { completed: boolean; completedAt?: string };
+  };
+}
 
 export interface StageAptitudeTestDisplayProps {
   data?: AptitudeTestStageData;
@@ -37,15 +51,15 @@ export function StageAptitudeTestDisplay({ data, onTaskChange }: StageAptitudeTe
   const getResultBadge = (result?: string) => {
     switch (result) {
       case '優秀':
-        return <Badge variant="default">優秀</Badge>;
+        return <Badge className="bg-green-100 text-green-800">優秀</Badge>;
       case '良好':
-        return <Badge variant="secondary">良好</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800">良好</Badge>;
       case '普通':
-        return <Badge variant="outline">普通</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">普通</Badge>;
       case '不合格':
-        return <Badge variant="destructive">不合格</Badge>;
+        return <Badge className="bg-red-100 text-red-800">不合格</Badge>;
       default:
-        return <Badge variant="outline">未評価</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">未評価</Badge>;
     }
   };
 

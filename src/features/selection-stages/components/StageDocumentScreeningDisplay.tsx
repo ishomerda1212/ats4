@@ -7,7 +7,19 @@ import { useState } from 'react';
 import { EmailTaskButton } from '@/features/email';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { DocumentScreeningStageData } from '@/types/documentScreening';
+
+export interface DocumentScreeningStageData {
+  id?: string;
+  result?: string;
+  resultDate?: string;
+  evaluator?: string;
+  comments?: string;
+  notes?: string;
+  tasks?: {
+    detailedContact?: { completed: boolean; completedAt?: string };
+    resultNotification?: { completed: boolean; completedAt?: string };
+  };
+}
 
 export interface StageDocumentScreeningDisplayProps {
   data?: DocumentScreeningStageData;
@@ -50,13 +62,13 @@ export function StageDocumentScreeningDisplay({
   const getResultBadge = (result?: string) => {
     switch (result) {
       case '合格':
-        return <Badge variant="default" className="bg-green-100 text-green-800">合格</Badge>;
+        return <Badge className="bg-green-100 text-green-800">合格</Badge>;
       case '不合格':
-        return <Badge variant="destructive">不合格</Badge>;
+        return <Badge className="bg-red-100 text-red-800">不合格</Badge>;
       case '保留':
-        return <Badge variant="secondary">保留</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">保留</Badge>;
       default:
-        return <Badge variant="outline">未定</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800">未定</Badge>;
     }
   };
 
