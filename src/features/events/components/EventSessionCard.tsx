@@ -22,21 +22,21 @@ export function EventSessionCard({
             {/* 日時 */}
             <div className="flex items-center space-x-2 min-w-[180px]">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">{formatDateTime(session.startDateTime)}</span>
+              <span className="font-medium">{formatDateTime(session.start)}</span>
             </div>
             
             {/* 時間 */}
             <div className="flex items-center space-x-2 min-w-[120px]">
               <Clock className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
-                {formatDateTime(session.endDateTime)}
+                {formatDateTime(session.end)}
               </span>
             </div>
             
             {/* 場所 */}
             <div className="flex items-center space-x-2 min-w-[150px]">
               <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">{session.venue}</span>
+              <span className="text-sm text-muted-foreground">{session.venue}</span>
             </div>
             
             {/* 参加者数 */}
@@ -44,13 +44,6 @@ export function EventSessionCard({
               <Users className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">{participantCount}名</span>
             </div>
-            
-            {/* 備考 */}
-            {session.notes && (
-              <div className="flex-1">
-                <span className="text-sm text-muted-foreground">{session.notes}</span>
-              </div>
-            )}
           </div>
           
           {/* アクションボタン */}

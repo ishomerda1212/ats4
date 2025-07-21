@@ -48,7 +48,18 @@ export function GroupEvaluationForm({
 
   // 下書きデータのキー
   const draftKey = `draft-evaluation-${applicant.id}-${sessionId}`;
-  const [draftData, setDraftData] = useLocalStorage(draftKey, {});
+  const emptyEvaluation: EvaluationFormData = {
+    evaluatorName: '',
+    firstImpression: '',
+    communicationSkills: '',
+    logicalThinking: '',
+    initiative: '',
+    teamwork: '',
+    motivation: '',
+    technicalSkills: '',
+    overallEvaluation: '',
+  };
+  const [draftData, setDraftData] = useLocalStorage<EvaluationFormData>(draftKey, emptyEvaluation);
 
   const form = useForm<EvaluationFormData>({
     resolver: zodResolver(evaluationSchema),
@@ -108,7 +119,7 @@ export function GroupEvaluationForm({
         const updatedEvaluation = {
           ...existingEvaluation,
           ...data,
-          updatedAt: new Date().toISOString(),
+          updatedAt: new Date(),
         };
         setEvaluations(current => 
           current.map(e => e.id === existingEvaluation.id ? updatedEvaluation : e)
@@ -120,8 +131,8 @@ export function GroupEvaluationForm({
           applicantId: applicant.id,
           selectionHistoryId: sessionId,
           ...data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         };
         setEvaluations(current => [...current, newEvaluation]);
       }
@@ -136,9 +147,9 @@ export function GroupEvaluationForm({
       });
 
       onSaveSuccess?.();
-    } catch (error) {
+    } catch {
       toast({
-        title: "エラーが発生しました",
+        title: "エラー",
         description: "評定表の保存に失敗しました。",
         variant: "destructive",
       });

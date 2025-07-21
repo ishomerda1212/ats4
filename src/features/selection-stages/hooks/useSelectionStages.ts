@@ -71,7 +71,7 @@ const defaultStageTemplates: SelectionStageTemplate[] = [
 
 export function useSelectionStages() {
   const [stageTemplates, setStageTemplates] = useLocalStorage<SelectionStageTemplate[]>('stageTemplates', defaultStageTemplates);
-  const [stageProgress, setStageProgress] = useLocalStorage<SelectionStageProgress>('stageProgress', []);
+  const [stageProgress, setStageProgress] = useLocalStorage<SelectionStageProgress[]>('stageProgress', []);
 
   const addStageTemplate = (template: Omit<SelectionStageTemplate, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newTemplate: SelectionStageTemplate = {
@@ -146,7 +146,7 @@ export function useSelectionStages() {
     updateStageTemplate(stageId, { defaultTasks: updatedTasks });
   };
 
-  const createTasksFromTemplate = (applicantId: string, stageTemplateId: string, selectionHistoryId: string) => {
+  const createTasksFromTemplate = (stageTemplateId: string, selectionHistoryId: string) => {
     const template = stageTemplates.find(t => t.id === stageTemplateId);
     if (!template) return [];
 
@@ -160,11 +160,11 @@ export function useSelectionStages() {
       priority: defaultTask.priority,
       assignee: defaultTask.assignee,
       dueDate: defaultTask.dueOffsetDays 
-        ? new Date(Date.now() + defaultTask.dueOffsetDays * 24 * 60 * 60 * 1000).toISOString()
+        ? new Date(Date.now() + defaultTask.dueOffsetDays * 24 * 60 * 60 * 1000)
         : undefined,
       emailTemplateId: defaultTask.emailTemplateId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }));
   };
 
@@ -194,13 +194,18 @@ export function useSelectionStages() {
       updatedAt: new Date().toISOString(),
     };
     setStageProgress(current => [...current, newProgress]);
+    
+    toast({
+      title: "選考進捗を追加しました",
+      description: "選考進捗が正常に追加されました。",
+    });
+    
     return newProgress;
   };
 
   return {
     stageTemplates,
     stageProgress,
-    loading,
     addStageTemplate,
     updateStageTemplate,
     deleteStageTemplate,

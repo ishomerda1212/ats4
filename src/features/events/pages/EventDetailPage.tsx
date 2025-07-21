@@ -14,11 +14,11 @@ import { EventSession } from '../types/event';
 
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const {
-    events,
+  const { 
+    events, 
+    loading,
     getEventSessions,
-    getSessionParticipants,
-    loading
+    getParticipantsBySession
   } = useEvents();
   
   const [showSessionForm, setShowSessionForm] = useState(false);
@@ -66,7 +66,7 @@ export function EventDetailPage() {
   };
 
   const totalParticipants = sessions.reduce((total, session) => {
-    return total + getSessionParticipants(session.id).length;
+    return total + getParticipantsBySession(session.id).length;
   }, 0);
 
   return (
@@ -163,7 +163,7 @@ export function EventDetailPage() {
                 <EventSessionCard
                   key={session.id}
                   session={session}
-                  participantCount={getSessionParticipants(session.id).length}
+                  participantCount={getParticipantsBySession(session.id).length}
                 />
               ))}
             </div>

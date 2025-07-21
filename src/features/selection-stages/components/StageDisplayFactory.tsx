@@ -39,7 +39,7 @@ type StageType =
 
 interface StageDisplayFactoryProps {
   stageType: StageType;
-  data?: any;
+  data?: unknown;
   applicantId?: string;
   applicantName?: string;
   applicantEmail?: string;
@@ -64,7 +64,7 @@ export function StageDisplayFactory({ stageType, data, applicantId, applicantNam
     case '集団面接':
       return <StageGroupInterviewDisplay data={data as GroupInterviewStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '人事面接':
-      return <StageInterviewDisplay stageType={stageType} data={data} />;
+      return <StageInterviewDisplay stageType={stageType} data={data as Record<string, unknown>} />;
     case '最終選考':
       return <StageFinalSelectionDisplay data={data as FinalSelectionStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case 'CEOセミナー':
@@ -76,11 +76,11 @@ export function StageDisplayFactory({ stageType, data, applicantId, applicantNam
           <p className="text-sm text-gray-600 mt-1">
             {stageType}の表示コンポーネントは準備中です。
           </p>
-          {data && Object.keys(data).length > 0 && (
+          {data && Object.keys(data as Record<string, unknown>).length > 0 && (
             <div className="mt-3">
               <h5 className="text-sm font-medium">入力データ:</h5>
               <pre className="text-xs bg-white p-2 rounded mt-1 overflow-auto">
-                {JSON.stringify(data, null, 2)}
+                {JSON.stringify(data as Record<string, unknown>, null, 2)}
               </pre>
             </div>
           )}

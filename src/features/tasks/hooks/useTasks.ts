@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { Task, EmailTemplate, EmailLog } from '../types/task';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 import { generateId } from '@/shared/utils/date';
 import { toast } from '@/hooks/use-toast';
+import { Task, EmailTemplate, EmailLog } from '../types/task';
 
 // モックデータ
 const mockEmailTemplates: EmailTemplate[] = [
@@ -26,8 +25,8 @@ const mockEmailTemplates: EmailTemplate[] = [
     stage: 'エントリー',
     isDefault: true,
     variables: ['applicantName', 'companyName', 'senderName', 'contactInfo'],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: 'company-info-session-template',
@@ -55,8 +54,8 @@ const mockEmailTemplates: EmailTemplate[] = [
     stage: '会社説明会',
     isDefault: true,
     variables: ['applicantName', 'companyName', 'senderName', 'eventDate', 'venue', 'contactInfo'],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: 'interview-schedule-template',
@@ -85,8 +84,8 @@ const mockEmailTemplates: EmailTemplate[] = [
     stage: '人事面接',
     isDefault: true,
     variables: ['applicantName', 'companyName', 'senderName', 'interviewDates', 'duration', 'contactInfo'],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: 'followup-after-session-template',
@@ -111,8 +110,8 @@ const mockEmailTemplates: EmailTemplate[] = [
     stage: '会社説明会',
     isDefault: false,
     variables: ['applicantName', 'companyName', 'senderName', 'contactInfo'],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   {
     id: 'reminder-before-session-template',
@@ -140,8 +139,8 @@ const mockEmailTemplates: EmailTemplate[] = [
     stage: '会社説明会',
     isDefault: false,
     variables: ['applicantName', 'companyName', 'senderName', 'eventDate', 'venue', 'contactInfo'],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    createdAt: new Date(),
+    updatedAt: new Date()
   }
 ];
 
@@ -149,16 +148,21 @@ export function useTasks() {
   const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', []);
   const [emailTemplates, setEmailTemplates] = useLocalStorage<EmailTemplate[]>('emailTemplates', mockEmailTemplates);
   const [emailLogs, setEmailLogs] = useLocalStorage<EmailLog[]>('emailLogs', []);
-  const [loading, setLoading] = useState(false);
 
   const addTask = (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newTask: Task = {
       ...task,
       id: generateId(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     setTasks(current => [...current, newTask]);
+    
+    toast({
+      title: "タスクを追加しました",
+      description: `${task.title}が正常に追加されました。`,
+    });
+    
     return newTask;
   };
 
@@ -166,10 +170,15 @@ export function useTasks() {
     setTasks(current =>
       current.map(task =>
         task.id === id
-          ? { ...task, ...updates, updatedAt: new Date().toISOString() }
+          ? { ...task, ...updates, updatedAt: new Date() }
           : task
       )
     );
+    
+    toast({
+      title: "タスクを更新しました",
+      description: "タスクが正常に更新されました。",
+    });
   };
 
   const deleteTask = (id: string) => {
@@ -192,43 +201,81 @@ export function useTasks() {
     body: string;
     sentBy: string;
   }) => {
-    setLoading(true);
     try {
-      // 実際のメール送信処理（ここではモック）
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const emailLog: EmailLog = {
-        id: generateId(),
-        ...emailData,
-        sentAt: new Date().toISOString(),
-        status: 'sent',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      setEmailLogs(current => [...current, emailLog]);
-
-      // タスクを完了状態に更新
-      updateTask(emailData.taskId, {
-        status: '完了',
-        completedAt: new Date().toISOString()
+      const response = await fetch('/api/send-email.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailData),
       });
 
-      toast({
-        title: "メールを送信しました",
-        description: "メールが正常に送信されました。",
-      });
+      if (!response.ok) {
+        throw new Error('メール送信に失敗しました');
+      }
 
-      return emailLog;
+      const result = await response.json();
+      
+      if (result.success) {
+        // メール送信ログを記録
+        const emailLog: EmailLog = {
+          id: generateId(),
+          taskId: emailData.taskId,
+          applicantId: emailData.applicantId,
+          templateId: emailData.templateId,
+          subject: emailData.subject,
+          body: emailData.body,
+          sentAt: new Date().toISOString(),
+          sentBy: emailData.sentBy,
+          status: 'sent',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        
+        setEmailLogs(current => [...current, emailLog]);
+        
+        // タスクを完了に更新
+        updateTask(emailData.taskId, {
+          status: '完了',
+          completedAt: new Date()
+        });
+        
+        toast({
+          title: "メールを送信しました",
+          description: "メールが正常に送信されました。",
+        });
+        
+        return result;
+      } else {
+        throw new Error(result.message || 'メール送信に失敗しました');
+      }
     } catch (error) {
+      console.error('メール送信エラー:', error);
+      
+      // エラーログを記録
+      const errorLog: EmailLog = {
+        id: generateId(),
+        taskId: emailData.taskId,
+        applicantId: emailData.applicantId,
+        templateId: emailData.templateId,
+        subject: emailData.subject,
+        body: emailData.body,
+        sentAt: new Date().toISOString(),
+        sentBy: emailData.sentBy,
+        status: 'failed',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      
+      setEmailLogs(current => [...current, errorLog]);
+      
       toast({
-        title: "メール送信に失敗しました",
-        description: "メールの送信中にエラーが発生しました。",
+        title: "メール送信エラー",
+        description: error instanceof Error ? error.message : "メール送信に失敗しました",
         variant: "destructive",
       });
+      
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -236,10 +283,16 @@ export function useTasks() {
     const newTemplate: EmailTemplate = {
       ...template,
       id: generateId(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     setEmailTemplates(current => [...current, newTemplate]);
+    
+    toast({
+      title: "メールテンプレートを追加しました",
+      description: `${template.name}が正常に追加されました。`,
+    });
+    
     return newTemplate;
   };
 
@@ -247,10 +300,15 @@ export function useTasks() {
     setEmailTemplates(current =>
       current.map(template =>
         template.id === id
-          ? { ...template, ...updates, updatedAt: new Date().toISOString() }
+          ? { ...template, ...updates, updatedAt: new Date() }
           : template
       )
     );
+    
+    toast({
+      title: "メールテンプレートを更新しました",
+      description: "メールテンプレートが正常に更新されました。",
+    });
   };
 
   const deleteEmailTemplate = (id: string) => {
@@ -261,7 +319,6 @@ export function useTasks() {
     tasks,
     emailTemplates,
     emailLogs,
-    loading,
     addTask,
     updateTask,
     deleteTask,

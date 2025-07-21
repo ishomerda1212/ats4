@@ -8,6 +8,7 @@ import { mockEvents } from '@/shared/data/mockEventData';
 import { generateId } from '@/shared/utils/date';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { SelectionStage } from '@/features/applicants/types/applicant';
 
 const eventSchema = z.object({
   name: z.string().min(1, 'イベント名を入力してください'),
@@ -41,9 +42,11 @@ export function useEventForm(event?: Event, mode: 'create' | 'edit' = 'create') 
       if (mode === 'create') {
         const newEvent: Event = {
           id: generateId(),
-          ...data,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          name: data.name,
+          stage: data.stage as SelectionStage,
+          description: data.description,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         };
         setEvents(current => [...current, newEvent]);
         
@@ -56,8 +59,10 @@ export function useEventForm(event?: Event, mode: 'create' | 'edit' = 'create') 
       } else if (event) {
         const updatedEvent: Event = {
           ...event,
-          ...data,
-          updatedAt: new Date().toISOString(),
+          name: data.name,
+          stage: data.stage as SelectionStage,
+          description: data.description,
+          updatedAt: new Date(),
         };
         setEvents(current => 
           current.map(e => e.id === event.id ? updatedEvent : e)

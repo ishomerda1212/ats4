@@ -36,15 +36,13 @@ export function useEventSessionForm(
   const form = useForm<EventSessionFormData>({
     resolver: zodResolver(eventSessionSchema),
     defaultValues: session ? {
-      startDateTime: session.startDateTime.slice(0, 16), // datetime-local format
-      endDateTime: session.endDateTime.slice(0, 16),
+      startDateTime: session.start.toISOString().slice(0, 16), // datetime-local format
+      endDateTime: session.end.toISOString().slice(0, 16),
       venue: session.venue,
-      notes: session.notes || '',
     } : {
       startDateTime: '',
       endDateTime: '',
       venue: '',
-      notes: '',
     },
   });
 
@@ -55,12 +53,13 @@ export function useEventSessionForm(
         const newSession: EventSession = {
           id: generateId(),
           eventId,
-          startDateTime: new Date(data.startDateTime).toISOString(),
-          endDateTime: new Date(data.endDateTime).toISOString(),
+          name: `セッション ${Date.now()}`,
+          start: new Date(data.startDateTime),
+          end: new Date(data.endDateTime),
           venue: data.venue,
-          notes: data.notes,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          participants: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
         };
         setEventSessions(current => [...current, newSession]);
         
@@ -71,11 +70,10 @@ export function useEventSessionForm(
       } else if (session) {
         const updatedSession: EventSession = {
           ...session,
-          startDateTime: new Date(data.startDateTime).toISOString(),
-          endDateTime: new Date(data.endDateTime).toISOString(),
+          start: new Date(data.startDateTime),
+          end: new Date(data.endDateTime),
           venue: data.venue,
-          notes: data.notes,
-          updatedAt: new Date().toISOString(),
+          updatedAt: new Date(),
         };
         setEventSessions(current => 
           current.map(s => s.id === session.id ? updatedSession : s)
@@ -88,10 +86,10 @@ export function useEventSessionForm(
       }
 
       onSuccess?.();
-    } catch (error) {
+    } catch {
       toast({
-        title: "エラーが発生しました",
-        description: "日時の保存に失敗しました。",
+        title: "エラー",
+        description: "セッションの保存に失敗しました。",
         variant: "destructive",
       });
     } finally {

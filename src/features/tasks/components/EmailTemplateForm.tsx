@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { EmailTemplate } from '../types/task';
 import { useTasks } from '../hooks/useTasks';
 import { SELECTION_STAGES } from '@/shared/utils/constants';
+import { SelectionStage } from '@/features/applicants/types/applicant';
 
 const emailTemplateSchema = z.object({
   name: z.string().min(1, 'テンプレート名を入力してください'),
@@ -54,6 +55,7 @@ export function EmailTemplateForm({ template, onCancel, onSuccess }: EmailTempla
     try {
       const templateData = {
         ...data,
+        stage: data.stage as SelectionStage,
         variables: extractVariables(data.subject + ' ' + data.body),
       };
 

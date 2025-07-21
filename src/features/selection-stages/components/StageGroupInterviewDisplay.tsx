@@ -6,7 +6,6 @@ import { ja } from 'date-fns/locale';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { GroupInterviewStageData } from '@/types/selection-stages';
 
 export interface GroupInterviewStageData {
   id?: string;
@@ -14,6 +13,7 @@ export interface GroupInterviewStageData {
   sessionDate?: string;
   sessionName?: string;
   eventName?: string;
+  location?: string;
   attendanceStatus?: string;
   groupSize?: number;
   evaluator?: string;

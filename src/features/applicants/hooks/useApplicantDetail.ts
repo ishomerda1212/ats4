@@ -30,13 +30,13 @@ export function useApplicantDetail(applicantId: string) {
   );
 
   // 各選考段階の詳細データを取得
-  const stageDetails = history.reduce((acc, stage) => {
+  const stageDetails: Record<string, Record<string, unknown>> = history.reduce((acc, stage) => {
     const details = mockStageDetails[stage.id as keyof typeof mockStageDetails];
     if (details) {
-      acc[stage.id] = details;
+      acc[stage.id] = details as Record<string, unknown>;
     }
     return acc;
-  }, {} as Record<string, unknown>);
+  }, {} as Record<string, Record<string, unknown>>);
 
   return {
     applicant,

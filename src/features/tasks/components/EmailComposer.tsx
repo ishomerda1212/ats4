@@ -18,7 +18,7 @@ interface EmailComposerProps {
 }
 
 export function EmailComposer({ task, applicant, onCancel, onSuccess }: EmailComposerProps) {
-  const { emailTemplates, getEmailTemplatesByStage, sendEmail, loading } = useTasks();
+  const { emailTemplates, getEmailTemplatesByStage, sendEmail } = useTasks();
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
@@ -26,8 +26,8 @@ export function EmailComposer({ task, applicant, onCancel, onSuccess }: EmailCom
 
   // 選考段階に応じたテンプレートを取得 + タスクに紐づくテンプレート
   const stageTemplates = getEmailTemplatesByStage(applicant.currentStage);
-  const taskTemplate = task.emailTemplateId ? 
-    emailTemplates.find(t => t.id === task.emailTemplateId) : null;
+  const taskTemplate = task.title.includes('メール') ?
+    emailTemplates.find(t => t.stage === 'エントリー') : null;
   
   const availableTemplates = taskTemplate ? 
     [taskTemplate, ...stageTemplates.filter(t => t.id !== taskTemplate.id)] : 
@@ -35,12 +35,12 @@ export function EmailComposer({ task, applicant, onCancel, onSuccess }: EmailCom
 
   // タスクに紐づくテンプレートがある場合は初期選択
   useEffect(() => {
-    if (taskTemplate && !selectedTemplate) {
-      setSelectedTemplate(taskTemplate);
-      setSubject(replaceVariables(taskTemplate.subject, variables));
-      setBody(replaceVariables(taskTemplate.body, variables));
+    if (selectedTemplate) {
+      setSubject(selectedTemplate.subject);
+      setBody(selectedTemplate.body);
+      setVariables(selectedTemplate.variables || {});
     }
-  }, [taskTemplate]);
+  }, [selectedTemplate]);
 
   // 変数置換用のデータ
   const variables = {
@@ -90,7 +90,7 @@ export function EmailComposer({ task, applicant, onCancel, onSuccess }: EmailCom
         sentBy: senderName,
       });
       onSuccess();
-    } catch (error) {
+    } catch {
       // エラーハンドリングはuseTasks内で行われる
     }
   };
@@ -196,10 +196,10 @@ export function EmailComposer({ task, applicant, onCancel, onSuccess }: EmailCom
           </Button>
           <Button 
             onClick={handleSend} 
-            disabled={loading || !subject.trim() || !body.trim()}
+            disabled={!subject.trim() || !body.trim()}
           >
             <Send className="h-4 w-4 mr-2" />
-            {loading ? '送信中...' : 'メール送信'}
+            メール送信
           </Button>
         </div>
       </CardContent>

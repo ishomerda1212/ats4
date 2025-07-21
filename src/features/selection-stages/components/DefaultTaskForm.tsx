@@ -12,7 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { DefaultTask } from '../types/selectionStage';
 import { useSelectionStages } from '../hooks/useSelectionStages';
-import { TASK_TYPES, TASK_PRIORITIES } from '@/features/tasks/types/task';
+import { TASK_TYPES, TASK_PRIORITIES, TaskType, TaskPriority } from '@/features/tasks/types/task';
 import { useTasks } from '@/features/tasks/hooks/useTasks';
 
 const defaultTaskSchema = z.object({

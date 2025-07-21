@@ -134,7 +134,7 @@ export function StageInterviewDisplay({ stageType, data }: StageInterviewDisplay
             {getResultIcon(data.result)}
             <div>
               <h5 className="font-medium">結果</h5>
-              <Badge variant={getResultBadgeVariant(data.result)}>
+              <Badge className={getResultBadgeVariant(data.result)}>
                 {data.result || '未判定'}
               </Badge>
             </div>

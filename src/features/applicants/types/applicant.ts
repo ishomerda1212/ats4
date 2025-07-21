@@ -38,8 +38,8 @@ export interface Applicant extends BaseEntity {
 export interface SelectionHistory extends BaseEntity {
   applicantId: string;
   stage: SelectionStage;
-  startDate: string;
-  endDate?: string;
+  startDate: Date;
+  endDate?: Date;
   status: SelectionStatus;
   notes?: string;
 }
@@ -67,8 +67,8 @@ export interface Task extends BaseEntity {
   status: TaskStatus;
   priority?: '低' | '中' | '高';
   assignee?: string;
-  dueDate?: string;
-  completedAt?: string;
+  dueDate?: Date;
+  completedAt?: Date;
   type?: 'general' | 'email' | 'document' | 'interview' | 'evaluation';
   emailTemplateId?: string;
 }

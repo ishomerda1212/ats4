@@ -9,12 +9,12 @@ import { useEvents } from '../hooks/useEvents';
 import { formatDateTime } from '@/shared/utils/date';
 
 export function EventListPage() {
-  const {
-    events,
+  const { 
+    events, 
     loading,
     getEventSessions,
-    getEventParticipantCount,
-    getSessionParticipants
+    getParticipantsBySession,
+    getEventParticipantCount
   } = useEvents();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -117,7 +117,7 @@ export function EventListPage() {
             <CardContent className="p-0">
               <div className="space-y-3 p-4">
                 {allSessions.map((session) => {
-                  const participantCount = getSessionParticipants(session.id).length;
+                  const participantCount = getParticipantsBySession(session.id).length;
                   return (
                     <div key={session.id} className="flex items-center justify-between p-4 border rounded-lg hover:shadow-sm transition-shadow">
                       <div className="flex items-center space-x-6 flex-1">
@@ -129,21 +129,21 @@ export function EventListPage() {
                         {/* 日時 */}
                         <div className="flex items-center space-x-2 min-w-[180px]">
                           <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">{formatDateTime(session.startDateTime)}</span>
+                          <span className="font-medium">{formatDateTime(session.start)}</span>
                         </div>
                         
                         {/* 時間 */}
                         <div className="flex items-center space-x-2 min-w-[120px]">
                           <Clock className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm text-muted-foreground">
-                            {formatDateTime(session.endDateTime)}
+                            {formatDateTime(session.end)}
                           </span>
                         </div>
                         
                         {/* 場所 */}
                         <div className="flex items-center space-x-2 min-w-[150px]">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{session.venue}</span>
+                          <span className="text-sm text-muted-foreground">{session.venue}</span>
                         </div>
                         
                         {/* 参加者数 */}
@@ -151,13 +151,6 @@ export function EventListPage() {
                           <Users className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm">{participantCount}名</span>
                         </div>
-                        
-                        {/* 備考 */}
-                        {session.notes && (
-                          <div className="flex-1">
-                            <span className="text-sm text-muted-foreground">{session.notes}</span>
-                          </div>
-                        )}
                       </div>
                       
                       {/* アクションボタン */}

@@ -25,7 +25,7 @@ export function useApplicants() {
     setApplicants(current => 
       current.map(applicant => 
         applicant.id === id 
-          ? { ...applicant, ...updates, updatedAt: new Date().toISOString() }
+          ? { ...applicant, ...updates, updatedAt: new Date() }
           : applicant
       )
     );

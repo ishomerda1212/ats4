@@ -21,9 +21,9 @@ export const mockEvents: Event[] = [
   },
   {
     id: generateId(),
-    name: '社長セミナー',
+    name: 'CEOセミナー',
     description: '代表取締役による経営方針説明と質疑応答セッションです。',
-    stage: '社長セミナー',
+    stage: 'CEOセミナー',
     createdAt: new Date('2024-01-15T11:00:00Z'),
     updatedAt: new Date('2024-01-15T11:00:00Z')
   }

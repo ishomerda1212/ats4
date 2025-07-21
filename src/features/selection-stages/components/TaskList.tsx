@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Clock, CheckCircle, AlertCircle, User, Calendar, Mail, Edit, Trash2 } from 'lucide-react';
-import { Task, TaskStatus } from '@/features/tasks/types/task';
+import { Task, TaskStatus, TaskType } from '@/features/tasks/types/task';
 import { TaskForm } from '@/features/tasks/components/TaskForm';
 import { EmailComposer } from '@/features/tasks/components/EmailComposer';
 import { useTasks } from '@/features/tasks/hooks/useTasks';
@@ -27,7 +27,6 @@ export function TaskList({ selectionHistoryId, applicant }: TaskListProps) {
   // タスクタイプを判定する関数
   const getTaskType = (task: Task): TaskType => {
     if (task.type) return task.type;
-    if (task.emailTemplateId) return 'email';
     if (task.title.includes('メール')) return 'email';
     if (task.title.includes('面接')) return 'interview';
     return 'general';
@@ -51,7 +50,7 @@ export function TaskList({ selectionHistoryId, applicant }: TaskListProps) {
                                  task.status === '未着手' ? '進行中' : '完了';
     updateTask(task.id, { 
       status: newStatus,
-      completedAt: newStatus === '完了' ? new Date().toISOString() : undefined
+      completedAt: newStatus === '完了' ? new Date() : undefined
     });
   };
 

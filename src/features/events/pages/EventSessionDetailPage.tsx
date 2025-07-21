@@ -11,14 +11,14 @@ import { ParticipantList } from '../components/ParticipantList';
 import { useEvents } from '../hooks/useEvents';
 import { useApplicants } from '@/features/applicants/hooks/useApplicants';
 import { formatDateTime, formatDate } from '@/shared/utils/date';
-import { EventSession } from '../types/event';
+import { EventSession, ParticipationStatus } from '../types/event';
 
 export function EventSessionDetailPage() {
   const { eventId, sessionId } = useParams<{ eventId: string; sessionId: string }>();
   const {
     events,
     getEventSessions,
-    getSessionParticipants,
+    getParticipantsBySession,
     updateParticipantStatus,
     deleteEventSession,
     updateEventSession,
@@ -32,7 +32,7 @@ export function EventSessionDetailPage() {
   const event = events.find(e => e.id === eventId);
   const sessions = event ? getEventSessions(event.id) : [];
   const session = sessions.find(s => s.id === sessionId);
-  const participants = session ? getSessionParticipants(session.id) : [];
+  const participants = session ? getParticipantsBySession(session.id) : [];
 
   // 参加者数のカウント
   const registrationCount = participants.filter(p => p.status === '申込').length;
@@ -84,7 +84,7 @@ export function EventSessionDetailPage() {
     setEditingSession(null);
   };
 
-  const handleStatusChange = (participantId: string, status: unknown) => {
+  const handleStatusChange = (participantId: string, status: ParticipationStatus) => {
     updateParticipantStatus(participantId, status);
   };
 
@@ -161,7 +161,7 @@ export function EventSessionDetailPage() {
                 <Calendar className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <h3 className="font-medium">開始日時</h3>
-                  <p className="text-muted-foreground">{formatDateTime(session.startDateTime)}</p>
+                  <p className="text-muted-foreground">{formatDateTime(session.start)}</p>
                 </div>
               </div>
               
@@ -169,7 +169,7 @@ export function EventSessionDetailPage() {
                 <Clock className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <h3 className="font-medium">終了日時</h3>
-                  <p className="text-muted-foreground">{formatDateTime(session.endDateTime)}</p>
+                  <p className="text-muted-foreground">{formatDateTime(session.end)}</p>
                 </div>
               </div>
             </div>

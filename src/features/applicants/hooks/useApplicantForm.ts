@@ -89,7 +89,7 @@ export function useApplicantForm(applicant?: Applicant, mode: 'create' | 'edit' 
 
         navigate(`/applicants/${applicant.id}`);
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "エラーが発生しました",
         description: "応募者情報の保存に失敗しました。",

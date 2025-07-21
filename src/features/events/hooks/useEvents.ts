@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Event, EventSession, EventParticipant } from '../types/event';
+import { Event, EventSession, EventParticipant, ParticipationStatus } from '../types/event';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 import { mockEvents, mockEventSessions, mockEventParticipants } from '@/shared/data/mockEventData';
 
@@ -13,14 +13,14 @@ export function useEvents() {
     return eventSessions.filter(session => session.eventId === eventId);
   };
 
-  const getSessionParticipants = (sessionId: string) => {
-    return eventParticipants.filter(participant => participant.eventSessionId === sessionId);
+  const getParticipantsBySession = (sessionId: string) => {
+    return eventParticipants.filter(participant => participant.eventId === sessionId);
   };
 
   const getEventParticipantCount = (eventId: string) => {
     const sessions = getEventSessions(eventId);
     return sessions.reduce((total, session) => {
-      return total + getSessionParticipants(session.id).length;
+      return total + getParticipantsBySession(session.id).length;
     }, 0);
   };
 
@@ -28,8 +28,8 @@ export function useEvents() {
     const newEvent: Event = {
       ...event,
       id: `event-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     setEvents(current => [...current, newEvent]);
     return newEvent;
@@ -39,7 +39,7 @@ export function useEvents() {
     setEvents(current =>
       current.map(event =>
         event.id === id
-          ? { ...event, ...updates, updatedAt: new Date().toISOString() }
+          ? { ...event, ...updates, updatedAt: new Date() }
           : event
       )
     );
@@ -51,7 +51,7 @@ export function useEvents() {
     const sessionIds = eventSessions.filter(session => session.eventId === id).map(s => s.id);
     setEventSessions(current => current.filter(session => session.eventId !== id));
     setEventParticipants(current => 
-      current.filter(participant => !sessionIds.includes(participant.eventSessionId))
+      current.filter(participant => !sessionIds.includes(participant.eventId))
     );
   };
 
@@ -59,8 +59,8 @@ export function useEvents() {
     const newSession: EventSession = {
       ...session,
       id: `session-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     setEventSessions(current => [...current, newSession]);
     return newSession;
@@ -70,7 +70,7 @@ export function useEvents() {
     setEventSessions(current =>
       current.map(session =>
         session.id === id
-          ? { ...session, ...updates, updatedAt: new Date().toISOString() }
+          ? { ...session, ...updates, updatedAt: new Date() }
           : session
       )
     );
@@ -79,7 +79,7 @@ export function useEvents() {
   const deleteEventSession = (id: string) => {
     setEventSessions(current => current.filter(session => session.id !== id));
     setEventParticipants(current => 
-      current.filter(participant => participant.eventSessionId !== id)
+      current.filter(participant => participant.eventId !== id)
     );
   };
 
@@ -87,8 +87,8 @@ export function useEvents() {
     const newParticipant: EventParticipant = {
       ...participant,
       id: `participant-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     setEventParticipants(current => [...current, newParticipant]);
     return newParticipant;
@@ -98,7 +98,7 @@ export function useEvents() {
     setEventParticipants(current =>
       current.map(participant =>
         participant.id === id
-          ? { ...participant, status, updatedAt: new Date().toISOString() }
+          ? { ...participant, status, updatedAt: new Date() }
           : participant
       )
     );
@@ -110,7 +110,7 @@ export function useEvents() {
     eventParticipants,
     loading,
     getEventSessions,
-    getSessionParticipants,
+    getParticipantsBySession,
     getEventParticipantCount,
     addEvent,
     updateEvent,

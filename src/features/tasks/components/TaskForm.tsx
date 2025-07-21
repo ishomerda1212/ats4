@@ -41,7 +41,7 @@ export function TaskForm({ selectionHistoryId, task, onCancel, onSuccess }: Task
       type: task.type,
       priority: task.priority,
       assignee: task.assignee || '',
-      dueDate: task.dueDate?.slice(0, 16) || '', // datetime-local format
+      dueDate: task.dueDate ? new Date(task.dueDate).toISOString().slice(0, 16) : '', // datetime-local format
     } : {
       title: '',
       description: '',
@@ -59,7 +59,7 @@ export function TaskForm({ selectionHistoryId, task, onCancel, onSuccess }: Task
           ...data,
           type: data.type as TaskType,
           priority: data.priority as TaskPriority,
-          dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
+          dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
         });
         toast({
           title: "タスクを更新しました",
@@ -68,11 +68,12 @@ export function TaskForm({ selectionHistoryId, task, onCancel, onSuccess }: Task
       } else {
         addTask({
           selectionHistoryId,
+          applicantId: '', // 一時的に空文字列を設定
           ...data,
           type: data.type as TaskType,
           priority: data.priority as TaskPriority,
           status: '未着手',
-          dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
+          dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
         });
         toast({
           title: "タスクを追加しました",
@@ -80,9 +81,9 @@ export function TaskForm({ selectionHistoryId, task, onCancel, onSuccess }: Task
         });
       }
       onSuccess();
-    } catch (error) {
+    } catch {
       toast({
-        title: "エラーが発生しました",
+        title: "エラー",
         description: "タスクの保存に失敗しました。",
         variant: "destructive",
       });
