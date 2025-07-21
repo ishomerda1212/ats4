@@ -15,6 +15,19 @@ import { Link } from 'react-router-dom';
 import { EvaluationCard } from '@/features/evaluations/components/EvaluationCard';
 import { StageDisplayFactory } from './StageDisplayFactory';
 
+export type StageType = 
+  | 'エントリー'
+  | '書類選考'
+  | '会社説明会'
+  | '適性検査'
+  | '職場見学'
+  | '職務体験'
+  | '個人面接'
+  | '集団面接'
+  | '最終選考'
+  | '内定'
+  | '不採用';
+
 interface SelectionStageAccordionProps {
   applicant: Applicant;
   history: SelectionHistory[];
@@ -80,19 +93,16 @@ export function SelectionStageAccordion({
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Badge variant={
-                          item.status === '完了' ? 'default' :
-                          item.status === '進行中' ? 'secondary' : 'destructive'
-                        }>
+                        <Badge className="bg-gray-100 text-gray-800">
                           {item.status}
                         </Badge>
                         {stageEvaluations.length > 0 && (
-                          <Badge variant="outline">
+                          <Badge className="bg-gray-100 text-gray-800">
                             評価 {stageEvaluations.length}件
                           </Badge>
                         )}
                         {currentStageData && Object.keys(currentStageData).length > 0 && (
-                          <Badge variant="outline" className="text-green-600">
+                          <Badge className="bg-gray-100 text-green-600">
                             データ入力済み
                           </Badge>
                         )}
@@ -107,7 +117,7 @@ export function SelectionStageAccordion({
                         
                         {/* 選考段階固有の表示 */}
                         <StageDisplayFactory 
-                          stageType={item.stage} as SelectionStage
+                          stageType={item.stage as StageType}
                           data={currentStageData}
                           applicantId={applicant.id}
                           applicantName={applicant.name}

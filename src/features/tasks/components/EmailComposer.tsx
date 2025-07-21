@@ -132,10 +132,10 @@ export function EmailComposer({ task, applicant, onCancel, onSuccess }: EmailCom
                     <FileText className="h-4 w-4" />
                     <span>{template.name}</span>
                     {template.id === taskTemplate?.id && (
-                      <Badge variant="default" className="text-xs ml-2">推奨</Badge>
+                      <Badge className="bg-blue-100 text-blue-800 text-xs ml-2">推奨</Badge>
                     )}
                     {template.isDefault && (
-                      <Badge variant="secondary" className="text-xs">デフォルト</Badge>
+                      <Badge className="bg-gray-100 text-gray-800 text-xs">デフォルト</Badge>
                     )}
                   </div>
                 </SelectItem>
@@ -181,7 +181,7 @@ export function EmailComposer({ task, applicant, onCancel, onSuccess }: EmailCom
             <label className="text-sm font-medium">使用可能な変数</label>
             <div className="flex flex-wrap gap-1">
               {selectedTemplate.variables.map((variable) => (
-                <Badge key={variable} variant="outline" className="text-xs">
+                <Badge key={variable} className="bg-gray-100 text-gray-800 text-xs">
                   {`{{${variable}}}`}
                 </Badge>
               ))}

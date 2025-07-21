@@ -118,7 +118,7 @@ export function EventSessionParticipantsPage() {
               </div>
               <div className="flex items-center space-x-2">
                 <Users className="h-4 w-4 text-muted-foreground" />
-                <span>{participants.length}名参加</span>
+                <Badge className="bg-gray-100 text-gray-800">{participants.length}名</Badge>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -192,8 +192,7 @@ export function EventSessionParticipantsPage() {
                       {applicant?.schoolName}
                     </p>
                     <Badge 
-                      variant={participant.status === '参加' ? 'default' : 'secondary'}
-                      className="text-xs"
+                      className={participant.status === '参加' ? 'bg-blue-100 text-blue-800 text-xs' : 'bg-gray-100 text-gray-800 text-xs'}
                     >
                       {participant.status}
                     </Badge>

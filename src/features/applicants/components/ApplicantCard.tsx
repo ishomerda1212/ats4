@@ -19,9 +19,7 @@ export function ApplicantCard({ applicant }: ApplicantCardProps) {
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
               <h3 className="text-lg font-semibold">{applicant.name}</h3>
-              <Badge variant="secondary" className="text-xs">
-                {applicant.source}
-              </Badge>
+              <Badge className="bg-green-100 text-green-800 text-xs">{applicant.source}</Badge>
             </div>
             <p className="text-sm text-muted-foreground">{applicant.nameKana}</p>
           </div>

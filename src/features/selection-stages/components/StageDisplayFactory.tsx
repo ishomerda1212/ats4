@@ -27,17 +27,19 @@ type StageType =
   | '会社説明会'
   | '適性検査'
   | '職場見学'
+  | '職務体験'
   | '仕事体験'
   | '個別面接'
   | '集団面接'
   | 'CEOセミナー'
   | '人事面接'
   | '最終選考'
-  | '内定';
+  | '内定'
+  | '不採用';
 
 interface StageDisplayFactoryProps {
   stageType: StageType;
-  data?: EntryStageData | FinalSelectionStageData | CEOSeminarStageData | DocumentScreeningStageData | CompanyInfoStageData | AptitudeTestStageData | WorkplaceVisitStageData | JobExperienceStageData | IndividualInterviewStageData | GroupInterviewStageData;
+  data?: any;
   applicantId?: string;
   applicantName?: string;
   applicantEmail?: string;
@@ -62,7 +64,7 @@ export function StageDisplayFactory({ stageType, data, applicantId, applicantNam
     case '集団面接':
       return <StageGroupInterviewDisplay data={data as GroupInterviewStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '人事面接':
-      return <StageInterviewDisplay stageType={stageType} data={data} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
+      return <StageInterviewDisplay stageType={stageType} data={data} />;
     case '最終選考':
       return <StageFinalSelectionDisplay data={data as FinalSelectionStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case 'CEOセミナー':

@@ -23,11 +23,11 @@ export function EventCard({ event, participantCount, sessionCount }: EventCardPr
             <StatusBadge stage={event.stage} />
           </div>
           <div className="flex items-center space-x-2">
-            <Badge variant="outline" className="flex items-center space-x-1">
+            <Badge className="bg-gray-100 text-gray-800 flex items-center space-x-1">
               <Calendar className="h-3 w-3" />
               <span>{sessionCount}回</span>
             </Badge>
-            <Badge variant="outline" className="flex items-center space-x-1">
+            <Badge className="bg-gray-100 text-gray-800 flex items-center space-x-1">
               <Users className="h-3 w-3" />
               <span>{participantCount}名</span>
             </Badge>

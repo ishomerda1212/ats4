@@ -25,7 +25,7 @@ export function EvaluationCard({ evaluation, applicantId, onView, onEdit, onDele
               {formatDateTime(evaluation.createdAt)}
             </p>
           </div>
-          <Badge variant="outline">評定表</Badge>
+          <Badge className="bg-gray-100 text-gray-800">評定表</Badge>
         </div>
         
         <div className="space-y-2 mb-4">

@@ -38,8 +38,8 @@ export function ApplicantInfoPanel({ applicant, selectionHistory, history = [] }
               <p className="text-muted-foreground">{applicant.nameKana}</p>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge variant="secondary">{applicant.source}</Badge>
-              <Badge variant="outline">{applicant.gender}</Badge>
+              <Badge className="bg-green-100 text-green-800">{applicant.source}</Badge>
+              <Badge className="bg-gray-100 text-blue-600 border-blue-600">データ入力済み</Badge>
             </div>
           </div>
 
@@ -108,14 +108,9 @@ export function ApplicantInfoPanel({ applicant, selectionHistory, history = [] }
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Badge variant={
-                        item.status === '完了' ? 'default' :
-                        item.status === '進行中' ? 'secondary' : 'destructive'
-                      }>
-                        {item.status}
-                      </Badge>
+                      <Badge className="bg-blue-100 text-blue-800">{item.status}</Badge>
                       {selectionHistory?.id === item.id && (
-                        <Badge variant="outline" className="text-blue-600 border-blue-600">
+                        <Badge className="bg-blue-100 text-blue-800 border-blue-600">
                           現在
                         </Badge>
                       )}

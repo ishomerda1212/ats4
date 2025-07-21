@@ -5,19 +5,20 @@ export type TaskType = 'general' | 'email' | 'document' | 'interview' | 'evaluat
 export type TaskStatus = '未着手' | '進行中' | '完了';
 export type TaskPriority = '低' | '中' | '高';
 
-export interface Task extends BaseEntity {
-  selectionHistoryId: string;
+export interface Task {
+  id: string;
   title: string;
-  description: string;
-  type?: TaskType;
+  description?: string;
   type: TaskType;
-  status: TaskStatus;
   priority: TaskPriority;
+  status: TaskStatus;
   assignee?: string;
-  dueDate?: string;
-  completedAt?: string;
-  emailTemplateId?: string;
-  metadata?: Record<string, unknown>;
+  dueDate?: Date;
+  completedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  selectionHistoryId: string;
+  applicantId: string;
 }
 
 export interface EmailTemplate extends BaseEntity {

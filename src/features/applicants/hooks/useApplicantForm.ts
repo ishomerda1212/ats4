@@ -74,7 +74,7 @@ export function useApplicantForm(applicant?: Applicant, mode: 'create' | 'edit' 
           description: `${data.name}さんの情報が正常に登録されました。`,
         });
 
-        navigate();
+        navigate('/applicants');
       } else if (applicant) {
         // const updatedApplicant: Applicant = {
         //   ...applicant,

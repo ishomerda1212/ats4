@@ -153,7 +153,6 @@ export function TaskList({ selectionHistoryId, applicant }: TaskListProps) {
                       </h5>
                       <TaskStatusBadge status={task.status} />
                       <Badge 
-                        variant="outline" 
                         className={`text-xs ${
                           task.priority === '高' ? 'border-red-300 text-red-700' :
                           task.priority === '中' ? 'border-yellow-300 text-yellow-700' :
@@ -163,7 +162,7 @@ export function TaskList({ selectionHistoryId, applicant }: TaskListProps) {
                         {task.priority}
                       </Badge>
                       {taskType === 'email' && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge className="bg-gray-100 text-gray-800 text-xs">
                           <Mail className="h-3 w-3 mr-1" />
                           メール
                         </Badge>
@@ -212,7 +211,7 @@ export function TaskList({ selectionHistoryId, applicant }: TaskListProps) {
                         </Button>
                       )}
                       {taskType === 'email' && task.status === '完了' && (
-                        <Badge variant="default" className="text-xs">
+                        <Badge className="bg-blue-100 text-blue-800 text-xs">
                           <Mail className="h-3 w-3 mr-1" />
                           送信済み
                         </Badge>

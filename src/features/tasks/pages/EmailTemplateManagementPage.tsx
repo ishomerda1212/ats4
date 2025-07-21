@@ -107,9 +107,9 @@ export function EmailTemplateManagementPage() {
                       <Mail className="h-4 w-4" />
                       <span>{template.name}</span>
                     </CardTitle>
-                    <Badge variant="outline">{template.stage}</Badge>
+                    <Badge className="bg-gray-100 text-gray-800">{template.stage}</Badge>
                     {template.isDefault && (
-                      <Badge variant="default" className="text-xs">デフォルト</Badge>
+                      <Badge className="bg-blue-100 text-blue-800 text-xs">デフォルト</Badge>
                     )}
                   </div>
                 </div>
@@ -135,12 +135,12 @@ export function EmailTemplateManagementPage() {
                     <p className="text-sm font-medium mb-1">使用変数</p>
                     <div className="flex flex-wrap gap-1">
                       {template.variables.slice(0, 3).map((variable) => (
-                        <Badge key={variable} variant="secondary" className="text-xs">
+                        <Badge key={variable} className="bg-gray-100 text-gray-800 text-xs">
                           {`{{${variable}}}`}
                         </Badge>
                       ))}
                       {template.variables.length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge className="bg-gray-100 text-gray-800 text-xs">
                           +{template.variables.length - 3}
                         </Badge>
                       )}

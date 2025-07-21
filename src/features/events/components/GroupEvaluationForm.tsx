@@ -164,12 +164,12 @@ export function GroupEvaluationForm({
           <CardTitle className="flex items-center space-x-2">
             <span>評定表入力</span>
             {existingEvaluation ? (
-              <Badge variant="default">
+              <Badge className="bg-blue-100 text-blue-800">
                 <CheckCircle className="h-3 w-3 mr-1" />
                 完了
               </Badge>
             ) : (
-              <Badge variant="secondary">
+              <Badge className="bg-gray-100 text-gray-800">
                 <Clock className="h-3 w-3 mr-1" />
                 {isDraft ? '下書き' : '未入力'}
               </Badge>

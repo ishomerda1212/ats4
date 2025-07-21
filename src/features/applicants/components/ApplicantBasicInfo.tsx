@@ -33,8 +33,8 @@ export function ApplicantBasicInfo({ applicant }: ApplicantBasicInfoProps) {
               <p className="text-muted-foreground">{applicant.nameKana}</p>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge variant="secondary">{applicant.source}</Badge>
-              <Badge variant="outline">{applicant.gender}</Badge>
+              <Badge className="bg-green-100 text-green-800">{applicant.source}</Badge>
+              <Badge className="bg-gray-100 text-gray-800">{applicant.gender}</Badge>
             </div>
           </div>
           <StatusBadge stage={applicant.currentStage} />

@@ -68,7 +68,7 @@ export function EvaluationView({ evaluation, applicantId, onEdit, onDelete }: Ev
             return (
               <div key={fieldConfig.key} className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <Badge variant="outline" className="text-xs">
+                  <Badge className="bg-gray-100 text-gray-800 text-xs">
                     {fieldConfig.label}
                   </Badge>
                 </div>

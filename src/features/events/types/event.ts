@@ -9,21 +9,19 @@ export interface Event extends BaseEntity {
 
 export interface EventSession extends BaseEntity {
   eventId: string;
-  startDateTime: string;
-  endDateTime: string;
+  name: string;
+  start: Date;
+  end: Date;
   venue: string;
-  notes?: string;
-  // 新しいフィールド
-  reportReminderDate?: string; // 開催報告とリマインドの日付
-  participantReportDate?: string; // 人数報告の日付
-  recruiter?: string; // リクルーター
+  participants: EventParticipant[];
 }
 
-export type ParticipationStatus = '申込' | '参加' | '欠席';
+export type ParticipationStatus = '参加' | '不参加' | '未定';
 
 export interface EventParticipant extends BaseEntity {
-  eventSessionId: string;
+  eventId: string;
   applicantId: string;
   status: ParticipationStatus;
-  registrationDate: string;
+  joinedAt?: Date;
+  updatedAt: Date;
 }

@@ -16,8 +16,8 @@ export const mockApplicants: Applicant[] = [
     phone: '090-1234-5678',
     email: 'tanaka@example.com',
     currentStage: '人事面接',
-    createdAt: '2024-01-15T09:00:00Z',
-    updatedAt: '2024-01-20T14:30:00Z'
+    createdAt: new Date('2024-01-15T09:00:00Z'),
+    updatedAt: new Date('2024-01-20T14:30:00Z')
   },
   {
     id: 'applicant-2',
@@ -33,8 +33,8 @@ export const mockApplicants: Applicant[] = [
     phone: '090-2345-6789',
     email: 'sato@example.com',
     currentStage: '会社説明会',
-    createdAt: '2024-01-16T10:15:00Z',
-    updatedAt: '2024-01-18T16:45:00Z'
+    createdAt: new Date('2024-01-16T10:15:00Z'),
+    updatedAt: new Date('2024-01-18T16:45:00Z')
   },
   {
     id: 'applicant-3',
@@ -50,8 +50,8 @@ export const mockApplicants: Applicant[] = [
     phone: '090-3456-7890',
     email: 'suzuki@example.com',
     currentStage: '最終選考',
-    createdAt: '2024-01-10T08:30:00Z',
-    updatedAt: '2024-01-22T11:20:00Z'
+    createdAt: new Date('2024-01-10T08:30:00Z'),
+    updatedAt: new Date('2024-01-22T11:20:00Z')
   },
   {
     id: 'applicant-4',
@@ -67,8 +67,8 @@ export const mockApplicants: Applicant[] = [
     phone: '090-4567-8901',
     email: 'takahashi@example.com',
     currentStage: 'エントリー',
-    createdAt: '2024-01-20T13:45:00Z',
-    updatedAt: '2024-01-20T13:45:00Z'
+    createdAt: new Date('2024-01-20T13:45:00Z'),
+    updatedAt: new Date('2024-01-20T13:45:00Z')
   },
   {
     id: 'applicant-5',
@@ -84,8 +84,8 @@ export const mockApplicants: Applicant[] = [
     phone: '090-5678-9012',
     email: 'yamada@example.com',
     currentStage: '内定',
-    createdAt: '2024-01-05T07:20:00Z',
-    updatedAt: '2024-01-25T15:10:00Z'
+    createdAt: new Date('2024-01-05T07:20:00Z'),
+    updatedAt: new Date('2024-01-25T15:10:00Z')
   },
   // 全ての選考段階を持つサンプル応募者
   {
@@ -102,8 +102,8 @@ export const mockApplicants: Applicant[] = [
     phone: '090-6789-0123',
     email: 'ito@example.com',
     currentStage: '内定',
-    createdAt: '2024-01-01T08:00:00Z',
-    updatedAt: '2024-01-30T16:00:00Z'
+    createdAt: new Date('2024-01-01T08:00:00Z'),
+    updatedAt: new Date('2024-01-30T16:00:00Z')
   }
 ];
 
@@ -113,187 +113,187 @@ export const mockSelectionHistory: SelectionHistory[] = [
     id: 'history-1',
     applicantId: mockApplicants[0].id,
     stage: 'エントリー',
-    startDate: '2024-01-15T09:00:00Z',
-    endDate: '2024-01-16T17:00:00Z',
+    startDate: new Date('2024-01-15T09:00:00Z'),
+    endDate: new Date('2024-01-16T17:00:00Z'),
     status: '完了',
     notes: 'エントリーシート確認完了',
-    createdAt: '2024-01-15T09:00:00Z',
-    updatedAt: '2024-01-16T17:00:00Z'
+    createdAt: new Date('2024-01-15T09:00:00Z'),
+    updatedAt: new Date('2024-01-16T17:00:00Z')
   },
   {
     id: 'history-2',
     applicantId: mockApplicants[0].id,
     stage: '会社説明会',
-    startDate: '2024-01-17T14:00:00Z',
-    endDate: '2024-01-17T16:00:00Z',
+    startDate: new Date('2024-01-17T14:00:00Z'),
+    endDate: new Date('2024-01-17T16:00:00Z'),
     status: '完了',
     notes: '参加確認済み',
-    createdAt: '2024-01-17T14:00:00Z',
-    updatedAt: '2024-01-17T16:00:00Z'
+    createdAt: new Date('2024-01-17T14:00:00Z'),
+    updatedAt: new Date('2024-01-17T16:00:00Z')
   },
   {
     id: 'history-3',
     applicantId: mockApplicants[0].id,
     stage: '人事面接',
-    startDate: '2024-01-20T14:30:00Z',
+    startDate: new Date('2024-01-20T14:30:00Z'),
     status: '進行中',
     notes: '面接官：田中部長',
-    createdAt: '2024-01-20T14:30:00Z',
-    updatedAt: '2024-01-20T14:30:00Z'
+    createdAt: new Date('2024-01-20T14:30:00Z'),
+    updatedAt: new Date('2024-01-20T14:30:00Z')
   },
   // 佐藤花子の選考履歴
   {
     id: 'history-4',
     applicantId: mockApplicants[1].id,
     stage: 'エントリー',
-    startDate: '2024-01-16T10:15:00Z',
-    endDate: '2024-01-16T18:00:00Z',
+    startDate: new Date('2024-01-16T10:15:00Z'),
+    endDate: new Date('2024-01-16T18:00:00Z'),
     status: '完了',
     notes: 'エントリーシート確認完了。商学部で経営学を専攻、優秀な成績',
-    createdAt: '2024-01-16T10:15:00Z',
-    updatedAt: '2024-01-16T18:00:00Z'
+    createdAt: new Date('2024-01-16T10:15:00Z'),
+    updatedAt: new Date('2024-01-16T18:00:00Z')
   },
   {
     id: 'history-5',
     applicantId: mockApplicants[1].id,
     stage: '会社説明会',
-    startDate: '2024-01-18T16:45:00Z',
+    startDate: new Date('2024-01-18T16:45:00Z'),
     status: '進行中',
     notes: '2024年2月15日の説明会に参加予定。積極的な質問が期待される',
-    createdAt: '2024-01-18T16:45:00Z',
-    updatedAt: '2024-01-18T16:45:00Z'
+    createdAt: new Date('2024-01-18T16:45:00Z'),
+    updatedAt: new Date('2024-01-18T16:45:00Z')
   },
   // 伊藤優子の全選考段階履歴
   {
     id: 'history-6',
     applicantId: mockApplicants[5].id,
     stage: 'エントリー',
-    startDate: '2024-01-01T08:00:00Z',
-    endDate: '2024-01-02T17:00:00Z',
+    startDate: new Date('2024-01-01T08:00:00Z'),
+    endDate: new Date('2024-01-02T17:00:00Z'),
     status: '完了',
     notes: 'エントリーシート確認完了。経営学専攻で優秀な成績',
-    createdAt: '2024-01-01T08:00:00Z',
-    updatedAt: '2024-01-02T17:00:00Z'
+    createdAt: new Date('2024-01-01T08:00:00Z'),
+    updatedAt: new Date('2024-01-02T17:00:00Z')
   },
   {
     id: 'history-6-5',
     applicantId: mockApplicants[5].id,
     stage: '書類選考',
-    startDate: '2024-01-03T09:00:00Z',
-    endDate: '2024-01-04T17:00:00Z',
+    startDate: new Date('2024-01-03T09:00:00Z'),
+    endDate: new Date('2024-01-04T17:00:00Z'),
     status: '完了',
     notes: '書類選考実施。経営学の知識と志望動機が評価された',
-    createdAt: '2024-01-03T09:00:00Z',
-    updatedAt: '2024-01-04T17:00:00Z'
+    createdAt: new Date('2024-01-03T09:00:00Z'),
+    updatedAt: new Date('2024-01-04T17:00:00Z')
   },
   {
     id: 'history-7',
     applicantId: mockApplicants[5].id,
     stage: '会社説明会',
-    startDate: '2024-01-05T14:00:00Z',
-    endDate: '2024-01-05T16:00:00Z',
+    startDate: new Date('2024-01-05T14:00:00Z'),
+    endDate: new Date('2024-01-05T16:00:00Z'),
     status: '完了',
     notes: '参加確認済み。積極的な質問が印象的',
-    createdAt: '2024-01-05T14:00:00Z',
-    updatedAt: '2024-01-05T16:00:00Z'
+    createdAt: new Date('2024-01-05T14:00:00Z'),
+    updatedAt: new Date('2024-01-05T16:00:00Z')
   },
   {
     id: 'history-8',
     applicantId: mockApplicants[5].id,
     stage: '適性検査',
-    startDate: '2024-01-08T10:00:00Z',
-    endDate: '2024-01-08T12:00:00Z',
+    startDate: new Date('2024-01-08T10:00:00Z'),
+    endDate: new Date('2024-01-08T12:00:00Z'),
     status: '完了',
     notes: 'Web適性検査実施。結果：優秀',
-    createdAt: '2024-01-08T10:00:00Z',
-    updatedAt: '2024-01-08T12:00:00Z'
+    createdAt: new Date('2024-01-08T10:00:00Z'),
+    updatedAt: new Date('2024-01-08T12:00:00Z')
   },
   {
     id: 'history-9',
     applicantId: mockApplicants[5].id,
     stage: '職場見学',
-    startDate: '2024-01-12T13:00:00Z',
-    endDate: '2024-01-12T15:00:00Z',
+    startDate: new Date('2024-01-12T13:00:00Z'),
+    endDate: new Date('2024-01-12T15:00:00Z'),
     status: '完了',
     notes: '本社オフィス見学実施。社員との交流も良好',
-    createdAt: '2024-01-12T13:00:00Z',
-    updatedAt: '2024-01-12T15:00:00Z'
+    createdAt: new Date('2024-01-12T13:00:00Z'),
+    updatedAt: new Date('2024-01-12T15:00:00Z')
   },
   {
     id: 'history-9-5',
     applicantId: mockApplicants[5].id,
     stage: '仕事体験',
-    startDate: '2024-01-14T09:00:00Z',
-    endDate: '2024-01-14T17:00:00Z',
+    startDate: new Date('2024-01-14T09:00:00Z'),
+    endDate: new Date('2024-01-14T17:00:00Z'),
     status: '完了',
     notes: '実際の業務を体験。積極的な姿勢が評価された',
-    createdAt: '2024-01-14T09:00:00Z',
-    updatedAt: '2024-01-14T17:00:00Z'
+    createdAt: new Date('2024-01-14T09:00:00Z'),
+    updatedAt: new Date('2024-01-14T17:00:00Z')
   },
   {
     id: 'history-9-6',
     applicantId: mockApplicants[5].id,
     stage: '個別面接',
-    startDate: '2024-01-16T14:00:00Z',
-    endDate: '2024-01-16T15:30:00Z',
+    startDate: new Date('2024-01-16T14:00:00Z'),
+    endDate: new Date('2024-01-16T15:30:00Z'),
     status: '完了',
     notes: '個別面接実施。志望動機とキャリアプランについて詳細に話し合った',
-    createdAt: '2024-01-16T14:00:00Z',
-    updatedAt: '2024-01-16T15:30:00Z'
+    createdAt: new Date('2024-01-16T14:00:00Z'),
+    updatedAt: new Date('2024-01-16T15:30:00Z')
   },
   {
     id: 'history-9-7',
     applicantId: mockApplicants[5].id,
     stage: '集団面接',
-    startDate: '2024-01-17T10:00:00Z',
-    endDate: '2024-01-17T12:00:00Z',
+    startDate: new Date('2024-01-17T10:00:00Z'),
+    endDate: new Date('2024-01-17T12:00:00Z'),
     status: '完了',
     notes: '集団面接実施。リーダーシップと協調性を評価',
-    createdAt: '2024-01-17T10:00:00Z',
-    updatedAt: '2024-01-17T12:00:00Z'
+    createdAt: new Date('2024-01-17T10:00:00Z'),
+    updatedAt: new Date('2024-01-17T12:00:00Z')
   },
   {
     id: 'history-10',
     applicantId: mockApplicants[5].id,
     stage: 'CEOセミナー',
-    startDate: '2024-01-15T18:00:00Z',
-    endDate: '2024-01-15T20:00:00Z',
+    startDate: new Date('2024-01-15T18:00:00Z'),
+    endDate: new Date('2024-01-15T20:00:00Z'),
     status: '完了',
     notes: 'CEOセミナー参加。経営理念への理解が深い',
-    createdAt: '2024-01-15T18:00:00Z',
-    updatedAt: '2024-01-15T20:00:00Z'
+    createdAt: new Date('2024-01-15T18:00:00Z'),
+    updatedAt: new Date('2024-01-15T20:00:00Z')
   },
   {
     id: 'history-11',
     applicantId: mockApplicants[5].id,
     stage: '人事面接',
-    startDate: '2024-01-18T14:00:00Z',
-    endDate: '2024-01-18T15:30:00Z',
+    startDate: new Date('2024-01-18T14:00:00Z'),
+    endDate: new Date('2024-01-18T15:30:00Z'),
     status: '完了',
     notes: '人事面接実施。企業文化への適合性を確認',
-    createdAt: '2024-01-18T14:00:00Z',
-    updatedAt: '2024-01-18T15:30:00Z'
+    createdAt: new Date('2024-01-18T14:00:00Z'),
+    updatedAt: new Date('2024-01-18T15:30:00Z')
   },
   {
     id: 'history-12',
     applicantId: mockApplicants[5].id,
     stage: '最終選考',
-    startDate: '2024-01-25T10:00:00Z',
-    endDate: '2024-01-25T11:30:00Z',
+    startDate: new Date('2024-01-25T10:00:00Z'),
+    endDate: new Date('2024-01-25T11:30:00Z'),
     status: '完了',
     notes: '最終選考実施。最終的な採用判断',
-    createdAt: '2024-01-25T10:00:00Z',
-    updatedAt: '2024-01-25T11:30:00Z'
+    createdAt: new Date('2024-01-25T10:00:00Z'),
+    updatedAt: new Date('2024-01-25T11:30:00Z')
   },
   {
     id: 'history-13',
     applicantId: mockApplicants[5].id,
     stage: '内定',
-    startDate: '2024-01-30T10:00:00Z',
+    startDate: new Date('2024-01-30T10:00:00Z'),
     status: '完了',
     notes: '内定通知完了。入社予定日：2025年4月1日',
-    createdAt: '2024-01-30T10:00:00Z',
-    updatedAt: '2024-01-30T16:00:00Z'
+    createdAt: new Date('2024-01-30T10:00:00Z'),
+    updatedAt: new Date('2024-01-30T16:00:00Z')
   }
 ];
 
@@ -311,8 +311,8 @@ export const mockEvaluations: Evaluation[] = [
     motivation: '志望動機が明確で熱意が伝わる',
     technicalSkills: '技術的なスキルは期待以上',
     overallEvaluation: '総合的に高評価。次の段階に進めたい',
-    createdAt: '2024-01-17T16:30:00Z',
-    updatedAt: '2024-01-17T16:30:00Z'
+    createdAt: new Date('2024-01-17T16:30:00Z'),
+    updatedAt: new Date('2024-01-17T16:30:00Z')
   },
   // 伊藤優子のCEOセミナー評価
   {
@@ -328,8 +328,8 @@ export const mockEvaluations: Evaluation[] = [
     motivation: '会社の未来について深く考えている',
     technicalSkills: '経営学の知識を活かした視点が評価できる',
     overallEvaluation: 'CEOセミナーでの理解度と意欲が非常に高い。次の段階に進めたい',
-    createdAt: '2024-01-15T20:30:00Z',
-    updatedAt: '2024-01-15T20:30:00Z'
+    createdAt: new Date('2024-01-15T20:30:00Z'),
+    updatedAt: new Date('2024-01-15T20:30:00Z')
   }
 ];
 
@@ -337,23 +337,23 @@ export const mockEvaluations: Evaluation[] = [
 export const mockStageDetails = {
   // 伊藤優子のCEOセミナー詳細データ
   'history-10': {
-    sessionDate: '2024-01-15T18:00:00Z',
+    sessionDate: new Date('2024-01-15T18:00:00Z'),
     sessionName: 'CEOセミナー 第1回',
     eventName: '2025年度新卒採用 CEOセミナー',
     reservationStatus: '予約済み',
     attendanceStatus: '参加',
-    impression: '経営理念への理解が深く、真剣に参加している。セミナー後の質疑応答で的確な質問をしており、会社の未来について深く考えていることが伝わった。',
+    impression: '経営理念への理解が深く、真剣に参加している。セミナー後の質疑応答での確な質問をしており、会社の未来について深く考えていることが伝わった。',
     notes: '経営学専攻の知識を活かした視点が評価できる。他の参加者との交流も良好。',
     tasks: {
-      detailedContact: { completed: true, completedAt: '2024-01-10T14:30:00Z' },
-      reminder: { completed: true, completedAt: '2024-01-14T16:00:00Z' }
+      detailedContact: { completed: true, completedAt: new Date('2024-01-10T14:30:00Z') },
+      reminder: { completed: true, completedAt: new Date('2024-01-14T16:00:00Z') }
     }
   },
   // 伊藤優子のエントリー詳細データ
   'history-6': {
     approaches: {
-      approach1: { completed: true, completedAt: '2024-01-01T10:00:00Z' },
-      approach2: { completed: true, completedAt: '2024-01-02T14:30:00Z' },
+      approach1: { completed: true, completedAt: new Date('2024-01-01T10:00:00Z') },
+      approach2: { completed: true, completedAt: new Date('2024-01-02T14:30:00Z') },
       approach3: { completed: false },
       approach4: { completed: false },
       approach5: { completed: false }
@@ -362,18 +362,18 @@ export const mockStageDetails = {
   // 伊藤優子の書類選考詳細データ
   'history-6-5': {
     result: '合格',
-    resultDate: '2024-01-04T17:00:00Z',
+    resultDate: new Date('2024-01-04T17:00:00Z'),
     evaluator: '人事部 田中',
     evaluationNotes: '経営学の知識が豊富で、志望動機も明確。エントリーシートの内容も充実しており、次の段階に進めることを推奨。',
     notes: '経営学の知識と志望動機が評価された。',
     tasks: {
-      detailedContact: { completed: true, completedAt: '2024-01-02T16:30:00Z' },
-      resultNotification: { completed: true, completedAt: '2024-01-04T18:00:00Z' }
+      detailedContact: { completed: true, completedAt: new Date('2024-01-02T16:30:00Z') },
+      resultNotification: { completed: true, completedAt: new Date('2024-01-04T18:00:00Z') }
     }
   },
   // 伊藤優子の適性検査詳細データ
   'history-8': {
-    sessionDate: '2024-01-08T10:00:00Z',
+    sessionDate: new Date('2024-01-08T10:00:00Z'),
     sessionName: '適性検査 第1回',
     eventName: '2025年度新卒採用 適性検査',
     testType: 'Web適性検査',
@@ -381,7 +381,7 @@ export const mockStageDetails = {
     result: '優秀',
     notes: '論理的思考力と問題解決能力が高い。特に数理系の問題で優秀な成績。',
     tasks: {
-      detailedContact: { completed: true, completedAt: '2024-01-05T14:30:00Z' }
+      detailedContact: { completed: true, completedAt: new Date('2024-01-05T14:30:00Z') }
     }
   },
   // 伊藤優子の人事面接詳細データ
@@ -397,24 +397,24 @@ export const mockStageDetails = {
   // 伊藤優子の最終選考詳細データ
   'history-12': {
     candidateDates: [
-      '2024-01-25T10:00:00Z',
-      '2024-01-26T10:00:00Z',
-      '2024-01-27T10:00:00Z'
+      new Date('2024-01-25T10:00:00Z'),
+      new Date('2024-01-26T10:00:00Z'),
+      new Date('2024-01-27T10:00:00Z')
     ],
     result: '合格',
-    resultDate: '2024-01-28T17:00:00Z',
+    resultDate: new Date('2024-01-28T17:00:00Z'),
     evaluator: '田中社長、人事部 佐藤部長',
     comments: '最終選考で総合的な評価を実施。志望動機、キャリアプラン、企業文化への適合性すべてにおいて高評価。リーダーシップとコミュニケーション能力も優秀。',
     notes: '最終選考実施。最終的な採用判断',
     tasks: {
-      detailedContact: { completed: true, completedAt: '2024-01-24T16:30:00Z' },
-      documentCollection: { completed: true, completedAt: '2024-01-26T14:00:00Z' },
-      resultNotification: { completed: true, completedAt: '2024-01-28T18:00:00Z' }
+      detailedContact: { completed: true, completedAt: new Date('2024-01-24T16:30:00Z') },
+      documentCollection: { completed: true, completedAt: new Date('2024-01-26T14:00:00Z') },
+      resultNotification: { completed: true, completedAt: new Date('2024-01-28T18:00:00Z') }
     }
   },
   // 伊藤優子の職場見学詳細データ
   'history-9': {
-    sessionDate: '2024-01-12T13:00:00Z',
+    sessionDate: new Date('2024-01-12T13:00:00Z'),
     sessionName: '職場見学 第1回',
     eventName: '2025年度新卒採用 職場見学',
     location: '本社オフィス（東京都渋谷区）',
@@ -422,12 +422,12 @@ export const mockStageDetails = {
     impression: '本社オフィス見学実施。社員との交流も良好で、職場の雰囲気を理解できた。',
     notes: '社員との交流も良好。職場の雰囲気を理解できた。',
     tasks: {
-      detailedContact: { completed: true, completedAt: '2024-01-10T16:30:00Z' }
+      detailedContact: { completed: true, completedAt: new Date('2024-01-10T16:30:00Z') }
     }
   },
   // 伊藤優子の仕事体験詳細データ
   'history-9-5': {
-    sessionDate: '2024-01-14T09:00:00Z',
+    sessionDate: new Date('2024-01-14T09:00:00Z'),
     sessionName: '仕事体験 第1回',
     eventName: '2025年度新卒採用 仕事体験',
     location: '本社オフィス（東京都渋谷区）',
@@ -435,12 +435,12 @@ export const mockStageDetails = {
     impression: '実際の業務を体験。積極的な姿勢で取り組み、チームワークも良好。実務経験を通じて会社への理解が深まった。',
     notes: '積極的な姿勢が評価された。実務経験を通じて会社への理解が深まった。',
     tasks: {
-      detailedContact: { completed: true, completedAt: '2024-01-12T14:30:00Z' }
+      detailedContact: { completed: true, completedAt: new Date('2024-01-12T14:30:00Z') }
     }
   },
   // 伊藤優子の会社説明会詳細データ
   'history-7': {
-    sessionDate: '2024-01-05T14:00:00Z',
+    sessionDate: new Date('2024-01-05T14:00:00Z'),
     sessionName: '会社説明会 第1回',
     eventName: '2025年度新卒採用 会社説明会',
     location: '本社オフィス（東京都渋谷区）',
@@ -448,12 +448,12 @@ export const mockStageDetails = {
     impression: '会社説明会に参加。企業理念や事業内容について理解を深めた。',
     notes: '企業理念や事業内容について理解を深めた。',
     tasks: {
-      detailedContact: { completed: true, completedAt: '2024-01-03T16:30:00Z' }
+      detailedContact: { completed: true, completedAt: new Date('2024-01-03T16:30:00Z') }
     }
   },
   // 田中太郎の会社説明会詳細データ
   'history-2': {
-    sessionDate: '2024-01-17T14:00:00Z',
+    sessionDate: new Date('2024-01-17T14:00:00Z'),
     sessionName: '会社説明会 第2回',
     eventName: '2025年度新卒採用 会社説明会',
     location: '本社オフィス（東京都渋谷区）',
@@ -461,12 +461,12 @@ export const mockStageDetails = {
     impression: '会社説明会に参加。技術的な質問が多く、関心の高さが伺える。',
     notes: '技術的な質問が多く、関心の高さが伺える。',
     tasks: {
-      detailedContact: { completed: true, completedAt: '2024-01-15T16:30:00Z' }
+      detailedContact: { completed: true, completedAt: new Date('2024-01-15T16:30:00Z') }
     }
   },
   // 伊藤優子の個別面接詳細データ
   'history-9-6': {
-    interviewDate: '2024-01-16T14:00:00Z',
+    interviewDate: new Date('2024-01-16T14:00:00Z'),
     interviewTime: '14:00-15:30',
     location: '本社オフィス（東京都渋谷区）',
     attendanceStatus: '参加',
@@ -474,30 +474,30 @@ export const mockStageDetails = {
     impression: '志望動機とキャリアプランについて詳細に話し合った。将来のビジョンが明確で、会社への理解も深い。',
     notes: '志望動機とキャリアプランについて詳細に話し合った。将来のビジョンが明確。',
     tasks: {
-      detailedContact: { completed: true, completedAt: '2024-01-14T16:30:00Z' }
+      detailedContact: { completed: true, completedAt: new Date('2024-01-14T16:30:00Z') }
     }
   },
   // 伊藤優子の集団面接詳細データ
   'history-9-7': {
-    sessionDate: '2024-01-17T10:00:00Z',
+    sessionDate: new Date('2024-01-17T10:00:00Z'),
     sessionName: '集団面接 第1回',
     eventName: '2025年度新卒採用 集団面接',
     location: '本社オフィス（東京都渋谷区）',
     candidateDates: [
-      '2024-01-17T10:00:00Z',
-      '2024-01-18T10:00:00Z',
-      '2024-01-19T10:00:00Z'
+      new Date('2024-01-17T10:00:00Z'),
+      new Date('2024-01-18T10:00:00Z'),
+      new Date('2024-01-19T10:00:00Z')
     ],
     attendanceStatus: '参加',
     result: '合格',
-    resultDate: '2024-01-20T17:00:00Z',
+    resultDate: new Date('2024-01-20T17:00:00Z'),
     groupSize: 5,
     evaluator: '人事部 佐藤、営業部 田中',
     impression: '集団面接でリーダーシップを発揮。他の参加者の意見も引き出し、チームワークを重視する姿勢が評価された。',
     notes: '集団面接実施。リーダーシップと協調性を評価。',
     tasks: {
-      detailedContact: { completed: true, completedAt: '2024-01-15T16:30:00Z' },
-      resultNotification: { completed: true, completedAt: '2024-01-20T18:00:00Z' }
+      detailedContact: { completed: true, completedAt: new Date('2024-01-15T16:30:00Z') },
+      resultNotification: { completed: true, completedAt: new Date('2024-01-20T18:00:00Z') }
     }
   }
 };
@@ -512,10 +512,10 @@ export const mockTasks: Task[] = [
     status: '完了',
     priority: '高',
     assignee: '人事部 田中',
-    dueDate: '2024-01-16T17:00:00Z',
-    completedAt: '2024-01-16T15:30:00Z',
-    createdAt: '2024-01-15T09:00:00Z',
-    updatedAt: '2024-01-16T15:30:00Z'
+    dueDate: new Date('2024-01-16T17:00:00Z'),
+    completedAt: new Date('2024-01-16T15:30:00Z'),
+    createdAt: new Date('2024-01-15T09:00:00Z'),
+    updatedAt: new Date('2024-01-16T15:30:00Z')
   },
   {
     id: 'task-2',
@@ -525,11 +525,11 @@ export const mockTasks: Task[] = [
     status: '完了',
     priority: '高',
     assignee: '人事部 田中',
-    dueDate: '2024-01-15T18:00:00Z',
-    completedAt: '2024-01-15T17:30:00Z',
+    dueDate: new Date('2024-01-15T18:00:00Z'),
+    completedAt: new Date('2024-01-15T17:30:00Z'),
     emailTemplateId: 'entry-confirmation-template',
-    createdAt: '2024-01-15T09:00:00Z',
-    updatedAt: '2024-01-15T17:30:00Z'
+    createdAt: new Date('2024-01-15T09:00:00Z'),
+    updatedAt: new Date('2024-01-15T17:30:00Z')
   },
   // 会社説明会段階のタスク
   {
@@ -540,11 +540,11 @@ export const mockTasks: Task[] = [
     status: '完了',
     priority: '高',
     assignee: '人事部 田中',
-    dueDate: '2024-01-17T10:00:00Z',
-    completedAt: '2024-01-16T16:30:00Z',
+    dueDate: new Date('2024-01-17T10:00:00Z'),
+    completedAt: new Date('2024-01-16T16:30:00Z'),
     emailTemplateId: 'company-info-session-template',
-    createdAt: '2024-01-16T10:00:00Z',
-    updatedAt: '2024-01-16T16:30:00Z'
+    createdAt: new Date('2024-01-16T10:00:00Z'),
+    updatedAt: new Date('2024-01-16T16:30:00Z')
   },
   // 人事面接段階のタスク
   {
@@ -555,10 +555,10 @@ export const mockTasks: Task[] = [
     status: '進行中',
     priority: '高',
     assignee: '人事部 佐藤',
-    dueDate: '2024-01-21T10:00:00Z',
+    dueDate: new Date('2024-01-21T10:00:00Z'),
     emailTemplateId: 'interview-schedule-template',
-    createdAt: '2024-01-18T09:00:00Z',
-    updatedAt: '2024-01-20T10:00:00Z'
+    createdAt: new Date('2024-01-18T09:00:00Z'),
+    updatedAt: new Date('2024-01-20T10:00:00Z')
   },
   {
     id: 'task-5',
@@ -568,10 +568,10 @@ export const mockTasks: Task[] = [
     status: '完了',
     priority: '高',
     assignee: '人事部 田中',
-    dueDate: '2024-01-20T12:00:00Z',
-    completedAt: '2024-01-19T16:00:00Z',
-    createdAt: '2024-01-18T09:00:00Z',
-    updatedAt: '2024-01-19T16:00:00Z'
+    dueDate: new Date('2024-01-20T12:00:00Z'),
+    completedAt: new Date('2024-01-19T16:00:00Z'),
+    createdAt: new Date('2024-01-18T09:00:00Z'),
+    updatedAt: new Date('2024-01-19T16:00:00Z')
   },
   // 佐藤花子の会社説明会段階タスク
   {
@@ -582,10 +582,10 @@ export const mockTasks: Task[] = [
     status: '進行中',
     priority: '高',
     assignee: '人事部 田中',
-    dueDate: '2024-01-25T17:00:00Z',
+    dueDate: new Date('2024-01-25T17:00:00Z'),
     emailTemplateId: 'company-info-session-template',
-    createdAt: '2024-01-18T16:45:00Z',
-    updatedAt: '2024-01-25T14:00:00Z'
+    createdAt: new Date('2024-01-18T16:45:00Z'),
+    updatedAt: new Date('2024-01-25T14:00:00Z')
   },
   {
     id: 'task-7',
@@ -595,10 +595,10 @@ export const mockTasks: Task[] = [
     status: '未着手',
     priority: '高',
     assignee: '人事部 山田',
-    dueDate: '2024-02-14T18:00:00Z',
+    dueDate: new Date('2024-02-14T18:00:00Z'),
     emailTemplateId: 'reminder-before-session-template',
-    createdAt: '2024-01-18T16:45:00Z',
-    updatedAt: '2024-01-18T16:45:00Z'
+    createdAt: new Date('2024-01-18T16:45:00Z'),
+    updatedAt: new Date('2024-01-18T16:45:00Z')
   },
   {
     id: 'task-8',
@@ -608,10 +608,10 @@ export const mockTasks: Task[] = [
     status: '未着手',
     priority: '中',
     assignee: '人事部 佐藤',
-    dueDate: '2024-02-16T10:00:00Z',
+    dueDate: new Date('2024-02-16T10:00:00Z'),
     emailTemplateId: 'followup-after-session-template',
-    createdAt: '2024-01-18T16:45:00Z',
-    updatedAt: '2024-01-18T16:45:00Z'
+    createdAt: new Date('2024-01-18T16:45:00Z'),
+    updatedAt: new Date('2024-01-18T16:45:00Z')
   },
   // 会社説明会段階のタスク
   {
@@ -623,10 +623,10 @@ export const mockTasks: Task[] = [
     status: '完了',
     priority: '中',
     assignee: '人事部 山田',
-    dueDate: '2024-01-17T12:00:00Z',
-    completedAt: '2024-01-17T11:30:00Z',
-    createdAt: '2024-01-16T10:00:00Z',
-    updatedAt: '2024-01-17T11:30:00Z'
+    dueDate: new Date('2024-01-17T12:00:00Z'),
+    completedAt: new Date('2024-01-17T11:30:00Z'),
+    createdAt: new Date('2024-01-16T10:00:00Z'),
+    updatedAt: new Date('2024-01-17T11:30:00Z')
   },
   {
     id: 'task-10',
@@ -637,11 +637,11 @@ export const mockTasks: Task[] = [
     status: '完了',
     priority: '高',
     assignee: '人事部 田中',
-    dueDate: '2024-01-17T10:00:00Z',
-    completedAt: '2024-01-16T16:30:00Z',
+    dueDate: new Date('2024-01-17T10:00:00Z'),
+    completedAt: new Date('2024-01-16T16:30:00Z'),
     emailTemplateId: 'company-info-session-template',
-    createdAt: '2024-01-16T10:00:00Z',
-    updatedAt: '2024-01-16T16:30:00Z'
+    createdAt: new Date('2024-01-16T10:00:00Z'),
+    updatedAt: new Date('2024-01-16T16:30:00Z')
   },
   // 人事面接段階のタスク
   {
@@ -653,10 +653,10 @@ export const mockTasks: Task[] = [
     status: '完了',
     priority: '高',
     assignee: '人事部 田中',
-    dueDate: '2024-01-20T12:00:00Z',
-    completedAt: '2024-01-19T16:00:00Z',
-    createdAt: '2024-01-18T09:00:00Z',
-    updatedAt: '2024-01-19T16:00:00Z'
+    dueDate: new Date('2024-01-20T12:00:00Z'),
+    completedAt: new Date('2024-01-19T16:00:00Z'),
+    createdAt: new Date('2024-01-18T09:00:00Z'),
+    updatedAt: new Date('2024-01-19T16:00:00Z')
   },
   {
     id: 'task-12',
@@ -667,10 +667,10 @@ export const mockTasks: Task[] = [
     status: '進行中',
     priority: '高',
     assignee: '人事部 佐藤',
-    dueDate: '2024-01-21T10:00:00Z',
+    dueDate: new Date('2024-01-21T10:00:00Z'),
     emailTemplateId: 'interview-schedule-template',
-    createdAt: '2024-01-18T09:00:00Z',
-    updatedAt: '2024-01-20T10:00:00Z'
+    createdAt: new Date('2024-01-18T09:00:00Z'),
+    updatedAt: new Date('2024-01-20T10:00:00Z')
   },
   {
     id: 'task-13',
@@ -681,9 +681,9 @@ export const mockTasks: Task[] = [
     status: '未着手',
     priority: '中',
     assignee: '人事部 山田',
-    dueDate: '2024-01-20T13:00:00Z',
-    createdAt: '2024-01-18T09:00:00Z',
-    updatedAt: '2024-01-18T09:00:00Z'
+    dueDate: new Date('2024-01-20T13:00:00Z'),
+    createdAt: new Date('2024-01-18T09:00:00Z'),
+    updatedAt: new Date('2024-01-18T09:00:00Z')
   },
   // 佐藤花子のエントリー段階タスク
   {
@@ -695,10 +695,10 @@ export const mockTasks: Task[] = [
     status: '完了',
     priority: '高',
     assignee: '人事部 山田',
-    dueDate: '2024-01-16T17:00:00Z',
-    completedAt: '2024-01-16T16:30:00Z',
-    createdAt: '2024-01-16T10:15:00Z',
-    updatedAt: '2024-01-16T16:30:00Z'
+    dueDate: new Date('2024-01-16T17:00:00Z'),
+    completedAt: new Date('2024-01-16T16:30:00Z'),
+    createdAt: new Date('2024-01-16T10:15:00Z'),
+    updatedAt: new Date('2024-01-16T16:30:00Z')
   },
   {
     id: 'task-15',
@@ -709,10 +709,10 @@ export const mockTasks: Task[] = [
     status: '完了',
     priority: '高',
     assignee: '人事部 田中',
-    dueDate: '2024-01-16T17:00:00Z',
-    completedAt: '2024-01-16T17:45:00Z',
-    createdAt: '2024-01-16T10:15:00Z',
-    updatedAt: '2024-01-16T17:45:00Z'
+    dueDate: new Date('2024-01-16T17:00:00Z'),
+    completedAt: new Date('2024-01-16T17:45:00Z'),
+    createdAt: new Date('2024-01-16T10:15:00Z'),
+    updatedAt: new Date('2024-01-16T17:45:00Z')
   },
   // 佐藤花子の会社説明会段階タスク
   {
@@ -724,10 +724,10 @@ export const mockTasks: Task[] = [
     status: '完了',
     priority: '中',
     assignee: '人事部 佐藤',
-    dueDate: '2024-01-19T12:00:00Z',
-    completedAt: '2024-01-19T11:00:00Z',
-    createdAt: '2024-01-18T16:45:00Z',
-    updatedAt: '2024-01-19T11:00:00Z'
+    dueDate: new Date('2024-01-19T12:00:00Z'),
+    completedAt: new Date('2024-01-19T11:00:00Z'),
+    createdAt: new Date('2024-01-18T16:45:00Z'),
+    updatedAt: new Date('2024-01-19T11:00:00Z')
   },
   {
     id: 'task-17',
@@ -738,10 +738,10 @@ export const mockTasks: Task[] = [
     status: '進行中',
     priority: '高',
     assignee: '人事部 田中',
-    dueDate: '2024-01-25T17:00:00Z',
+    dueDate: new Date('2024-01-25T17:00:00Z'),
     emailTemplateId: 'company-info-session-template',
-    createdAt: '2024-01-18T16:45:00Z',
-    updatedAt: '2024-01-25T14:00:00Z'
+    createdAt: new Date('2024-01-18T16:45:00Z'),
+    updatedAt: new Date('2024-01-25T14:00:00Z')
   },
   {
     id: 'task-18',
@@ -752,9 +752,9 @@ export const mockTasks: Task[] = [
     status: '未着手',
     priority: '中',
     assignee: '人事部 山田',
-    dueDate: '2024-02-15T13:00:00Z',
-    createdAt: '2024-01-18T16:45:00Z',
-    updatedAt: '2024-01-18T16:45:00Z'
+    dueDate: new Date('2024-02-15T13:00:00Z'),
+    createdAt: new Date('2024-01-18T16:45:00Z'),
+    updatedAt: new Date('2024-01-18T16:45:00Z')
   },
   {
     id: 'task-19',
@@ -765,10 +765,10 @@ export const mockTasks: Task[] = [
     status: '未着手',
     priority: '中',
     assignee: '人事部 佐藤',
-    dueDate: '2024-02-16T10:00:00Z',
+    dueDate: new Date('2024-02-16T10:00:00Z'),
     emailTemplateId: 'followup-after-session-template',
-    createdAt: '2024-01-18T16:45:00Z',
-    updatedAt: '2024-01-18T16:45:00Z'
+    createdAt: new Date('2024-01-18T16:45:00Z'),
+    updatedAt: new Date('2024-01-18T16:45:00Z')
   },
   {
     id: 'task-20',
@@ -779,9 +779,9 @@ export const mockTasks: Task[] = [
     status: '未着手',
     priority: '高',
     assignee: '人事部 山田',
-    dueDate: '2024-02-14T18:00:00Z',
+    dueDate: new Date('2024-02-14T18:00:00Z'),
     emailTemplateId: 'reminder-before-session-template',
-    createdAt: '2024-01-18T16:45:00Z',
-    updatedAt: '2024-01-18T16:45:00Z'
+    createdAt: new Date('2024-01-18T16:45:00Z'),
+    updatedAt: new Date('2024-01-18T16:45:00Z')
   }
 ];

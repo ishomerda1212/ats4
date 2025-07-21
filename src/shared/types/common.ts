@@ -2,8 +2,8 @@ export type Status = 'loading' | 'error' | 'success' | 'idle';
 
 export interface BaseEntity {
   id: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface SelectOption {

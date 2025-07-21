@@ -138,10 +138,10 @@ export function StageManagementPage() {
                     <div>
                       <div className="flex items-center space-x-2">
                         <CardTitle>{stage.order}. {stage.name}</CardTitle>
-                        <Badge variant={stage.isActive ? 'default' : 'secondary'}>
+                        <Badge className="bg-gray-100 text-gray-800">
                           {stage.isActive ? '有効' : '無効'}
                         </Badge>
-                        <Badge variant="outline">
+                        <Badge className="bg-gray-100 text-gray-800 text-xs">
                           {stage.defaultTasks.length}タスク
                         </Badge>
                       </div>
@@ -207,14 +207,14 @@ export function StageManagementPage() {
                               <div className="flex-1">
                                 <div className="flex items-center space-x-2 mb-1">
                                   <h5 className="font-medium">{task.title}</h5>
-                                  <Badge variant="outline" className="text-xs">
+                                  <Badge className="bg-gray-100 text-gray-800 text-xs">
                                     {task.type}
                                   </Badge>
-                                  <Badge variant="outline" className="text-xs">
+                                  <Badge className="bg-gray-100 text-gray-800 text-xs">
                                     {task.priority}
                                   </Badge>
                                   {task.isRequired && (
-                                    <Badge variant="destructive" className="text-xs">
+                                    <Badge className="bg-red-100 text-red-800 text-xs">
                                       必須
                                     </Badge>
                                   )}

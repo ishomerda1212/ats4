@@ -173,7 +173,7 @@ export function EventRegistrationPage() {
                                     <MapPin className="h-4 w-4 text-muted-foreground" />
                                     <span className="text-sm">{session.venue}</span>
                                   </div>
-                                  <Badge variant="outline" className="flex items-center space-x-1">
+                                  <Badge className="bg-gray-100 text-gray-800 flex items-center space-x-1">
                                     <Users className="h-3 w-3" />
                                     <span>{participants.length}名参加予定</span>
                                   </Badge>
