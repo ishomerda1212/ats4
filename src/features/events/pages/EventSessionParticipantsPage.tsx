@@ -8,9 +8,10 @@ import { Clock, MapPin, Users, CheckCircle, FileText, ArrowLeft } from 'lucide-r
 import { Link } from 'react-router-dom';
 import { useEvents } from '../hooks/useEvents';
 import { useApplicants } from '@/features/applicants/hooks/useApplicants';
+import { ApplicantInfoPanel } from '@/features/evaluations/components/ApplicantInfoPanel';
 import { formatDateTime } from '@/shared/utils/date';
 import { Applicant } from '@/features/applicants/types/applicant';
-
+import { EvaluationForm } from '@/features/evaluations/components/EvaluationForm';
 
 export function EventSessionParticipantsPage() {
   const { eventId, sessionId } = useParams<{ eventId: string; sessionId: string }>();
@@ -24,6 +25,7 @@ export function EventSessionParticipantsPage() {
   const { applicants } = useApplicants();
   
   const [selectedParticipants, setSelectedParticipants] = useState<Set<string>>(new Set());
+  const [currentApplicant, setCurrentApplicant] = useState<Applicant | null>(null);
 
   const event = events.find(e => e.id === eventId);
   const session = eventSessions.find(s => s.id === sessionId);
@@ -52,7 +54,7 @@ export function EventSessionParticipantsPage() {
   };
 
   const handleApplicantClick = (applicant: Applicant) => {
-    // setCurrentApplicant(applicant); // この行を削除
+    setCurrentApplicant(applicant);
     // 選択状態も更新
     const newSelected = new Set([applicant.id]);
     setSelectedParticipants(newSelected);
@@ -205,27 +207,27 @@ export function EventSessionParticipantsPage() {
 
         {/* 応募者詳細情報 */}
         <Card className="lg:col-span-1 overflow-y-auto">
-          {/* {currentApplicant ? ( // この行を削除
+          {currentApplicant ? (
             <ApplicantInfoPanel applicant={currentApplicant} />
-          ) : ( */}
+          ) : (
             <CardContent className="text-center py-8">
               <p className="text-muted-foreground">応募者を選択してください</p>
             </CardContent>
-          {/* )} */}
+          )}
         </Card>
 
         {/* 評定表入力エリア */}
         <Card className="lg:col-span-1 overflow-y-auto">
-          {/* {currentApplicant ? ( // この行を削除
+          {currentApplicant ? (
             <EvaluationForm
               applicantId={currentApplicant.id}
               selectionHistoryId={sessionId!}
             />
-          ) : ( */}
+          ) : (
             <CardContent className="text-center py-8">
               <p className="text-muted-foreground">応募者を選択して評定表を入力してください</p>
             </CardContent>
-          {/* )} */}
+          )}
         </Card>
       </div>
     </div>

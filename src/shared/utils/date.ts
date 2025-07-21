@@ -1,9 +1,16 @@
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 export const formatDate = (date: string | Date, pattern = 'yyyy/MM/dd'): string => {
-  const dateObj = typeof date === 'string' ? parseISO(date) : date;
-  return format(dateObj, pattern, { locale: ja });
+  try {
+    const dateObj = typeof date === 'string' ? parseISO(date) : date;
+    if (!isValid(dateObj)) {
+      return '無効な日付';
+    }
+    return format(dateObj, pattern, { locale: ja });
+  } catch {
+    return '無効な日付';
+  }
 };
 
 export const formatDateTime = (date: string | Date): string => {

@@ -67,7 +67,7 @@ export function ParticipantList({ participants, applicants, onStatusChange }: Pa
                   
                   <div className="flex items-center space-x-4">
                     <div className="text-xs text-muted-foreground">
-                      申込日: {formatDate(participant.registrationDate)}
+                      申込日: {participant.createdAt ? formatDate(participant.createdAt) : '未設定'}
                     </div>
                     
                     {onStatusChange ? (

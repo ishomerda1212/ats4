@@ -20,7 +20,7 @@ export interface EventSession extends BaseEntity {
   participantReportDate?: string;
 }
 
-export type ParticipationStatus = '参加' | '不参加' | '未定' | '申込';
+export type ParticipationStatus = '参加' | '不参加' | '未定' | '申込' | '欠席';
 
 export interface EventParticipant extends BaseEntity {
   eventId: string;
