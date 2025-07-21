@@ -70,12 +70,6 @@ export function useEventForm(event?: Event, mode: 'create' | 'edit' = 'create') 
 
         navigate(`/events/${event.id}`);
       }
-    } catch (error) {
-      toast({
-        title: "エラーが発生しました",
-        description: "イベントの保存に失敗しました。",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }

@@ -6,9 +6,10 @@ import { ja } from 'date-fns/locale';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { CompanyInfoStageData } from '@/types/companyInfo';
 
 export interface StageCompanyInfoDisplayProps {
-  data?: any;
+  data?: CompanyInfoStageData;
   applicantId?: string;
   applicantName?: string;
   applicantEmail?: string;

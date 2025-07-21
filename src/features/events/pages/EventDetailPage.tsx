@@ -18,7 +18,6 @@ export function EventDetailPage() {
     events,
     getEventSessions,
     getSessionParticipants,
-    deleteEventSession,
     loading
   } = useEvents();
   

@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Applicant } from '../types/applicant';
-import { generateId } from '@/shared/utils/date';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 

@@ -7,9 +7,10 @@ import { useState } from 'react';
 import { EmailTaskButton } from '@/features/email';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { DocumentScreeningStageData } from '@/types/documentScreening';
 
 export interface StageDocumentScreeningDisplayProps {
-  data?: any;
+  data?: DocumentScreeningStageData;
   applicantId?: string;
   applicantName?: string;
   applicantEmail?: string;

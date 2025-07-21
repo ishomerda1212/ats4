@@ -6,9 +6,10 @@ import { ja } from 'date-fns/locale';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { AptitudeTestStageData } from '@/types/selection';
 
 export interface StageAptitudeTestDisplayProps {
-  data?: any;
+  data?: AptitudeTestStageData;
   applicantId?: string;
   applicantName?: string;
   applicantEmail?: string;
