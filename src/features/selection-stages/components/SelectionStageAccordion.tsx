@@ -79,7 +79,19 @@ export function SelectionStageAccordion({
               const currentStageData = stageDetails[item.id];
               
               return (
-                <AccordionItem key={item.id} value={item.id} className="border rounded-lg">
+                <AccordionItem 
+                  key={item.id} 
+                  value={item.id} 
+                  className={`border rounded-lg ${
+                    item.status === '進行中' 
+                      ? 'bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-800' 
+                      : item.status === '完了'
+                      ? 'bg-gray-50 border-gray-200 dark:bg-gray-950/20 dark:border-gray-700'
+                      : item.status === '不採用'
+                      ? 'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800'
+                      : 'border-gray-200 dark:border-gray-700'
+                  }`}
+                >
                   <AccordionTrigger className="px-4 py-3 hover:no-underline">
                     <div className="flex items-center justify-between w-full mr-4">
                       <div className="flex items-center space-x-3">

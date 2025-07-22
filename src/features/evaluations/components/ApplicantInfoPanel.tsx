@@ -93,6 +93,12 @@ export function ApplicantInfoPanel({ applicant, selectionHistory, history = [] }
                   className={`p-3 border rounded-lg ${
                     selectionHistory?.id === item.id 
                       ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20' 
+                      : item.status === '進行中'
+                      ? 'border-orange-300 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-700'
+                      : item.status === '完了'
+                      ? 'border-gray-300 bg-gray-50 dark:bg-gray-950/20 dark:border-gray-700'
+                      : item.status === '不採用'
+                      ? 'border-red-300 bg-red-50 dark:bg-red-950/20 dark:border-red-700'
                       : 'border-gray-200 dark:border-gray-700'
                   }`}
                 >
