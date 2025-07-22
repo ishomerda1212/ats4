@@ -81,7 +81,7 @@ export function GroupEvaluationForm({
     if (!autoSave) return;
 
     const subscription = form.watch((data) => {
-      setDraftData(data);
+      setDraftData(data as EvaluationFormData);
       setLastSaved(new Date());
     });
 
@@ -138,7 +138,7 @@ export function GroupEvaluationForm({
       }
 
       // 下書きデータを削除
-      setDraftData({});
+      setDraftData(emptyEvaluation);
       setIsDraft(false);
       
       toast({

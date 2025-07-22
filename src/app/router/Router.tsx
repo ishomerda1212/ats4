@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from '@/shared/components/layout/Layout';
 import { ApplicantListPage } from '@/features/applicants/pages/ApplicantListPage';
 import { ApplicantDetailPage } from '@/features/applicants/pages/ApplicantDetailPage';
@@ -19,7 +19,7 @@ import { ApplicantMailPage } from '@/features/email/pages/ApplicantMailPage';
 
 export function Router() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/applicants" replace />} />
@@ -42,6 +42,6 @@ export function Router() {
         </Route>
         <Route path="register/:applicantId" element={<EventRegistrationPage />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }

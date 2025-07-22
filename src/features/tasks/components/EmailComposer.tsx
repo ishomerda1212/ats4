@@ -24,6 +24,7 @@ export function EmailComposer({ task, applicant, onCancel, onSuccess }: EmailCom
   const [body, setBody] = useState('');
   const [senderName, setSenderName] = useState('人事部');
 
+
   // 選考段階に応じたテンプレートを取得 + タスクに紐づくテンプレート
   const stageTemplates = getEmailTemplatesByStage(applicant.currentStage);
   const taskTemplate = task.title.includes('メール') ?
@@ -33,17 +34,8 @@ export function EmailComposer({ task, applicant, onCancel, onSuccess }: EmailCom
     [taskTemplate, ...stageTemplates.filter(t => t.id !== taskTemplate.id)] : 
     stageTemplates;
 
-  // タスクに紐づくテンプレートがある場合は初期選択
-  useEffect(() => {
-    if (selectedTemplate) {
-      setSubject(selectedTemplate.subject);
-      setBody(selectedTemplate.body);
-      setVariables(selectedTemplate.variables || {});
-    }
-  }, [selectedTemplate]);
-
   // 変数置換用のデータ
-  const variables = {
+  const templateVariables = {
     applicantName: applicant.name,
     companyName: '株式会社サンプル',
     senderName: senderName,
@@ -54,13 +46,21 @@ export function EmailComposer({ task, applicant, onCancel, onSuccess }: EmailCom
     duration: '60',
   };
 
+  // タスクに紐づくテンプレートがある場合は初期選択
+  useEffect(() => {
+    if (selectedTemplate) {
+      setSubject(selectedTemplate.subject);
+      setBody(selectedTemplate.body);
+    }
+  }, [selectedTemplate]);
+
   // テンプレート選択時の処理
   const handleTemplateSelect = (templateId: string) => {
     const template = availableTemplates.find(t => t.id === templateId);
     if (template) {
       setSelectedTemplate(template);
-      setSubject(replaceVariables(template.subject, variables));
-      setBody(replaceVariables(template.body, variables));
+      setSubject(replaceVariables(template.subject, templateVariables));
+      setBody(replaceVariables(template.body, templateVariables));
     }
   };
 

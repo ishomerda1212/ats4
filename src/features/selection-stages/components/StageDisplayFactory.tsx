@@ -1,3 +1,4 @@
+
 import { StageEntryDisplay } from './StageEntryDisplay';
 import { StageCompanyInfoDisplay } from './StageCompanyInfoDisplay';
 import { StageAptitudeTestDisplay } from './StageAptitudeTestDisplay';
@@ -76,14 +77,19 @@ export function StageDisplayFactory({ stageType, data, applicantId, applicantNam
           <p className="text-sm text-gray-600 mt-1">
             {stageType}の表示コンポーネントは準備中です。
           </p>
-          {data && Object.keys(data as Record<string, unknown>).length > 0 && (
-            <div className="mt-3">
-              <h5 className="text-sm font-medium">入力データ:</h5>
-              <pre className="text-xs bg-white p-2 rounded mt-1 overflow-auto">
-                {JSON.stringify(data as Record<string, unknown>, null, 2)}
-              </pre>
-            </div>
-          )}
+          {(() => {
+            if (data && typeof data === 'object' && data !== null && Object.keys(data).length > 0) {
+              return (
+                <div className="mt-3">
+                  <h5 className="text-sm font-medium">入力データ:</h5>
+                  <pre className="text-xs bg-white p-2 rounded mt-1 overflow-auto">
+                    {String(JSON.stringify(data, null, 2))}
+                  </pre>
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
       );
     default:
