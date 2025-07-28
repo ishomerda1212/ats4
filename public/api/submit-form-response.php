@@ -36,14 +36,14 @@ $eventName = $data['eventName'] ?? '不明';
 $eventStage = $data['eventStage'] ?? '不明';
 
 // 送信先メールアドレス（実際の担当者メールアドレスに変更）
-$to = 'hr@yourcompany.com'; // 実際のメールアドレスに変更
+$to = 'ishome.kai@gmail.com'; // 実際のメールアドレスに変更
 $subject = "【日程調整回答】{$applicantName}様 - {$eventName}";
 
 // メール本文を作成
 $body = createEmailBody($applicantName, $eventName, $eventStage, $responses);
 
 // 送信者情報
-$from = 'noreply@yourdomain.com'; // 実際のドメインに変更
+$from = 'ishome.kai@gmail.com'; // 実際のドメインに変更
 $fromName = '採用管理システム';
 
 // メールヘッダーの設定
