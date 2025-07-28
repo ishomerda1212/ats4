@@ -27,9 +27,9 @@ export function TaskList({ selectionHistoryId, applicant }: TaskListProps) {
   // タスクタイプを判定する関数
   const getTaskType = (task: Task): TaskType => {
     if (task.type) return task.type;
-    if (task.title.includes('メール')) return 'email';
-    if (task.title.includes('面接')) return 'interview';
-    return 'general';
+    if (task.title.includes('メール')) return '詳細連絡';
+    if (task.title.includes('面接')) return '日程調整連絡';
+    return '詳細連絡';
   };
 
   const getStatusIcon = (status: TaskStatus) => {
@@ -160,7 +160,7 @@ export function TaskList({ selectionHistoryId, applicant }: TaskListProps) {
                       >
                         {task.priority}
                       </Badge>
-                      {taskType === 'email' && (
+                      {taskType === '詳細連絡' && (
                         <Badge className="bg-gray-100 text-gray-800 text-xs">
                           <Mail className="h-3 w-3 mr-1" />
                           メール
@@ -198,7 +198,7 @@ export function TaskList({ selectionHistoryId, applicant }: TaskListProps) {
                     </div>
                     
                     <div className="flex items-center space-x-2 mt-2">
-                      {taskType === 'email' && task.status !== '完了' && (
+                      {taskType === '詳細連絡' && task.status !== '完了' && (
                         <Button
                           size="sm" 
                           variant="outline"
@@ -209,7 +209,7 @@ export function TaskList({ selectionHistoryId, applicant }: TaskListProps) {
                           メール作成
                         </Button>
                       )}
-                      {taskType === 'email' && task.status === '完了' && (
+                      {taskType === '詳細連絡' && task.status === '完了' && (
                         <Badge className="bg-blue-100 text-blue-800 text-xs">
                           <Mail className="h-3 w-3 mr-1" />
                           送信済み

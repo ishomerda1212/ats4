@@ -1,9 +1,7 @@
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, CheckCircle, XCircle, Clock, FileText, Send } from 'lucide-react';
+import { Calendar, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { useState } from 'react';
 
 export interface FinalSelectionStageData {
   candidateDates?: string[];
@@ -27,25 +25,7 @@ export interface StageFinalSelectionDisplayProps {
   onTaskChange?: (taskName: string, completed: boolean) => void;
 }
 
-export function StageFinalSelectionDisplay({ data, onTaskChange }: StageFinalSelectionDisplayProps) {
-  const [tasks, setTasks] = useState(data?.tasks || {
-    detailedContact: { completed: false },
-    documentCollection: { completed: false },
-    resultNotification: { completed: false }
-  });
-
-  const handleTaskChange = (taskName: string, checked: boolean) => {
-    const newTasks = { ...tasks };
-    const taskKey = taskName as keyof typeof tasks;
-    
-    newTasks[taskKey] = {
-      completed: checked,
-      completedAt: checked ? new Date().toISOString() : undefined
-    };
-    
-    setTasks(newTasks);
-    onTaskChange?.(taskName, checked);
-  };
+export function StageFinalSelectionDisplay({ data }: StageFinalSelectionDisplayProps) {
 
   const getResultBadge = (result?: string) => {
     switch (result) {

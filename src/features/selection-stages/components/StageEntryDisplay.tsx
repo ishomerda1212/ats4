@@ -23,7 +23,7 @@ export interface StageEntryDisplayProps {
   onApproachChange?: (approachNumber: number, completed: boolean) => void;
 }
 
-export function StageEntryDisplay({ data, onApproachChange }: StageEntryDisplayProps) {
+export function StageEntryDisplay({ data }: StageEntryDisplayProps) {
 
   return (
     <div className="space-y-4">

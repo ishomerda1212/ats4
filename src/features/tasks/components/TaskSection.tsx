@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { 
@@ -13,12 +13,11 @@ import {
   AlertCircle, 
   Calendar,
   Edit,
-  Plus,
   User
 } from 'lucide-react';
 import { useTaskManagement } from '../hooks/useTaskManagement';
 import { Applicant } from '@/features/applicants/types/applicant';
-import { TaskStatus, ContactStatus, CONTACT_STATUSES } from '../types/task';
+import { TaskStatus, ContactStatus, CONTACT_STATUSES, TaskInstance } from '../types/task';
 import { formatDate } from '@/shared/utils/date';
 
 interface TaskSectionProps {
@@ -35,7 +34,7 @@ export function TaskSection({ applicant }: TaskSectionProps) {
     getDueStatus
   } = useTaskManagement();
   
-  const [editingTask, setEditingTask] = useState<any>(null);
+  const [editingTask, setEditingTask] = useState<TaskInstance | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [dueDate, setDueDate] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
@@ -97,7 +96,7 @@ export function TaskSection({ applicant }: TaskSectionProps) {
     }
   };
 
-  const handleEditTask = (task: any) => {
+  const handleEditTask = (task: TaskInstance) => {
     setEditingTask(task);
     setDueDate(task.dueDate ? formatDate(task.dueDate, 'YYYY-MM-DD') : '');
     setAssignedTo(task.assignedTo || '');

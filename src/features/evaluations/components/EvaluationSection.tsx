@@ -16,7 +16,7 @@ interface EvaluationSectionProps {
   onEvaluationUpdate: (evaluations: Evaluation[]) => void;
 }
 
-export function EvaluationSection({ applicant, evaluations, onEvaluationUpdate }: EvaluationSectionProps) {
+export function EvaluationSection({ applicant, evaluations }: EvaluationSectionProps) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, FileText, UserCheck, ClipboardList } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, FileText, UserCheck, ClipboardList, Monitor } from 'lucide-react';
 import { EventSessionForm } from '../components/EventSessionForm';
 import { ParticipantList } from '../components/ParticipantList';
 import { useEvents } from '../hooks/useEvents';
@@ -184,6 +184,14 @@ export function EventSessionDetailPage() {
               </div>
               
               <div className="flex items-center space-x-3">
+                <Monitor className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <h3 className="font-medium">開催形式</h3>
+                  <p className="text-muted-foreground">{session.format || '未設定'}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center space-x-3">
                 <Users className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <h3 className="font-medium">参加者数</h3>
@@ -298,6 +306,7 @@ export function EventSessionDetailPage() {
       <ParticipantList
         participants={participants}
         applicants={applicants}
+        session={session}
         onStatusChange={handleStatusChange}
       />
     </div>

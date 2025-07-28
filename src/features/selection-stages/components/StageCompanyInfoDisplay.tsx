@@ -1,11 +1,9 @@
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, CheckCircle, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar, MapPin, ChevronDown, ChevronRight, Monitor, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 
 export interface CompanyInfoStageData {
   id?: string;
@@ -14,6 +12,7 @@ export interface CompanyInfoStageData {
   eventName?: string;
   attendanceStatus?: string;
   location?: string;
+  format?: '対面' | 'オンライン' | 'ハイブリッド';
   impression?: string;
   notes?: string;
   tasks?: {
@@ -23,29 +22,10 @@ export interface CompanyInfoStageData {
 
 export interface StageCompanyInfoDisplayProps {
   data?: CompanyInfoStageData;
-  applicantId?: string;
-  applicantName?: string;
-  applicantEmail?: string;
-  onTaskChange?: (taskName: string, completed: boolean) => void;
 }
 
-export function StageCompanyInfoDisplay({ data, onTaskChange, applicantId }: StageCompanyInfoDisplayProps) {
-  const [tasks, setTasks] = useState(data?.tasks || {
-    detailedContact: { completed: false }
-  });
-
-  const handleTaskChange = (taskName: string, checked: boolean) => {
-    const newTasks = { ...tasks };
-    const taskKey = taskName as keyof typeof tasks;
-    
-    newTasks[taskKey] = {
-      completed: checked,
-      completedAt: checked ? new Date().toISOString() : undefined
-    };
-    
-    setTasks(newTasks);
-    onTaskChange?.(taskName, checked);
-  };
+export function StageCompanyInfoDisplay({ data }: StageCompanyInfoDisplayProps) {
+  const [isSessionInfoExpanded, setIsSessionInfoExpanded] = useState(false);
 
   const getAttendanceStatusBadge = (status?: string) => {
     switch (status) {
@@ -57,6 +37,19 @@ export function StageCompanyInfoDisplay({ data, onTaskChange, applicantId }: Sta
         return <Badge className="bg-yellow-100 text-yellow-800">遅刻</Badge>;
       case '早退':
         return <Badge className="bg-purple-100 text-purple-800">早退</Badge>;
+      default:
+        return <Badge className="bg-gray-100 text-gray-800">未定</Badge>;
+    }
+  };
+
+  const getFormatBadge = (format?: string) => {
+    switch (format) {
+      case '対面':
+        return <Badge className="bg-blue-100 text-blue-800 flex items-center gap-1"><Users className="w-3 h-3" />対面</Badge>;
+      case 'オンライン':
+        return <Badge className="bg-purple-100 text-purple-800 flex items-center gap-1"><Monitor className="w-3 h-3" />オンライン</Badge>;
+      case 'ハイブリッド':
+        return <Badge className="bg-orange-100 text-orange-800 flex items-center gap-1"><Users className="w-3 h-3" />ハイブリッド</Badge>;
       default:
         return <Badge className="bg-gray-100 text-gray-800">未定</Badge>;
     }
@@ -77,8 +70,29 @@ export function StageCompanyInfoDisplay({ data, onTaskChange, applicantId }: Sta
       {/* セッション情報（参加実績）（データがある場合のみ表示） */}
       {data && (data.sessionDate || data.sessionName || data.eventName || data.attendanceStatus) && (
         <div className="space-y-4">
-          <h5 className="font-medium">セッション情報（参加実績）</h5>
+          <div className="flex items-center justify-between">
+            <h5 className="font-medium">セッション情報（参加実績）</h5>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsSessionInfoExpanded(!isSessionInfoExpanded)}
+              className="flex items-center gap-1"
+            >
+              {isSessionInfoExpanded ? (
+                <>
+                  <ChevronDown className="w-4 h-4" />
+                  詳細を隠す
+                </>
+              ) : (
+                <>
+                  <ChevronRight className="w-4 h-4" />
+                  詳細を表示
+                </>
+              )}
+            </Button>
+          </div>
           
+          {/* 常に表示される基本情報 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center space-x-3">
               <Calendar className="h-5 w-5 text-muted-foreground" />
@@ -91,26 +105,6 @@ export function StageCompanyInfoDisplay({ data, onTaskChange, applicantId }: Sta
             </div>
             
             <div>
-              <h6 className="font-medium">イベント名</h6>
-              <p className="text-sm text-muted-foreground">{data.eventName || '未設定'}</p>
-            </div>
-          </div>
-
-          <div>
-            <h6 className="font-medium">セッション名</h6>
-            <p className="text-sm text-muted-foreground">{data.sessionName || '未設定'}</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center space-x-3">
-              <MapPin className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <h6 className="font-medium">場所</h6>
-                <p className="text-sm text-muted-foreground">{data.location || '未設定'}</p>
-              </div>
-            </div>
-            
-            <div>
               <h6 className="font-medium">参加実績</h6>
               <div className="mt-1">
                 {getAttendanceStatusBadge(data.attendanceStatus)}
@@ -118,17 +112,49 @@ export function StageCompanyInfoDisplay({ data, onTaskChange, applicantId }: Sta
             </div>
           </div>
 
-          {data.impression && (
-            <div>
-              <h6 className="font-medium">印象・感想</h6>
-              <p className="text-sm text-muted-foreground mt-1">{data.impression}</p>
-            </div>
-          )}
+          {/* アコーディオンで隠す詳細情報 */}
+          {isSessionInfoExpanded && (
+            <div className="space-y-4 border-t pt-4">
+              <div>
+                <h6 className="font-medium">イベント名</h6>
+                <p className="text-sm text-muted-foreground">{data.eventName || '未設定'}</p>
+              </div>
 
-          {data.notes && (
-            <div>
-              <h6 className="font-medium">備考</h6>
-              <p className="text-sm text-muted-foreground mt-1">{data.notes}</p>
+              <div>
+                <h6 className="font-medium">セッション名</h6>
+                <p className="text-sm text-muted-foreground">{data.sessionName || '未設定'}</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center space-x-3">
+                  <MapPin className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <h6 className="font-medium">場所</h6>
+                    <p className="text-sm text-muted-foreground">{data.location || '未設定'}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h6 className="font-medium">開催形式</h6>
+                  <div className="mt-1">
+                    {getFormatBadge(data.format)}
+                  </div>
+                </div>
+              </div>
+
+              {data.impression && (
+                <div>
+                  <h6 className="font-medium">印象・感想</h6>
+                  <p className="text-sm text-muted-foreground mt-1">{data.impression}</p>
+                </div>
+              )}
+
+              {data.notes && (
+                <div>
+                  <h6 className="font-medium">備考</h6>
+                  <p className="text-sm text-muted-foreground mt-1">{data.notes}</p>
+                </div>
+              )}
             </div>
           )}
         </div>

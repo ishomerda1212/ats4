@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Mail, Phone } from 'lucide-react';
-import { EventParticipant, ParticipationStatus } from '../types/event';
+import { User, Phone, Monitor, Users } from 'lucide-react';
+import { EventParticipant, ParticipationStatus, EventSession } from '../types/event';
 import { Applicant } from '@/features/applicants/types/applicant';
-import { formatDate } from '@/shared/utils/date';
 
 interface ParticipantListProps {
   participants: EventParticipant[];
   applicants: Applicant[];
+  session?: EventSession;
   onStatusChange?: (participantId: string, status: ParticipationStatus) => void;
 }
 
@@ -20,9 +20,22 @@ const STATUS_COLORS: Record<ParticipationStatus, string> = {
   '未定': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
 };
 
-export function ParticipantList({ participants, applicants, onStatusChange }: ParticipantListProps) {
+export function ParticipantList({ participants, applicants, session, onStatusChange }: ParticipantListProps) {
   const getApplicant = (applicantId: string) => {
     return applicants.find(a => a.id === applicantId);
+  };
+
+  const getFormatBadge = (format?: string) => {
+    switch (format) {
+      case '対面':
+        return <Badge className="bg-blue-100 text-blue-800 flex items-center gap-1"><Users className="w-3 h-3" />対面</Badge>;
+      case 'オンライン':
+        return <Badge className="bg-purple-100 text-purple-800 flex items-center gap-1"><Monitor className="w-3 h-3" />オンライン</Badge>;
+      case 'ハイブリッド':
+        return <Badge className="bg-orange-100 text-orange-800 flex items-center gap-1"><Users className="w-3 h-3" />ハイブリッド</Badge>;
+      default:
+        return <Badge className="bg-gray-100 text-gray-800">未定</Badge>;
+    }
   };
 
   return (
@@ -57,20 +70,18 @@ export function ParticipantList({ participants, applicants, onStatusChange }: Pa
                     
                     <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                       <div className="flex items-center space-x-1">
-                        <Mail className="h-3 w-3" />
-                        <span>{applicant.email}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
                         <Phone className="h-3 w-3" />
                         <span>{applicant.phone}</span>
                       </div>
+                      {session?.format && (
+                        <div className="flex items-center space-x-1">
+                          {getFormatBadge(session.format)}
+                        </div>
+                      )}
                     </div>
                   </div>
                   
                   <div className="flex items-center space-x-4">
-                    <div className="text-xs text-muted-foreground">
-                      申込日: {participant.createdAt ? formatDate(participant.createdAt) : '未設定'}
-                    </div>
                     
                     {onStatusChange ? (
                       <Select

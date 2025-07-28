@@ -1,6 +1,4 @@
 import { Event, EventSession, EventParticipant } from '@/features/events/types/event';
-import { generateId } from '@/shared/utils/date';
-import { mockApplicants } from './mockData';
 
 export const mockEvents: Event[] = [
   {
@@ -94,6 +92,7 @@ export const mockEventSessions: EventSession[] = [
     start: new Date('2024-02-15T14:00:00Z'),
     end: new Date('2024-02-15T16:00:00Z'),
     venue: '本社オフィスA',
+    format: '対面',
     participants: [],
     createdAt: new Date('2024-01-10T09:00:00Z'),
     updatedAt: new Date('2024-01-10T09:00:00Z')
@@ -105,6 +104,7 @@ export const mockEventSessions: EventSession[] = [
     start: new Date('2024-02-20T10:00:00Z'),
     end: new Date('2024-02-20T12:00:00Z'),
     venue: '本社オフィスB',
+    format: 'オンライン',
     participants: [],
     createdAt: new Date('2024-01-10T09:00:00Z'),
     updatedAt: new Date('2024-01-10T09:00:00Z')
@@ -117,6 +117,7 @@ export const mockEventSessions: EventSession[] = [
     start: new Date('2024-02-25T13:00:00Z'),
     end: new Date('2024-02-25T15:00:00Z'),
     venue: '開発フロア',
+    format: '対面',
     participants: [],
     createdAt: new Date('2024-01-12T10:00:00Z'),
     updatedAt: new Date('2024-01-12T10:00:00Z')
@@ -129,6 +130,7 @@ export const mockEventSessions: EventSession[] = [
     start: new Date('2024-03-05T15:00:00Z'),
     end: new Date('2024-03-05T17:00:00Z'),
     venue: '大会議室',
+    format: '対面',
     participants: [],
     createdAt: new Date('2024-01-15T11:00:00Z'),
     updatedAt: new Date('2024-01-15T11:00:00Z')
@@ -141,6 +143,7 @@ export const mockEventSessions: EventSession[] = [
     start: new Date('2024-03-10T10:00:00Z'),
     end: new Date('2024-03-10T11:00:00Z'),
     venue: '面接室A',
+    format: '対面',
     maxParticipants: 1, // 個別面接なので1名まで
     participants: [],
     recruiter: '田中部長',
@@ -154,6 +157,7 @@ export const mockEventSessions: EventSession[] = [
     start: new Date('2024-03-10T14:00:00Z'),
     end: new Date('2024-03-10T15:00:00Z'),
     venue: '面接室B',
+    format: 'オンライン',
     maxParticipants: 1, // 個別面接なので1名まで
     participants: [],
     recruiter: '佐藤課長',
@@ -167,6 +171,7 @@ export const mockEventSessions: EventSession[] = [
     start: new Date('2024-03-12T13:00:00Z'),
     end: new Date('2024-03-12T14:00:00Z'),
     venue: '面接室A',
+    format: '対面',
     maxParticipants: 1, // 個別面接なので1名まで
     participants: [],
     recruiter: '鈴木マネージャー',
@@ -181,6 +186,7 @@ export const mockEventSessions: EventSession[] = [
     start: new Date('2024-03-15T10:00:00Z'),
     end: new Date('2024-03-15T12:00:00Z'),
     venue: '大会議室',
+    format: '対面',
     maxParticipants: 8, // 集団面接なので8名まで
     participants: [],
     recruiter: '人事部一同',
@@ -194,6 +200,7 @@ export const mockEventSessions: EventSession[] = [
     start: new Date('2024-03-18T14:00:00Z'),
     end: new Date('2024-03-18T16:00:00Z'),
     venue: '会議室C',
+    format: 'オンライン',
     maxParticipants: 8, // 集団面接なので8名まで
     participants: [],
     recruiter: '人事部一同',

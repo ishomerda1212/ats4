@@ -51,15 +51,15 @@ export function StageDisplayFactory({ stageType, data, applicantId, applicantNam
     case 'エントリー':
       return <StageEntryDisplay data={data as EntryStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '書類選考':
-      return <StageDocumentScreeningDisplay data={data as DocumentScreeningStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
+      return <StageDocumentScreeningDisplay data={data as DocumentScreeningStageData} />;
     case '会社説明会':
-      return <StageCompanyInfoDisplay data={data as CompanyInfoStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
+      return <StageCompanyInfoDisplay data={data as CompanyInfoStageData} />;
     case '適性検査':
       return <StageAptitudeTestDisplay data={data as AptitudeTestStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '職場見学':
       return <StageWorkplaceVisitDisplay data={data as WorkplaceVisitStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '仕事体験':
-      return <StageJobExperienceDisplay data={data as JobExperienceStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
+      return <StageJobExperienceDisplay data={data as JobExperienceStageData} />;
     case '個別面接':
       return <StageIndividualInterviewDisplay data={data as IndividualInterviewStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '集団面接':

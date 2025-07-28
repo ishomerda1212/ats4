@@ -18,18 +18,10 @@ export interface DocumentScreeningStageData {
 
 export interface StageDocumentScreeningDisplayProps {
   data?: DocumentScreeningStageData;
-  applicantId?: string;
-  applicantName?: string;
-  applicantEmail?: string;
-  onTaskChange?: (taskName: string, completed: boolean) => void;
 }
 
 export function StageDocumentScreeningDisplay({ 
-  data, 
-  onTaskChange, 
-  applicantId, 
-  applicantName, 
-  applicantEmail 
+  data 
 }: StageDocumentScreeningDisplayProps) {
 
   const getResultBadge = (result?: string) => {

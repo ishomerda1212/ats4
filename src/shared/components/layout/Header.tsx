@@ -1,5 +1,4 @@
-import { Building2, Users, Calendar, FileText } from 'lucide-react';
-import { Settings, Mail, Clock } from 'lucide-react';
+import { Building2, Users, Calendar, FileText, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
 

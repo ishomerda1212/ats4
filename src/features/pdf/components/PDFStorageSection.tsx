@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Upload, Download, Trash2, Eye } from 'lucide-react';
+import { FileText, Upload, Download, Trash2 } from 'lucide-react';
 import { usePDF } from '../hooks/usePDF';
 import { PDFDocument, PDFCategory } from '../types/pdf';
 import { Applicant } from '@/features/applicants/types/applicant';
@@ -17,7 +17,7 @@ interface PDFStorageSectionProps {
 }
 
 export function PDFStorageSection({ applicant }: PDFStorageSectionProps) {
-  const { documents, uploadPDF, deletePDF, getDocumentsByApplicant } = usePDF();
+  const { uploadPDF, deletePDF, getDocumentsByApplicant } = usePDF();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<PDFCategory>('履歴書');
   const [description, setDescription] = useState('');

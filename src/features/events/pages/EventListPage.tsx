@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, Calendar, Clock, MapPin, Users, Eye } from 'lucide-react';
+import { Plus, Search, Calendar, Clock, MapPin, Users, Eye, CalendarPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EventCard } from '../components/EventCard';
+import { EventReservationForm, ReservationFormData } from '../components/EventReservationForm';
 import { useEvents } from '../hooks/useEvents';
 import { formatDateTime } from '@/shared/utils/date';
+import { useApplicants } from '@/features/applicants/hooks/useApplicants';
 
 export function EventListPage() {
   const { 
@@ -14,10 +16,41 @@ export function EventListPage() {
     loading,
     getEventSessions,
     getParticipantsBySession,
-    getEventParticipantCount
+    getEventParticipantCount,
+    registerParticipant
   } = useEvents();
 
+  const { applicants } = useApplicants();
   const [searchTerm, setSearchTerm] = useState('');
+  const [showReservationForm, setShowReservationForm] = useState(false);
+  const [reservationLoading, setReservationLoading] = useState(false);
+
+  const handleReservationSubmit = async (formData: ReservationFormData) => {
+    setReservationLoading(true);
+    try {
+      // 1. イベント参加者として登録
+      registerParticipant({
+        eventId: formData.selectedSessionId,
+        applicantId: formData.selectedApplicantId,
+        status: '申込'
+      });
+
+      // 2. フォームを閉じる
+      setShowReservationForm(false);
+      
+      // 3. 成功メッセージを表示
+      alert('予約が完了しました！');
+    } catch (error) {
+      console.error('予約エラー:', error);
+      alert('予約に失敗しました。もう一度お試しください。');
+    } finally {
+      setReservationLoading(false);
+    }
+  };
+
+  const handleReservationCancel = () => {
+    setShowReservationForm(false);
+  };
 
   const filteredEvents = events.filter(event =>
     event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -42,12 +75,21 @@ export function EventListPage() {
           <p className="text-muted-foreground mt-1">採用イベントの管理を行います</p>
         </div>
         
-        <Link to="/events/create">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            新規イベント作成
+        <div className="flex items-center space-x-3">
+          <Button
+            variant="outline"
+            onClick={() => setShowReservationForm(true)}
+          >
+            <CalendarPlus className="h-4 w-4 mr-2" />
+            イベント予約
           </Button>
-        </Link>
+          <Link to="/events/create">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              新規イベント作成
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <Card>
@@ -90,16 +132,16 @@ export function EventListPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredEvents.map((event) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                participantCount={getEventParticipantCount(event.id)}
-                sessionCount={getEventSessions(event.id).length}
-              />
-            ))}
-          </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEvents.map((event) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              participantCount={getEventParticipantCount(event.id)}
+              sessionCount={getEventSessions(event.id).length}
+            />
+          ))}
+        </div>
         )}
       </div>
 
@@ -168,6 +210,22 @@ export function EventListPage() {
               </div>
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* 予約フォーム */}
+      {showReservationForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <EventReservationForm
+              events={events}
+              applicants={applicants}
+              getEventSessions={getEventSessions}
+              onSubmit={handleReservationSubmit}
+              onCancel={handleReservationCancel}
+              loading={reservationLoading}
+            />
+          </div>
         </div>
       )}
     </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { SessionFormData } from '../types/applicantForm';
-import { formatDate, formatTime } from '@/shared/utils/date';
+import { formatTime } from '@/shared/utils/date';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, MapPin, Users } from 'lucide-react';
 

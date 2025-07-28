@@ -12,7 +12,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { DefaultTask } from '../types/selectionStage';
 import { useSelectionStages } from '../hooks/useSelectionStages';
-import { TASK_TYPES, TASK_PRIORITIES, TaskType, TaskPriority } from '@/features/tasks/types/task';
 import { useTasks } from '@/features/tasks/hooks/useTasks';
 
 const defaultTaskSchema = z.object({
@@ -69,14 +68,14 @@ export function DefaultTaskForm({ stageId, task, onCancel, onSuccess }: DefaultT
       if (task) {
         updateDefaultTask(stageId, task.id, {
           ...data,
-          type: data.type as TaskType,
-          priority: data.priority as TaskPriority,
+          type: data.type as DefaultTask['type'],
+          priority: data.priority as DefaultTask['priority'],
         });
       } else {
         addDefaultTask(stageId, {
           ...data,
-          type: data.type as TaskType,
-          priority: data.priority as TaskPriority,
+          type: data.type as DefaultTask['type'],
+          priority: data.priority as DefaultTask['priority'],
         });
       }
       onSuccess();
@@ -171,11 +170,11 @@ export function DefaultTaskForm({ stageId, task, onCancel, onSuccess }: DefaultT
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {TASK_TYPES.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="general">一般</SelectItem>
+                        <SelectItem value="email">メール</SelectItem>
+                        <SelectItem value="document">書類</SelectItem>
+                        <SelectItem value="interview">面接</SelectItem>
+                        <SelectItem value="evaluation">評価</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -196,11 +195,9 @@ export function DefaultTaskForm({ stageId, task, onCancel, onSuccess }: DefaultT
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {TASK_PRIORITIES.map((priority) => (
-                          <SelectItem key={priority.value} value={priority.value}>
-                            {priority.label}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="低">低</SelectItem>
+                        <SelectItem value="中">中</SelectItem>
+                        <SelectItem value="高">高</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

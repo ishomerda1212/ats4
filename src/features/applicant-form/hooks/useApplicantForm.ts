@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 import { Event, EventSession, EventParticipant } from '@/features/events/types/event';
 import { Applicant } from '@/features/applicants/types/applicant';
@@ -23,11 +23,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
   const [applicant, setApplicant] = useState<Applicant | null>(null);
   const [responses, setResponses] = useState<Record<string, 'participate' | 'not_participate' | 'pending'>>({});
 
-  useEffect(() => {
-    loadEventAndApplicantData();
-  }, [applicantId, eventId]);
-
-  const loadEventAndApplicantData = () => {
+  const loadEventAndApplicantData = useCallback(() => {
     try {
       setLoading(true);
       
@@ -103,6 +99,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
             start: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1週間後
             end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000), // 2時間後
             venue: 'サンプル会場A',
+            format: '対面',
             maxParticipants: 20,
             participants: [],
             recruiter: 'サンプル担当者',
@@ -116,6 +113,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
             start: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 2週間後
             end: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000), // 2時間後
             venue: 'サンプル会場B',
+            format: 'オンライン',
             maxParticipants: 15,
             participants: [],
             recruiter: 'サンプル担当者',
@@ -137,6 +135,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
           startDate: session.start,
           endDate: session.end,
           venue: session.venue,
+          format: session.format,
           maxParticipants: session.maxParticipants,
           currentParticipants: participantCount,
           recruiter: session.recruiter
@@ -170,12 +169,16 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
         setResponses(defaultResponses);
       }
 
-    } catch (err) {
+    } catch {
       setError('データの読み込みに失敗しました');
     } finally {
       setLoading(false);
     }
-  };
+  }, [applicantId, eventId, events, eventSessions, eventParticipants, applicants, applicantResponses]);
+
+  useEffect(() => {
+    loadEventAndApplicantData();
+  }, [loadEventAndApplicantData]);
 
   const updateResponse = (sessionId: string, status: 'participate' | 'not_participate' | 'pending') => {
     setResponses(prev => ({
@@ -288,7 +291,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
       setEventParticipants(updatedParticipants);
       
       return { success: true, message: '回答を送信しました。メールでも通知されました。' };
-    } catch (err) {
+    } catch {
       return { success: false, message: '送信に失敗しました' };
     }
   };

@@ -1,11 +1,7 @@
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, CheckCircle } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 
 export interface AptitudeTestStageData {
   id?: string;
@@ -30,23 +26,8 @@ export interface StageAptitudeTestDisplayProps {
   onTaskChange?: (taskName: string, completed: boolean) => void;
 }
 
-export function StageAptitudeTestDisplay({ data, onTaskChange }: StageAptitudeTestDisplayProps) {
-  const [tasks, setTasks] = useState(data?.tasks || {
-    detailedContact: { completed: false }
-  });
+export function StageAptitudeTestDisplay({ data }: StageAptitudeTestDisplayProps) {
 
-  const handleTaskChange = (taskName: string, checked: boolean) => {
-    const newTasks = { ...tasks };
-    const taskKey = taskName as keyof typeof tasks;
-    
-    newTasks[taskKey] = {
-      completed: checked,
-      completedAt: checked ? new Date().toISOString() : undefined
-    };
-    
-    setTasks(newTasks);
-    onTaskChange?.(taskName, checked);
-  };
 
   const getResultBadge = (result?: string) => {
     switch (result) {

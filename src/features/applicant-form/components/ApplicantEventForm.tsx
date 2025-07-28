@@ -5,7 +5,7 @@ import { ApplicantFormProps } from '../types/applicantForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin, Users, Building2, User, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Calendar, Clock, Building2, CheckCircle, AlertCircle } from 'lucide-react';
 
 export const ApplicantEventForm: React.FC<ApplicantFormProps> = ({ 
   applicantId, 
@@ -38,7 +38,7 @@ export const ApplicantEventForm: React.FC<ApplicantFormProps> = ({
         type: result.success ? 'success' : 'error',
         text: result.message
       });
-    } catch (err) {
+    } catch {
       setSubmitMessage({
         type: 'error',
         text: '送信中にエラーが発生しました'
@@ -55,9 +55,6 @@ export const ApplicantEventForm: React.FC<ApplicantFormProps> = ({
     );
   };
 
-  const getParticipatingSessionsCount = () => {
-    return Object.values(responses).filter(response => response === 'participate').length;
-  };
 
   if (loading) {
     return (
@@ -147,7 +144,7 @@ export const ApplicantEventForm: React.FC<ApplicantFormProps> = ({
           </CardHeader>
           <CardContent className="p-0">
             <div className="space-y-2">
-              {eventData.sessions.map((session, index) => (
+              {eventData.sessions.map((session) => (
                 <div key={session.sessionId} className="px-4 pb-4 last:pb-0">
                   <SessionCard
                     session={session}

@@ -13,6 +13,7 @@ export interface EventSession extends BaseEntity {
   start: Date;
   end: Date;
   venue: string;
+  format: '対面' | 'オンライン' | 'ハイブリッド'; // 開催形式
   participants: EventParticipant[];
   notes?: string;
   recruiter?: string;

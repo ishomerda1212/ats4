@@ -1,11 +1,7 @@
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar, CheckCircle, MapPin } from 'lucide-react';
+import { Calendar, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 
 export interface WorkplaceVisitStageData {
   id?: string;
@@ -30,23 +26,7 @@ export interface StageWorkplaceVisitDisplayProps {
   onTaskChange?: (taskName: string, completed: boolean) => void;
 }
 
-export function StageWorkplaceVisitDisplay({ data, onTaskChange }: StageWorkplaceVisitDisplayProps) {
-  const [tasks, setTasks] = useState(data?.tasks || {
-    detailedContact: { completed: false }
-  });
-
-  const handleTaskChange = (taskName: string, checked: boolean) => {
-    const newTasks = { ...tasks };
-    const taskKey = taskName as keyof typeof tasks;
-    
-    newTasks[taskKey] = {
-      completed: checked,
-      completedAt: checked ? new Date().toISOString() : undefined
-    };
-    
-    setTasks(newTasks);
-    onTaskChange?.(taskName, checked);
-  };
+export function StageWorkplaceVisitDisplay({ data }: StageWorkplaceVisitDisplayProps) {
 
   const getAttendanceStatusBadge = (status?: string) => {
     switch (status) {

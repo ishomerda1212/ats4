@@ -1,8 +1,8 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { TaskInstance, FixedTask, TaskStatus, ContactStatus } from '../types/task';
 import { getFixedTasksByStage } from '../data/taskTemplates';
 import { generateId } from '@/shared/utils/date';
-import { Applicant } from '@/features/applicants/types/applicant';
+import { Applicant, SelectionStage } from '@/features/applicants/types/applicant';
 
 // モックデータ（実際の実装ではAPIやストレージを使用）
 const mockTaskInstances: TaskInstance[] = [
@@ -161,7 +161,7 @@ export const useTaskManagement = () => {
 
   // 応募者の特定段階のタスクを取得
   const getApplicantTasksByStage = useCallback((applicant: Applicant, stage: string): (FixedTask & TaskInstance)[] => {
-    const fixedTasks = getFixedTasksByStage(stage as any);
+    const fixedTasks = getFixedTasksByStage(stage as SelectionStage);
     
     return fixedTasks.map(fixedTask => {
       const instance = taskInstances.find(
@@ -246,7 +246,7 @@ export const useTaskManagement = () => {
           let isContactTask = false;
           
           for (const stage of allStages) {
-            const fixedTasks = getFixedTasksByStage(stage as any);
+            const fixedTasks = getFixedTasksByStage(stage as SelectionStage);
             const fixedTask = fixedTasks.find(ft => ft.id === task.taskId);
             if (fixedTask && ['詳細連絡', '日程調整連絡', 'リマインド', '結果連絡'].includes(fixedTask.type)) {
               isContactTask = true;

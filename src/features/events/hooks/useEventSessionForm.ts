@@ -57,6 +57,7 @@ export function useEventSessionForm(
           start: new Date(data.startDateTime),
           end: new Date(data.endDateTime),
           venue: data.venue,
+          format: '対面',
           participants: [],
           createdAt: new Date(),
           updatedAt: new Date(),

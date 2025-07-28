@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,14 +9,14 @@ import {
   CheckCircle, 
   AlertCircle, 
   Calendar,
-  Filter,
   Search,
   SortAsc,
   SortDesc
 } from 'lucide-react';
 import { useTaskManagement } from '../hooks/useTaskManagement';
 import { useApplicants } from '@/features/applicants/hooks/useApplicants';
-import { TaskStatus, ContactStatus } from '../types/task';
+import { TaskStatus, TaskInstance, FixedTask } from '../types/task';
+import { Applicant } from '@/features/applicants/types/applicant';
 import { formatDate } from '@/shared/utils/date';
 
 type FilterStatus = 'all' | 'pending' | 'in-progress' | 'completed' | 'overdue' | 'upcoming';
@@ -24,7 +24,7 @@ type SortBy = 'dueDate' | 'applicant' | 'stage' | 'status';
 type SortOrder = 'asc' | 'desc';
 
 export function TaskListPage() {
-  const { taskInstances, getApplicantTasks, getApplicantTasksByStage, getUpcomingTasks, getOverdueTasks, getDaysUntilDue, getDueStatus } = useTaskManagement();
+  const { getDaysUntilDue, getDueStatus, getApplicantTasksByStage } = useTaskManagement();
   const { applicants } = useApplicants();
   
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
@@ -35,8 +35,8 @@ export function TaskListPage() {
   // 全タスクを取得
   const allTasks = useMemo(() => {
     const tasks: Array<{
-      applicant: any;
-      task: any;
+      applicant: Applicant;
+      task: FixedTask & TaskInstance;
       daysUntilDue?: number;
       dueStatus?: string;
     }> = [];
@@ -80,10 +80,10 @@ export function TaskListPage() {
         filtered = filtered.filter(({ task }) => task.status === '完了');
         break;
       case 'overdue':
-        filtered = filtered.filter(({ task, dueStatus }) => dueStatus === 'overdue');
+        filtered = filtered.filter(({ dueStatus }) => dueStatus === 'overdue');
         break;
       case 'upcoming':
-        filtered = filtered.filter(({ task, dueStatus }) => dueStatus === 'urgent' || dueStatus === 'upcoming');
+        filtered = filtered.filter(({ dueStatus }) => dueStatus === 'urgent' || dueStatus === 'upcoming');
         break;
     }
 
@@ -101,11 +101,12 @@ export function TaskListPage() {
       let comparison = 0;
       
       switch (sortBy) {
-        case 'dueDate':
+        case 'dueDate': {
           const aDate = a.task.dueDate || new Date(9999, 11, 31);
           const bDate = b.task.dueDate || new Date(9999, 11, 31);
           comparison = aDate.getTime() - bDate.getTime();
           break;
+        }
         case 'applicant':
           comparison = a.applicant.name.localeCompare(b.applicant.name);
           break;

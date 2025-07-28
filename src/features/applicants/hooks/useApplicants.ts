@@ -31,6 +31,17 @@ export function useApplicants() {
     );
   };
 
+  const addApplicant = (applicant: Omit<Applicant, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const newApplicant: Applicant = {
+      ...applicant,
+      id: `applicant-${Date.now()}`,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    setApplicants(current => [...current, newApplicant]);
+    return newApplicant;
+  };
+
   return {
     applicants: filteredApplicants,
     loading,
@@ -39,6 +50,7 @@ export function useApplicants() {
     selectedStage,
     setSelectedStage,
     getStageCount,
-    updateApplicant
+    updateApplicant,
+    addApplicant
   };
 }

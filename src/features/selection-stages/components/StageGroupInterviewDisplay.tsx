@@ -1,11 +1,7 @@
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar, CheckCircle, XCircle, Clock, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 
 export interface GroupInterviewStageData {
   id?: string;
@@ -36,24 +32,7 @@ export interface StageGroupInterviewDisplayProps {
   onTaskChange?: (taskName: string, completed: boolean) => void;
 }
 
-export function StageGroupInterviewDisplay({ data, onTaskChange, applicantId }: StageGroupInterviewDisplayProps) {
-  const [tasks, setTasks] = useState(data?.tasks || {
-    detailedContact: { completed: false },
-    resultNotification: { completed: false }
-  });
-
-  const handleTaskChange = (taskName: string, checked: boolean) => {
-    const newTasks = { ...tasks };
-    const taskKey = taskName as keyof typeof tasks;
-    
-    newTasks[taskKey] = {
-      completed: checked,
-      completedAt: checked ? new Date().toISOString() : undefined
-    };
-    
-    setTasks(newTasks);
-    onTaskChange?.(taskName, checked);
-  };
+export function StageGroupInterviewDisplay({ data }: StageGroupInterviewDisplayProps) {
 
   const getAttendanceStatusBadge = (status?: string) => {
     switch (status) {
