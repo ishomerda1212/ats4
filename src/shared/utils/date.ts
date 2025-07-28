@@ -17,6 +17,10 @@ export const formatDateTime = (date: string | Date): string => {
   return formatDate(date, 'yyyy/MM/dd HH:mm');
 };
 
+export const formatTime = (date: string | Date): string => {
+  return formatDate(date, 'HH:mm');
+};
+
 export const generateId = (): string => {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };

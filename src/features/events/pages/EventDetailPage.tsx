@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Plus, Edit, Calendar, Users } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Calendar, Users, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EventSessionCard } from '../components/EventSessionCard';
 import { EventSessionForm } from '../components/EventSessionForm';
@@ -118,6 +118,24 @@ export function EventDetailPage() {
           <div>
             <h3 className="font-medium mb-2">説明</h3>
             <p className="text-muted-foreground">{event.description}</p>
+          </div>
+
+          {/* サンプルフォームへのリンク */}
+          <div className="pt-4 border-t">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium mb-2">応募者フォーム</h3>
+                <p className="text-sm text-muted-foreground">
+                  このイベントの応募者フォームのサンプルを確認できます
+                </p>
+              </div>
+              <Link to={`/applicant-form/sample/${event.id}`}>
+                <Button variant="outline" size="sm">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  サンプルフォームを確認
+                </Button>
+              </Link>
+            </div>
           </div>
 
           <div className="pt-4 border-t">

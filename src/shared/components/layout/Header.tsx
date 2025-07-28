@@ -49,16 +49,6 @@ export function Header() {
                 </Button>
               </Link>
               
-              <Link to="/stages">
-                <Button 
-                  variant={isActive('/stages') ? 'default' : 'ghost'}
-                  className="flex items-center space-x-2"
-                >
-                  <Settings className="h-4 w-4" />
-                  <span>選考段階管理</span>
-                </Button>
-              </Link>
-              
               <Link to="/tasks">
                 <Button 
                   variant={isActive('/tasks') ? 'default' : 'ghost'}
@@ -69,15 +59,6 @@ export function Header() {
                 </Button>
               </Link>
               
-              <Link to="/email-templates">
-                <Button 
-                  variant={isActive('/email-templates') ? 'default' : 'ghost'}
-                  className="flex items-center space-x-2"
-                >
-                  <Mail className="h-4 w-4" />
-                  <span>メールテンプレート</span>
-                </Button>
-              </Link>
             </nav>
           </div>
         </div>
