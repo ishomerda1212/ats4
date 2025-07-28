@@ -151,74 +151,7 @@ export function StageFinalSelectionDisplay({ data, onTaskChange }: StageFinalSel
         </div>
       )}
 
-      {/* タスク（常に表示） */}
-      <div>
-        <h5 className="font-medium mb-3">タスク</h5>
-        <div className="space-y-3">
-          <div className="flex items-center space-x-3">
-            <Checkbox
-              id="detailedContact"
-              checked={tasks.detailedContact?.completed || false}
-              onCheckedChange={(checked: boolean | 'indeterminate') => handleTaskChange('detailedContact', checked === true)}
-            />
-            <div className="flex-1">
-              <label htmlFor="detailedContact" className="text-sm font-medium">
-                詳細連絡
-              </label>
-              {tasks.detailedContact?.completed && tasks.detailedContact?.completedAt && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  完了日: {format(new Date(tasks.detailedContact.completedAt), 'PPP', { locale: ja })}
-                </p>
-              )}
-            </div>
-            {tasks.detailedContact?.completed && (
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            )}
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <Checkbox
-              id="documentCollection"
-              checked={tasks.documentCollection?.completed || false}
-              onCheckedChange={(checked: boolean | 'indeterminate') => handleTaskChange('documentCollection', checked === true)}
-            />
-            <div className="flex-1">
-              <label htmlFor="documentCollection" className="text-sm font-medium">
-                提出書類回収
-              </label>
-              {tasks.documentCollection?.completed && tasks.documentCollection?.completedAt && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  完了日: {format(new Date(tasks.documentCollection.completedAt), 'PPP', { locale: ja })}
-                </p>
-              )}
-            </div>
-            {tasks.documentCollection?.completed && (
-              <FileText className="h-4 w-4 text-green-600" />
-            )}
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <Checkbox
-              id="resultNotification"
-              checked={tasks.resultNotification?.completed || false}
-              onCheckedChange={(checked: boolean | 'indeterminate') => handleTaskChange('resultNotification', checked === true)}
-            />
-            <div className="flex-1">
-              <label htmlFor="resultNotification" className="text-sm font-medium">
-                結果連絡
-              </label>
-              {tasks.resultNotification?.completed && tasks.resultNotification?.completedAt && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  完了日: {format(new Date(tasks.resultNotification.completedAt), 'PPP', { locale: ja })}
-                </p>
-              )}
-            </div>
-            {tasks.resultNotification?.completed && (
-              <Send className="h-4 w-4 text-green-600" />
-            )}
-          </div>
-        </div>
-      </div>
+      {/* タスクはSelectionStageAccordionで統合管理されるため、ここでは表示しない */}
     </div>
   );
 } 

@@ -6,7 +6,7 @@ import { ApplicantBasicInfo } from '../components/ApplicantBasicInfo';
 import { SelectionStageAccordion } from '@/features/selection-stages/components/SelectionStageAccordion';
 import { useApplicantDetail } from '../hooks/useApplicantDetail';
 import { EvaluationSection } from '@/features/evaluations/components/EvaluationSection';
-import { PDFStorageSection } from '@/features/pdf/components/PDFExportSection';
+import { PDFStorageSection } from '@/features/pdf/components/PDFStorageSection';
 
 export function ApplicantDetailPage() {
   const { id } = useParams<{ id: string }>();

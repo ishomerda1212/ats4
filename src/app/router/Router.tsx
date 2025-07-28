@@ -15,6 +15,7 @@ import { EventSessionDetailPage } from '@/features/events/pages/EventSessionDeta
 import { EventSessionParticipantsPage } from '@/features/events/pages/EventSessionParticipantsPage';
 import { StageManagementPage } from '@/features/selection-stages/pages/StageManagementPage';
 import { EmailTemplateManagementPage } from '@/features/tasks/pages/EmailTemplateManagementPage';
+import { TaskListPage } from '@/features/tasks/pages/TaskListPage';
 import { ApplicantMailPage } from '@/features/email/pages/ApplicantMailPage';
 
 export function Router() {
@@ -38,6 +39,7 @@ export function Router() {
           <Route path="events/:eventId/sessions/:sessionId/participants" element={<EventSessionParticipantsPage />} />
           <Route path="reports" element={<div>レポート（実装予定）</div>} />
           <Route path="stages" element={<StageManagementPage />} />
+          <Route path="tasks" element={<TaskListPage />} />
           <Route path="email-templates" element={<EmailTemplateManagementPage />} />
         </Route>
         <Route path="register/:applicantId" element={<EventRegistrationPage />} />

@@ -1,5 +1,5 @@
 import { Building2, Users, Calendar, FileText } from 'lucide-react';
-import { Settings, Mail } from 'lucide-react';
+import { Settings, Mail, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -56,6 +56,16 @@ export function Header() {
                 >
                   <Settings className="h-4 w-4" />
                   <span>選考段階管理</span>
+                </Button>
+              </Link>
+              
+              <Link to="/tasks">
+                <Button 
+                  variant={isActive('/tasks') ? 'default' : 'ghost'}
+                  className="flex items-center space-x-2"
+                >
+                  <Clock className="h-4 w-4" />
+                  <span>タスク管理</span>
                 </Button>
               </Link>
               

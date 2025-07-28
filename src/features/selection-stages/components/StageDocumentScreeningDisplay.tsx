@@ -1,12 +1,7 @@
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { CheckCircle, XCircle, Clock, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
-import { useState } from 'react';
-import { EmailTaskButton } from '@/features/email';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 
 export interface DocumentScreeningStageData {
   id?: string;
@@ -36,28 +31,6 @@ export function StageDocumentScreeningDisplay({
   applicantName, 
   applicantEmail 
 }: StageDocumentScreeningDisplayProps) {
-  const [tasks, setTasks] = useState(data?.tasks || {
-    detailedContact: { completed: false },
-    resultNotification: { completed: false }
-  });
-
-  const handleTaskChange = (taskName: string, checked: boolean) => {
-    const newTasks = { ...tasks };
-    const taskKey = taskName as keyof typeof tasks;
-    
-    newTasks[taskKey] = {
-      completed: checked,
-      completedAt: checked ? new Date().toISOString() : undefined
-    };
-    
-    setTasks(newTasks);
-    onTaskChange?.(taskName, checked);
-  };
-
-  const handleEmailSent = (taskName: string) => {
-    // メール送信後にタスクを完了としてマーク
-    handleTaskChange(taskName, true);
-  };
 
   const getResultBadge = (result?: string) => {
     switch (result) {
@@ -148,70 +121,7 @@ export function StageDocumentScreeningDisplay({
         </div>
       )}
 
-      {/* タスク（常に表示） */}
-      <div>
-        <h5 className="font-medium mb-3">タスク</h5>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between p-3 border rounded-lg">
-            <div className="flex items-center space-x-3">
-              <Checkbox
-                id="detailedContact"
-                checked={tasks.detailedContact?.completed || false}
-                onCheckedChange={(checked: boolean | 'indeterminate') => handleTaskChange('detailedContact', checked === true)}
-              />
-              <div className="flex-1">
-                <label htmlFor="detailedContact" className="text-sm font-medium">
-                  詳細連絡
-                </label>
-                {tasks.detailedContact?.completed && tasks.detailedContact?.completedAt && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    完了日: {format(new Date(tasks.detailedContact.completedAt), 'PPP', { locale: ja })}
-                  </p>
-                )}
-              </div>
-              {tasks.detailedContact?.completed && (
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              )}
-            </div>
-            <Link to={`/applicants/${applicantId}/mail?stage=書類選考&historyId=${data?.id || ''}`}>
-              <Button variant="outline" size="sm">メール送信</Button>
-            </Link>
-          </div>
-
-          <div className="flex items-center justify-between p-3 border rounded-lg">
-            <div className="flex items-center space-x-3">
-              <Checkbox
-                id="resultNotification"
-                checked={tasks.resultNotification?.completed || false}
-                onCheckedChange={(checked: boolean | 'indeterminate') => handleTaskChange('resultNotification', checked === true)}
-              />
-              <div className="flex-1">
-                <label htmlFor="resultNotification" className="text-sm font-medium">
-                  結果連絡
-                </label>
-                {tasks.resultNotification?.completed && tasks.resultNotification?.completedAt && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    完了日: {format(new Date(tasks.resultNotification.completedAt), 'PPP', { locale: ja })}
-                  </p>
-                )}
-              </div>
-              {tasks.resultNotification?.completed && (
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              )}
-            </div>
-            <EmailTaskButton
-              taskName="結果連絡"
-              applicantId={applicantId}
-              applicantName={applicantName}
-              applicantEmail={applicantEmail}
-              stage="書類選考"
-              onEmailSent={() => handleEmailSent('resultNotification')}
-              variant="outline"
-              size="sm"
-            />
-          </div>
-        </div>
-      </div>
+      {/* タスクはSelectionStageAccordionで統合管理されるため、ここでは表示しない */}
     </div>
   );
 } 
