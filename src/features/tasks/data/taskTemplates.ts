@@ -52,46 +52,6 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
       isRequired: true,
       estimatedDuration: 30,
       order: 5
-    },
-    {
-      id: 'entry-detail-contact',
-      stage: 'エントリー',
-      title: '詳細連絡',
-      description: '詳細情報の連絡',
-      type: '詳細連絡',
-      isRequired: true,
-      estimatedDuration: 15,
-      order: 6
-    },
-    {
-      id: 'entry-schedule-contact',
-      stage: 'エントリー',
-      title: '日程調整連絡',
-      description: '日程調整の連絡',
-      type: '日程調整連絡',
-      isRequired: true,
-      estimatedDuration: 20,
-      order: 7
-    },
-    {
-      id: 'entry-remind-contact',
-      stage: 'エントリー',
-      title: 'リマインド',
-      description: 'リマインド連絡',
-      type: 'リマインド',
-      isRequired: true,
-      estimatedDuration: 10,
-      order: 8
-    },
-    {
-      id: 'entry-result-contact',
-      stage: 'エントリー',
-      title: '結果連絡',
-      description: '結果の連絡',
-      type: '結果連絡',
-      isRequired: true,
-      estimatedDuration: 15,
-      order: 9
     }
   ],
   '書類選考': [

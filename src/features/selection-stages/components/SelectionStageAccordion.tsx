@@ -7,19 +7,21 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Clock, XCircle, Plus, Calendar, User, Edit, Mail } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, Plus, Calendar, User, Edit, Mail, ExternalLink } from 'lucide-react';
 import { SelectionHistory, Evaluation } from '@/features/applicants/types/applicant';
 import { Applicant } from '@/features/applicants/types/applicant';
 import { formatDateTime } from '@/shared/utils/date';
 import { StageDisplayFactory } from './StageDisplayFactory';
 import { useTaskManagement } from '@/features/tasks/hooks/useTaskManagement';
 import { TaskStatus, ContactStatus, CONTACT_STATUSES } from '@/features/tasks/types/task';
+import { useEvents } from '@/features/events/hooks/useEvents';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export type StageType = 
   | 'エントリー'
@@ -47,6 +49,8 @@ export function SelectionStageAccordion({
   evaluations,
   stageDetails = {}
 }: SelectionStageAccordionProps) {
+  const navigate = useNavigate();
+  
   const { 
     getApplicantTasks, 
     getApplicantTasksByStage,
@@ -56,6 +60,11 @@ export function SelectionStageAccordion({
     setTaskDueDate, 
     assignTask 
   } = useTaskManagement();
+
+  const { events } = useEvents();
+  
+  // デバッグ情報をコンソールに出力
+  console.log('SelectionStageAccordion - Available events:', events);
 
   const [editingTask, setEditingTask] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -331,6 +340,52 @@ export function SelectionStageAccordion({
                                         <Button size="sm">
                                           <Mail className="h-3 w-3 mr-1" />
                                           メール送信
+                                        </Button>
+                                      )}
+                                      {task.type === '日程調整連絡' && (
+                                        <Button 
+                                          size="sm"
+                                          variant="default"
+                                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                                          onClick={() => {
+                                            console.log('Schedule form button clicked');
+                                            console.log('Current stage:', item.stage);
+                                            console.log('Available events in SelectionStageAccordion:', events);
+                                            
+                                            // デバッグ情報をアラートで表示
+                                            const debugInfo = `
+デバッグ情報:
+- 現在の段階: ${item.stage}
+- 利用可能なイベント数: ${events.length}
+- イベント一覧: ${events.map(e => `${e.stage}(${e.id})`).join(', ')}
+                                            `;
+                                            console.log(debugInfo);
+                                            
+                                            // 該当する段階のイベントを探す
+                                            const matchingEvent = events.find(event => 
+                                              event.stage === item.stage
+                                            );
+                                            
+                                            console.log('Available events:', events.map(e => ({ id: e.id, stage: e.stage })));
+                                            console.log('Looking for stage:', item.stage);
+                                            console.log('Matching event:', matchingEvent);
+                                            
+                                            if (matchingEvent) {
+                                              const url = `/applicant-form/${applicant.id}/${matchingEvent.id}`;
+                                              console.log('Opening URL:', url);
+                                              // ハッシュ付きURLでナビゲーション
+                                              window.location.hash = url;
+                                            } else {
+                                              // イベントが見つからない場合はサンプルモードで開く
+                                              const url = `/applicant-form/sample/${item.stage}`;
+                                              console.log('Opening sample URL:', url);
+                                              // ハッシュ付きURLでナビゲーション
+                                              window.location.hash = url;
+                                            }
+                                          }}
+                                        >
+                                          <ExternalLink className="h-3 w-3 mr-1" />
+                                          日程調整フォーム
                                         </Button>
                                       )}
                                       {task.type === '結果連絡' && (

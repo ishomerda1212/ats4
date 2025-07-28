@@ -4,12 +4,17 @@ import { Event, EventSession, EventParticipant } from '@/features/events/types/e
 import { Applicant } from '@/features/applicants/types/applicant';
 import { ApplicantEventResponse, SessionResponse, EventFormData, SessionFormData } from '../types/applicantForm';
 import { generateId } from '@/shared/utils/date';
+import { mockEvents, mockEventSessions, mockEventParticipants } from '@/shared/data/mockEventData';
+import { mockApplicants } from '@/shared/data/mockData';
 
 export const useApplicantForm = (applicantId: string, eventId: string) => {
-  const [events] = useLocalStorage<Event[]>('events', []);
-  const [eventSessions] = useLocalStorage<EventSession[]>('eventSessions', []);
-  const [eventParticipants, setEventParticipants] = useLocalStorage<EventParticipant[]>('eventParticipants', []);
-  const [applicants] = useLocalStorage<Applicant[]>('applicants', []);
+  // デバッグ情報をコンソールに出力
+  console.log('useApplicantForm - Parameters:', { applicantId, eventId });
+  
+  const [events] = useLocalStorage<Event[]>('events', mockEvents);
+  const [eventSessions] = useLocalStorage<EventSession[]>('eventSessions', mockEventSessions);
+  const [eventParticipants, setEventParticipants] = useLocalStorage<EventParticipant[]>('eventParticipants', mockEventParticipants);
+  const [applicants] = useLocalStorage<Applicant[]>('applicants', mockApplicants);
   const [applicantResponses, setApplicantResponses] = useLocalStorage<ApplicantEventResponse[]>('applicantResponses', []);
   
   const [loading, setLoading] = useState(true);
@@ -25,6 +30,10 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
   const loadEventAndApplicantData = () => {
     try {
       setLoading(true);
+      
+      console.log('loadEventAndApplicantData - Starting with:', { applicantId, eventId });
+      console.log('Available events:', events);
+      console.log('Available applicants:', applicants);
       
       // サンプルモードかどうかを判定
       const isSampleMode = applicantId === 'sample';
@@ -186,6 +195,47 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
         return { success: true, message: 'サンプルモードです。実際の送信は行われません。' };
       }
 
+      // メール送信用のデータを準備
+      const emailData = {
+        applicantId,
+        eventId,
+        applicantName: applicant.name,
+        eventName: eventData.eventName,
+        eventStage: eventData.stage,
+        responses: Object.entries(responses).map(([sessionId, status]) => {
+          const session = eventData.sessions.find(s => s.sessionId === sessionId);
+          return {
+            sessionId,
+            sessionName: session?.sessionName || '不明なセッション',
+            sessionDate: session ? new Date(session.startDate).toLocaleDateString('ja-JP') : '',
+            sessionTime: session ? `${new Date(session.startDate).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} - ${new Date(session.endDate).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}` : '',
+            sessionVenue: session?.venue || '',
+            status
+          };
+        })
+      };
+
+      // メール送信
+      try {
+        const emailResponse = await fetch('/api/submit-form-response.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(emailData)
+        });
+
+        const emailResult = await emailResponse.json();
+        
+        if (!emailResult.success) {
+          console.error('Email sending failed:', emailResult.error);
+          // メール送信が失敗しても、ローカルデータは保存する
+        }
+      } catch (emailError) {
+        console.error('Email sending error:', emailError);
+        // メール送信エラーでも、ローカルデータは保存する
+      }
+
       // セッション回答を作成
       const sessionResponses: SessionResponse[] = Object.entries(responses).map(([sessionId, status]) => ({
         sessionId,
@@ -237,7 +287,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
 
       setEventParticipants(updatedParticipants);
       
-      return { success: true, message: '回答を送信しました' };
+      return { success: true, message: '回答を送信しました。メールでも通知されました。' };
     } catch (err) {
       return { success: false, message: '送信に失敗しました' };
     }

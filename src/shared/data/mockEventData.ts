@@ -4,7 +4,7 @@ import { mockApplicants } from './mockData';
 
 export const mockEvents: Event[] = [
   {
-    id: generateId(),
+    id: 'event-company-info',
     name: '会社説明会',
     description: '弊社の事業内容、働く環境、キャリアパスについて詳しくご説明します。',
     stage: '会社説明会',
@@ -12,7 +12,7 @@ export const mockEvents: Event[] = [
     updatedAt: new Date('2024-01-10T09:00:00Z')
   },
   {
-    id: generateId(),
+    id: 'event-workplace-tour',
     name: '職場見学会',
     description: '実際の職場を見学し、社員との交流を通じて職場の雰囲気を体感していただけます。',
     stage: '職場見学',
@@ -20,7 +20,7 @@ export const mockEvents: Event[] = [
     updatedAt: new Date('2024-01-12T10:00:00Z')
   },
   {
-    id: generateId(),
+    id: 'event-ceo-seminar',
     name: 'CEOセミナー',
     description: '代表取締役による経営方針説明と質疑応答セッションです。',
     stage: 'CEOセミナー',
@@ -28,7 +28,7 @@ export const mockEvents: Event[] = [
     updatedAt: new Date('2024-01-15T11:00:00Z')
   },
   {
-    id: generateId(),
+    id: 'event-individual-interview',
     name: '個別面接',
     description: '採用担当者との1対1の面接です。',
     stage: '個別面接',
@@ -36,20 +36,60 @@ export const mockEvents: Event[] = [
     updatedAt: new Date('2024-01-18T09:00:00Z')
   },
   {
-    id: generateId(),
+    id: 'event-group-interview',
     name: '集団面接',
     description: '複数の応募者による集団面接です。',
     stage: '集団面接',
     createdAt: new Date('2024-01-20T09:00:00Z'),
     updatedAt: new Date('2024-01-20T09:00:00Z')
+  },
+  {
+    id: 'event-document-screening',
+    name: '書類選考',
+    description: '書類選考の詳細説明と提出書類の確認を行います。',
+    stage: '書類選考',
+    createdAt: new Date('2024-01-08T09:00:00Z'),
+    updatedAt: new Date('2024-01-08T09:00:00Z')
+  },
+  {
+    id: 'event-aptitude-test',
+    name: '適性検査',
+    description: '適性検査の実施と結果確認を行います。',
+    stage: '適性検査',
+    createdAt: new Date('2024-01-09T09:00:00Z'),
+    updatedAt: new Date('2024-01-09T09:00:00Z')
+  },
+  {
+    id: 'event-job-experience',
+    name: '仕事体験',
+    description: '実際の業務を体験していただき、職場の雰囲気を体感していただけます。',
+    stage: '仕事体験',
+    createdAt: new Date('2024-01-14T09:00:00Z'),
+    updatedAt: new Date('2024-01-14T09:00:00Z')
+  },
+  {
+    id: 'event-final-selection',
+    name: '最終選考',
+    description: '最終選考の面接と総合評価を行います。',
+    stage: '最終選考',
+    createdAt: new Date('2024-01-22T09:00:00Z'),
+    updatedAt: new Date('2024-01-22T09:00:00Z')
+  },
+  {
+    id: 'event-offer',
+    name: '内定',
+    description: '内定通知と入社手続きの案内を行います。',
+    stage: '内定',
+    createdAt: new Date('2024-01-25T09:00:00Z'),
+    updatedAt: new Date('2024-01-25T09:00:00Z')
   }
 ];
 
 export const mockEventSessions: EventSession[] = [
   // 会社説明会のセッション
   {
-    id: generateId(),
-    eventId: mockEvents[0].id,
+    id: 'session-company-info-1',
+    eventId: 'event-company-info',
     name: '会社説明会 第1回',
     start: new Date('2024-02-15T14:00:00Z'),
     end: new Date('2024-02-15T16:00:00Z'),
@@ -59,8 +99,8 @@ export const mockEventSessions: EventSession[] = [
     updatedAt: new Date('2024-01-10T09:00:00Z')
   },
   {
-    id: generateId(),
-    eventId: mockEvents[0].id,
+    id: 'session-company-info-2',
+    eventId: 'event-company-info',
     name: '会社説明会 第2回',
     start: new Date('2024-02-20T10:00:00Z'),
     end: new Date('2024-02-20T12:00:00Z'),
@@ -71,8 +111,8 @@ export const mockEventSessions: EventSession[] = [
   },
   // 職場見学会のセッション
   {
-    id: generateId(),
-    eventId: mockEvents[1].id,
+    id: 'session-workplace-tour-1',
+    eventId: 'event-workplace-tour',
     name: '職場見学会 第1回',
     start: new Date('2024-02-25T13:00:00Z'),
     end: new Date('2024-02-25T15:00:00Z'),
@@ -83,8 +123,8 @@ export const mockEventSessions: EventSession[] = [
   },
   // 社長セミナーのセッション
   {
-    id: generateId(),
-    eventId: mockEvents[2].id,
+    id: 'session-ceo-seminar-1',
+    eventId: 'event-ceo-seminar',
     name: '社長セミナー 第1回',
     start: new Date('2024-03-05T15:00:00Z'),
     end: new Date('2024-03-05T17:00:00Z'),
@@ -95,8 +135,8 @@ export const mockEventSessions: EventSession[] = [
   },
   // 個別面接のセッション（上限1名）
   {
-    id: generateId(),
-    eventId: mockEvents[3].id,
+    id: 'session-individual-interview-a',
+    eventId: 'event-individual-interview',
     name: '個別面接 A日程',
     start: new Date('2024-03-10T10:00:00Z'),
     end: new Date('2024-03-10T11:00:00Z'),
@@ -108,8 +148,8 @@ export const mockEventSessions: EventSession[] = [
     updatedAt: new Date('2024-01-18T09:00:00Z')
   },
   {
-    id: generateId(),
-    eventId: mockEvents[3].id,
+    id: 'session-individual-interview-b',
+    eventId: 'event-individual-interview',
     name: '個別面接 B日程',
     start: new Date('2024-03-10T14:00:00Z'),
     end: new Date('2024-03-10T15:00:00Z'),
@@ -121,8 +161,8 @@ export const mockEventSessions: EventSession[] = [
     updatedAt: new Date('2024-01-18T09:00:00Z')
   },
   {
-    id: generateId(),
-    eventId: mockEvents[3].id,
+    id: 'session-individual-interview-c',
+    eventId: 'event-individual-interview',
     name: '個別面接 C日程',
     start: new Date('2024-03-12T13:00:00Z'),
     end: new Date('2024-03-12T14:00:00Z'),
@@ -135,8 +175,8 @@ export const mockEventSessions: EventSession[] = [
   },
   // 集団面接のセッション（上限8名）
   {
-    id: generateId(),
-    eventId: mockEvents[4].id,
+    id: 'session-group-interview-1',
+    eventId: 'event-group-interview',
     name: '集団面接 第1回',
     start: new Date('2024-03-15T10:00:00Z'),
     end: new Date('2024-03-15T12:00:00Z'),
@@ -148,8 +188,8 @@ export const mockEventSessions: EventSession[] = [
     updatedAt: new Date('2024-01-20T09:00:00Z')
   },
   {
-    id: generateId(),
-    eventId: mockEvents[4].id,
+    id: 'session-group-interview-2',
+    eventId: 'event-group-interview',
     name: '集団面接 第2回',
     start: new Date('2024-03-18T14:00:00Z'),
     end: new Date('2024-03-18T16:00:00Z'),
@@ -164,36 +204,36 @@ export const mockEventSessions: EventSession[] = [
 
 export const mockEventParticipants: EventParticipant[] = [
   {
-    id: generateId(),
-    eventId: mockEventSessions[0].id,
-    applicantId: mockApplicants[0].id, // 田中太郎
+    id: 'participant-1',
+    eventId: 'session-company-info-1',
+    applicantId: 'applicant-1', // 田中太郎
     status: '未定',
     joinedAt: new Date('2024-01-20T10:00:00Z'),
     createdAt: new Date('2024-01-20T10:00:00Z'),
     updatedAt: new Date('2024-01-20T10:00:00Z')
   },
   {
-    id: generateId(),
-    eventId: mockEventSessions[0].id,
-    applicantId: mockApplicants[1].id, // 佐藤花子
+    id: 'participant-2',
+    eventId: 'session-company-info-1',
+    applicantId: 'applicant-2', // 佐藤花子
     status: '参加',
     joinedAt: new Date('2024-01-18T14:30:00Z'),
     createdAt: new Date('2024-01-18T14:30:00Z'),
     updatedAt: new Date('2024-02-15T16:00:00Z')
   },
   {
-    id: generateId(),
-    eventId: mockEventSessions[1].id,
-    applicantId: mockApplicants[2].id, // 鈴木次郎
+    id: 'participant-3',
+    eventId: 'session-workplace-tour-1',
+    applicantId: 'applicant-3', // 鈴木次郎
     status: '未定',
     joinedAt: new Date('2024-01-22T09:15:00Z'),
     createdAt: new Date('2024-01-22T09:15:00Z'),
     updatedAt: new Date('2024-01-22T09:15:00Z')
   },
   {
-    id: generateId(),
-    eventId: mockEventSessions[0].id,
-    applicantId: mockApplicants[3].id, // 高橋美咲
+    id: 'participant-4',
+    eventId: 'session-company-info-1',
+    applicantId: 'applicant-4', // 高橋美咲
     status: '未定',
     joinedAt: new Date('2024-01-21T15:20:00Z'),
     createdAt: new Date('2024-01-21T15:20:00Z'),
@@ -201,9 +241,9 @@ export const mockEventParticipants: EventParticipant[] = [
   },
   // 個別面接（上限1名）の参加者サンプル
   {
-    id: generateId(),
-    eventId: mockEventSessions[4].id, // 個別面接A日程
-    applicantId: mockApplicants[0].id, // 田中太郎
+    id: 'participant-5',
+    eventId: 'session-individual-interview-a', // 個別面接A日程
+    applicantId: 'applicant-1', // 田中太郎
     status: '申込',
     joinedAt: new Date('2024-02-01T10:00:00Z'),
     createdAt: new Date('2024-02-01T10:00:00Z'),
@@ -211,18 +251,18 @@ export const mockEventParticipants: EventParticipant[] = [
   },
   // 集団面接（上限8名）の参加者サンプル
   {
-    id: generateId(),
-    eventId: mockEventSessions[8].id, // 集団面接第1回
-    applicantId: mockApplicants[1].id, // 佐藤花子
+    id: 'participant-6',
+    eventId: 'session-group-interview-1', // 集団面接第1回
+    applicantId: 'applicant-2', // 佐藤花子
     status: '申込',
     joinedAt: new Date('2024-02-05T14:00:00Z'),
     createdAt: new Date('2024-02-05T14:00:00Z'),
     updatedAt: new Date('2024-02-05T14:00:00Z')
   },
   {
-    id: generateId(),
-    eventId: mockEventSessions[8].id, // 集団面接第1回
-    applicantId: mockApplicants[2].id, // 鈴木次郎
+    id: 'participant-7',
+    eventId: 'session-group-interview-1', // 集団面接第1回
+    applicantId: 'applicant-3', // 鈴木次郎
     status: '参加',
     joinedAt: new Date('2024-02-06T09:00:00Z'),
     createdAt: new Date('2024-02-06T09:00:00Z'),

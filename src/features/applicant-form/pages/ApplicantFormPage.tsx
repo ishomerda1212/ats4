@@ -8,6 +8,9 @@ export const ApplicantFormPage: React.FC = () => {
     eventId: string;
   }>();
 
+  // デバッグ情報をコンソールに出力
+  console.log('ApplicantFormPage - URL Parameters:', { applicantId, eventId });
+
   if (!applicantId || !eventId) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
@@ -22,6 +25,11 @@ export const ApplicantFormPage: React.FC = () => {
             応募者IDまたはイベントIDが指定されていません。
             正しいURLでアクセスしてください。
           </p>
+          <div className="mt-4 p-3 bg-gray-100 rounded text-sm">
+            <p>Debug Info:</p>
+            <p>applicantId: {applicantId || 'undefined'}</p>
+            <p>eventId: {eventId || 'undefined'}</p>
+          </div>
         </div>
       </div>
     );
