@@ -86,6 +86,8 @@ export function ParticipantList({ participants, applicants, onStatusChange }: Pa
                           <SelectItem value="申込">申込</SelectItem>
                           <SelectItem value="参加">参加</SelectItem>
                           <SelectItem value="欠席">欠席</SelectItem>
+                          <SelectItem value="不参加">不参加</SelectItem>
+                          <SelectItem value="未定">未定</SelectItem>
                         </SelectContent>
                       </Select>
                     ) : (

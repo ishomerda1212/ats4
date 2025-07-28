@@ -77,19 +77,14 @@ export function StageDisplayFactory({ stageType, data, applicantId, applicantNam
           <p className="text-sm text-gray-600 mt-1">
             {stageType}の表示コンポーネントは準備中です。
           </p>
-          {(() => {
-            if (data && typeof data === 'object' && data !== null && Object.keys(data).length > 0) {
-              return (
-                <div className="mt-3">
-                  <h5 className="text-sm font-medium">入力データ:</h5>
-                  <pre className="text-xs bg-white p-2 rounded mt-1 overflow-auto">
-                    {String(JSON.stringify(data, null, 2))}
-                  </pre>
-                </div>
-              );
-            }
-            return null;
-          })()}
+          {data && typeof data === 'object' && data !== null && Object.keys(data).length > 0 ? (
+            <div className="mt-3">
+              <h5 className="text-sm font-medium">入力データ:</h5>
+              <pre className="text-xs bg-white p-2 rounded mt-1 overflow-auto">
+                {String(JSON.stringify(data, null, 2))}
+              </pre>
+            </div>
+          ) : null}
         </div>
       );
     default:

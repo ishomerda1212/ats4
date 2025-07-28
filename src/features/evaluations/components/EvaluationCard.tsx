@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Eye, Trash2 } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Evaluation } from '../types/evaluation';
 import { formatDateTime } from '@/shared/utils/date';
@@ -11,10 +11,9 @@ interface EvaluationCardProps {
   applicantId?: string;
   onView?: (evaluation: Evaluation) => void;
   onEdit?: (evaluation: Evaluation) => void;
-  onDelete?: (evaluation: Evaluation) => void;
 }
 
-export function EvaluationCard({ evaluation, applicantId, onView, onEdit, onDelete }: EvaluationCardProps) {
+export function EvaluationCard({ evaluation, applicantId, onView, onEdit }: EvaluationCardProps) {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-4">
@@ -57,12 +56,6 @@ export function EvaluationCard({ evaluation, applicantId, onView, onEdit, onDele
             <Button size="sm" variant="outline" onClick={() => onEdit(evaluation)}>
               <Eye className="h-3 w-3 mr-1" />
               編集
-            </Button>
-          )}
-          {onDelete && (
-            <Button size="sm" variant="outline" onClick={() => onDelete(evaluation)}>
-              <Trash2 className="h-3 w-3 mr-1" />
-              削除
             </Button>
           )}
         </div>

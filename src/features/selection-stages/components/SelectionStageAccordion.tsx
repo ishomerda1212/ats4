@@ -7,12 +7,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Clock, XCircle, Plus, FileText } from 'lucide-react';
+import { CheckCircle, Clock, XCircle, Plus } from 'lucide-react';
 import { SelectionHistory, Evaluation } from '@/features/applicants/types/applicant';
 import { Applicant } from '@/features/applicants/types/applicant';
 import { formatDateTime } from '@/shared/utils/date';
-import { Link } from 'react-router-dom';
-import { EvaluationCard } from '@/features/evaluations/components/EvaluationCard';
 import { StageDisplayFactory } from './StageDisplayFactory';
 
 export type StageType = 
@@ -54,9 +52,7 @@ export function SelectionStageAccordion({
     }
   };
 
-  const getStageEvaluations = (historyId: string) => {
-    return evaluations.filter(e => e.selectionHistoryId === historyId);
-  };
+
 
   return (
     <Card>
@@ -75,7 +71,6 @@ export function SelectionStageAccordion({
         ) : (
           <Accordion type="multiple" className="space-y-2">
             {history.map((item) => {
-              const stageEvaluations = getStageEvaluations(item.id);
               const currentStageData = stageDetails[item.id];
               
               return (
@@ -108,11 +103,7 @@ export function SelectionStageAccordion({
                         <Badge className="bg-gray-100 text-gray-800">
                           {item.status}
                         </Badge>
-                        {stageEvaluations.length > 0 && (
-                          <Badge className="bg-gray-100 text-gray-800">
-                            評価 {stageEvaluations.length}件
-                          </Badge>
-                        )}
+
                         {currentStageData && Object.keys(currentStageData).length > 0 && (
                           <Badge className="bg-gray-100 text-green-600">
                             データ入力済み
@@ -137,32 +128,7 @@ export function SelectionStageAccordion({
                         />
                       </div>
 
-                      {/* 2. 評定表 */}
-                      <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-sm font-medium">評定表 ({stageEvaluations.length}件)</h4>
-                          <Link to={`/applicants/${applicant.id}/evaluation?historyId=${item.id}`}>
-                            <Button size="sm" variant="outline">
-                              <FileText className="h-3 w-3 mr-1" />
-                              評定表作成
-                            </Button>
-                          </Link>
-                        </div>
-                        
-                        {stageEvaluations.length > 0 ? (
-                          <div className="space-y-2">
-                            {stageEvaluations.map((evaluation) => (
-                              <EvaluationCard 
-                                key={evaluation.id}
-                                evaluation={evaluation}
-                                applicantId={applicant.id}
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-sm text-muted-foreground">評定表がありません</p>
-                        )}
-                      </div>
+
 
                       {/* 3. 備考 */}
                       {item.notes && (

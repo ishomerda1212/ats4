@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { ApplicantBasicInfo } from '../components/ApplicantBasicInfo';
 import { SelectionStageAccordion } from '@/features/selection-stages/components/SelectionStageAccordion';
 import { useApplicantDetail } from '../hooks/useApplicantDetail';
+import { EvaluationSection } from '@/features/evaluations/components/EvaluationSection';
+import { PDFStorageSection } from '@/features/pdf/components/PDFExportSection';
 
 export function ApplicantDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -55,6 +57,16 @@ export function ApplicantDetailPage() {
         history={history} 
         evaluations={evaluations}
         stageDetails={stageDetails}
+      />
+
+      <EvaluationSection
+        applicant={applicant}
+        evaluations={evaluations}
+        onEvaluationUpdate={() => { /* 必要に応じて更新処理を実装 */ }}
+      />
+
+      <PDFStorageSection
+        applicant={applicant}
       />
     </div>
   );

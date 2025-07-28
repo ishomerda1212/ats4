@@ -160,7 +160,7 @@ export function GroupEvaluationForm({
 
   const saveDraft = () => {
     const currentData = form.getValues();
-    setDraftData(currentData);
+    setDraftData(currentData as EvaluationFormData);
     setLastSaved(new Date());
     toast({
       title: "下書きを保存しました",
