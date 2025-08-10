@@ -17,6 +17,7 @@ import { EmailTemplateManagementPage } from '@/features/tasks/pages/EmailTemplat
 import { TaskListPage } from '@/features/tasks/pages/TaskListPage';
 import { ApplicantMailPage } from '@/features/email/pages/ApplicantMailPage';
 import { ApplicantFormPage } from '@/features/applicant-form/pages/ApplicantFormPage';
+import { ApplicantResponseViewPage } from '@/features/applicant-form/pages/ApplicantResponseViewPage';
 
 export function Router() {
   return (
@@ -43,6 +44,7 @@ export function Router() {
         </Route>
         <Route path="register/:applicantId" element={<EventRegistrationPage />} />
         <Route path="applicant-form/:applicantId/:eventId" element={<ApplicantFormPage />} />
+        <Route path="applicant-response/:applicantId/:eventId" element={<ApplicantResponseViewPage />} />
       </Routes>
     </HashRouter>
   );

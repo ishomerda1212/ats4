@@ -11,48 +11,48 @@ import { toast } from '@/hooks/use-toast';
 
 const evaluationSchema = z.object({
   evaluatorName: z.string().min(1, '評価者名を入力してください'),
-  firstImpression: z.string().min(1, '第一印象を入力してください'),
-  communicationSkills: z.string().min(1, 'コミュニケーション能力を入力してください'),
-  logicalThinking: z.string().min(1, '論理的思考力を入力してください'),
-  initiative: z.string().min(1, '積極性・主体性を入力してください'),
-  teamwork: z.string().min(1, '協調性を入力してください'),
-  motivation: z.string().min(1, '志望動機・熱意を入力してください'),
-  technicalSkills: z.string().min(1, '技術的スキルを入力してください'),
-  overallEvaluation: z.string().min(1, '総合評価を入力してください'),
+  motivationReason: z.string().min(1, '志望理由系の評価を入力してください'),
+  experienceBackground: z.string().min(1, '経歴・経験系の評価を入力してください'),
+  selfUnderstanding: z.string().min(1, '自己理解系の評価を入力してください'),
+  problemSolving: z.string().min(1, '課題対応・行動特性系の評価を入力してください'),
+  futureVision: z.string().min(1, '将来像系の評価を入力してください'),
+  reverseQuestion: z.string().min(1, '逆質問の評価を入力してください'),
 });
 
-export function useEvaluationForm(applicantId: string, selectionHistoryId: string) {
+export function useEvaluationForm(applicantId: string) {
   const [, setEvaluations] = useLocalStorage<Evaluation[]>('evaluations', mockEvaluations);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  console.log('useEvaluationForm called with:', { applicantId });
 
   const form = useForm<EvaluationFormData>({
     resolver: zodResolver(evaluationSchema),
     defaultValues: {
       evaluatorName: '',
-      firstImpression: '',
-      communicationSkills: '',
-      logicalThinking: '',
-      initiative: '',
-      teamwork: '',
-      motivation: '',
-      technicalSkills: '',
-      overallEvaluation: '',
+      motivationReason: '',
+      experienceBackground: '',
+      selfUnderstanding: '',
+      problemSolving: '',
+      futureVision: '',
+      reverseQuestion: '',
     },
   });
 
   const onSubmit = async (data: EvaluationFormData) => {
+    console.log('評定表フォームが送信されました:', data);
     setLoading(true);
     try {
       const newEvaluation: Evaluation = {
         id: generateId(),
         applicantId,
-        selectionHistoryId,
+        selectionHistoryId: '', // 空文字列または削除
         ...data,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
+      console.log('新しい評価を作成:', newEvaluation);
       setEvaluations(current => [...current, newEvaluation]);
       
       toast({
@@ -61,7 +61,8 @@ export function useEvaluationForm(applicantId: string, selectionHistoryId: strin
       });
 
       navigate(`/applicants/${applicantId}`);
-    } catch {
+    } catch (error) {
+      console.error('評定表保存エラー:', error);
       toast({
         title: "エラーが発生しました",
         description: "評定表の保存に失敗しました。",

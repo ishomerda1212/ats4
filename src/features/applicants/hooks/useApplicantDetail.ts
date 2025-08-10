@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Applicant, SelectionHistory, Evaluation, Task } from '../types/applicant';
+import { Applicant, SelectionHistory, Task } from '../types/applicant';
+import { Evaluation } from '@/features/evaluations/types/evaluation';
 import { mockApplicants, mockSelectionHistory, mockEvaluations, mockTasks, mockStageDetails } from '@/shared/data/mockData';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 

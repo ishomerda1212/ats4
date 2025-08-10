@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useApplicantForm } from '../hooks/useApplicantForm';
 import { SessionCard } from './SessionCard';
+import { ApplicantResponseView } from './ApplicantResponseView';
 import { ApplicantFormProps } from '../types/applicantForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, Building2, CheckCircle, AlertCircle } from 'lucide-react';
+import { ApplicantEventResponse } from '../types/applicantForm';
 
 export const ApplicantEventForm: React.FC<ApplicantFormProps> = ({ 
   applicantId, 
@@ -27,6 +29,8 @@ export const ApplicantEventForm: React.FC<ApplicantFormProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [showResponseView, setShowResponseView] = useState(false);
+  const [submittedResponse, setSubmittedResponse] = useState<ApplicantEventResponse | null>(null);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -38,6 +42,12 @@ export const ApplicantEventForm: React.FC<ApplicantFormProps> = ({
         type: result.success ? 'success' : 'error',
         text: result.message
       });
+      
+      // 送信成功時は回答確認画面を表示
+      if (result.success && result.response) {
+        setSubmittedResponse(result.response);
+        setShowResponseView(true);
+      }
     } catch {
       setSubmitMessage({
         type: 'error',
@@ -55,6 +65,18 @@ export const ApplicantEventForm: React.FC<ApplicantFormProps> = ({
     );
   };
 
+  // 回答確認画面が表示されている場合
+  if (showResponseView && submittedResponse && eventData && applicant) {
+    return (
+      <ApplicantResponseView
+        applicant={applicant}
+        eventData={eventData}
+        response={submittedResponse}
+        isReadOnly={true}
+        onBack={() => setShowResponseView(false)}
+      />
+    );
+  }
 
   if (loading) {
     return (

@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Evaluation } from '../types/evaluation';
 import { Applicant } from '@/features/applicants/types/applicant';
-import { EvaluationForm } from './EvaluationForm';
 import { EvaluationView } from './EvaluationView';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatDate } from '@/shared/utils/date';
@@ -17,19 +17,8 @@ interface EvaluationSectionProps {
 }
 
 export function EvaluationSection({ applicant, evaluations }: EvaluationSectionProps) {
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [selectedEvaluation, setSelectedEvaluation] = useState<Evaluation | null>(null);
-
-
-
-
-
-  const openEditDialog = (evaluation: Evaluation) => {
-    setSelectedEvaluation(evaluation);
-    setIsEditDialogOpen(true);
-  };
 
   const openViewDialog = (evaluation: Evaluation) => {
     setSelectedEvaluation(evaluation);
@@ -41,24 +30,27 @@ export function EvaluationSection({ applicant, evaluations }: EvaluationSectionP
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>評定表</CardTitle>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            新規作成
-          </Button>
+          <Link to={`/applicants/${applicant.id}/evaluation`}>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              新規作成
+            </Button>
+          </Link>
         </div>
       </CardHeader>
       <CardContent>
         {evaluations.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground">評定表がありません</p>
-            <Button 
-              variant="outline" 
-              className="mt-2"
-              onClick={() => setIsCreateDialogOpen(true)}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              最初の評定表を作成
-            </Button>
+            <Link to={`/applicants/${applicant.id}/evaluation`}>
+              <Button 
+                variant="outline" 
+                className="mt-2"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                最初の評定表を作成
+              </Button>
+            </Link>
           </div>
         ) : (
           <div className="space-y-4">
@@ -92,48 +84,20 @@ export function EvaluationSection({ applicant, evaluations }: EvaluationSectionP
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => openEditDialog(evaluation)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-
+                  <Link to={`/applicants/${applicant.id}/evaluation`}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
         )}
       </CardContent>
-
-      {/* 新規作成ダイアログ */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>評定表作成</DialogTitle>
-          </DialogHeader>
-          <EvaluationForm
-            applicantId={applicant.id}
-            selectionHistoryId=""
-          />
-        </DialogContent>
-      </Dialog>
-
-      {/* 編集ダイアログ */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>評定表編集</DialogTitle>
-          </DialogHeader>
-          {selectedEvaluation && (
-            <EvaluationForm
-              applicantId={applicant.id}
-              selectionHistoryId={selectedEvaluation.selectionHistoryId}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
 
       {/* 表示ダイアログ */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>

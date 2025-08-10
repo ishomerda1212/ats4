@@ -6,6 +6,7 @@ import { ApplicantEventResponse, SessionResponse, EventFormData, SessionFormData
 import { generateId } from '@/shared/utils/date';
 import { mockEvents, mockEventSessions, mockEventParticipants } from '@/shared/data/mockEventData';
 import { mockApplicants } from '@/shared/data/mockData';
+import { mockApplicantResponses } from '@/shared/data/mockApplicantResponseData';
 
 export const useApplicantForm = (applicantId: string, eventId: string) => {
   // デバッグ情報をコンソールに出力
@@ -15,7 +16,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
   const [eventSessions] = useLocalStorage<EventSession[]>('eventSessions', mockEventSessions);
   const [eventParticipants, setEventParticipants] = useLocalStorage<EventParticipant[]>('eventParticipants', mockEventParticipants);
   const [applicants] = useLocalStorage<Applicant[]>('applicants', mockApplicants);
-  const [applicantResponses, setApplicantResponses] = useLocalStorage<ApplicantEventResponse[]>('applicantResponses', []);
+  const [applicantResponses, setApplicantResponses] = useLocalStorage<ApplicantEventResponse[]>('applicantResponses', mockApplicantResponses);
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -220,7 +221,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
 
       // メール送信
       try {
-        const emailResponse = await fetch('/api/submit-form-response.php', {
+        const emailResponse = await fetch('/api/submit-form-response', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -290,7 +291,11 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
 
       setEventParticipants(updatedParticipants);
       
-      return { success: true, message: '回答を送信しました。メールでも通知されました。' };
+      return { 
+        success: true, 
+        message: '回答を送信しました。メールでも通知されました。',
+        response: newResponse
+      };
     } catch {
       return { success: false, message: '送信に失敗しました' };
     }

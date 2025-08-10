@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, Mail, Phone, MapPin, Calendar, School } from 'lucide-react';
+import { Edit, Mail, Phone, MapPin, Calendar, School, Target, Heart, Briefcase, Award, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Applicant } from '../types/applicant';
 import { StatusBadge } from '@/shared/components/common/StatusBadge';
@@ -87,13 +87,113 @@ export function ApplicantBasicInfo({ applicant }: ApplicantBasicInfoProps) {
           </div>
         </div>
 
-        <div className="pt-4 border-t">
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>登録日: {formatDate(applicant.createdAt)}</span>
-            <span>最終更新: {formatDate(applicant.updatedAt)}</span>
+        {/* 詳細情報セクション */}
+        <div className="pt-6 border-t">
+          <h3 className="text-lg font-semibold mb-4">詳細情報</h3>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* 志望動機・就活の軸・他社状況・将来像 */}
+            <div className="space-y-4">
+              {applicant.motivation && (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Target className="h-4 w-4 text-blue-600" />
+                    <h4 className="font-medium text-sm">志望動機</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
+                    {applicant.motivation}
+                  </p>
+                </div>
+              )}
+
+              {applicant.jobSearchAxis && (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Award className="h-4 w-4 text-green-600" />
+                    <h4 className="font-medium text-sm">就活の軸</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
+                    {applicant.jobSearchAxis}
+                  </p>
+                </div>
+              )}
+
+              {applicant.otherCompanyStatus && (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Briefcase className="h-4 w-4 text-orange-600" />
+                    <h4 className="font-medium text-sm">他社状況</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
+                    {applicant.otherCompanyStatus}
+                  </p>
+                </div>
+              )}
+
+              {applicant.futureVision && (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Target className="h-4 w-4 text-purple-600" />
+                    <h4 className="font-medium text-sm">将来像</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
+                    {applicant.futureVision}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* 長所・短所・経験・活動歴 */}
+            <div className="space-y-4">
+              {applicant.strengths && (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Heart className="h-4 w-4 text-red-600" />
+                    <h4 className="font-medium text-sm">長所</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
+                    {applicant.strengths}
+                  </p>
+                </div>
+              )}
+
+              {applicant.weaknesses && (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <User className="h-4 w-4 text-yellow-600" />
+                    <h4 className="font-medium text-sm">短所</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
+                    {applicant.weaknesses}
+                  </p>
+                </div>
+              )}
+
+              {applicant.experience && (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Briefcase className="h-4 w-4 text-indigo-600" />
+                    <h4 className="font-medium text-sm">経験・活動歴</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
+                    {applicant.experience}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 登録日と最終更新日 */}
+          <div className="pt-4 border-t mt-6">
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <span>登録日: {formatDate(applicant.createdAt)}</span>
+              <span>最終更新: {formatDate(applicant.updatedAt)}</span>
+            </div>
           </div>
         </div>
       </CardContent>
     </Card>
   );
 }
+
+export default ApplicantBasicInfo;

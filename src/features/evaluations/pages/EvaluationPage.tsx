@@ -1,14 +1,16 @@
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useApplicantDetail } from '@/features/applicants/hooks/useApplicantDetail';
 import { EvaluationForm } from '../components/EvaluationForm';
 import { ApplicantInfoPanel } from '../components/ApplicantInfoPanel';
 
 export function EvaluationPage() {
   const { id } = useParams<{ id: string }>();
-  const [searchParams] = useSearchParams();
-  const historyId = searchParams.get('historyId');
+  
+  console.log('EvaluationPage - URL params:', { id });
   
   const { applicant, history, loading } = useApplicantDetail(id!);
+
+  console.log('EvaluationPage - Data:', { applicant, history });
 
   if (loading) {
     return (
@@ -19,38 +21,34 @@ export function EvaluationPage() {
     );
   }
 
-  if (!applicant || !historyId) {
+  if (!applicant) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">応募者または選考履歴が見つかりませんでした。</p>
+        <p className="text-muted-foreground">応募者が見つかりませんでした。</p>
       </div>
     );
   }
 
-  const selectionHistory = history.find(h => h.id === historyId);
-
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">評定表入力</h1>
+    <div className="h-screen flex flex-col">
+      <div className="flex-shrink-0 p-4 border-b">
+        <h1 className="text-2xl font-bold">評定表入力</h1>
         <p className="text-muted-foreground mt-1">
-          {applicant.name}さんの{selectionHistory?.stage}評定表
+          {applicant.name}さんの評定表
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 p-4 min-h-0">
         <div className="overflow-y-auto">
           <ApplicantInfoPanel 
             applicant={applicant} 
-            selectionHistory={selectionHistory}
             history={history}
           />
         </div>
         
         <div className="overflow-y-auto">
           <EvaluationForm 
-            applicantId={applicant.id} 
-            selectionHistoryId={historyId}
+            applicantId={applicant.id}
           />
         </div>
       </div>

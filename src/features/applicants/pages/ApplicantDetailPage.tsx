@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ApplicantBasicInfo } from '../components/ApplicantBasicInfo';
+import ApplicantBasicInfo from '../components/ApplicantBasicInfo';
 import { SelectionStageAccordion } from '@/features/selection-stages/components/SelectionStageAccordion';
 import { useApplicantDetail } from '../hooks/useApplicantDetail';
 import { EvaluationSection } from '@/features/evaluations/components/EvaluationSection';
@@ -53,9 +53,8 @@ export function ApplicantDetailPage() {
       <ApplicantBasicInfo applicant={applicant} />
       
       <SelectionStageAccordion 
-        applicant={applicant}
+        applicant={applicant} 
         history={history} 
-        evaluations={evaluations}
         stageDetails={stageDetails}
       />
 

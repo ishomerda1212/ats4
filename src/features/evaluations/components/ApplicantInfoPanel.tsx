@@ -6,11 +6,10 @@ import { formatDateTime } from '@/shared/utils/date';
 
 interface ApplicantInfoPanelProps {
   applicant: Applicant;
-  selectionHistory?: SelectionHistory;
   history?: SelectionHistory[];
 }
 
-export function ApplicantInfoPanel({ applicant, selectionHistory, history = [] }: ApplicantInfoPanelProps) {
+export function ApplicantInfoPanel({ applicant, history = [] }: ApplicantInfoPanelProps) {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case '完了':
@@ -91,7 +90,7 @@ export function ApplicantInfoPanel({ applicant, selectionHistory, history = [] }
                 <div 
                   key={item.id} 
                   className={`p-3 border rounded-lg ${
-                    selectionHistory?.id === item.id 
+                    item.id === applicant.id 
                       ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20' 
                       : item.status === '進行中'
                       ? 'border-orange-300 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-700'
@@ -115,7 +114,7 @@ export function ApplicantInfoPanel({ applicant, selectionHistory, history = [] }
                     </div>
                     <div className="flex items-center space-x-2">
                       <Badge className="bg-blue-100 text-blue-800">{item.status}</Badge>
-                      {selectionHistory?.id === item.id && (
+                      {item.id === applicant.id && (
                         <Badge className="bg-blue-100 text-blue-800 border-blue-600">
                           現在
                         </Badge>

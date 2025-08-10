@@ -25,10 +25,10 @@ export function ApplicantForm({ applicant, mode }: ApplicantFormProps) {
           <CardTitle>
             {mode === 'create' ? '新規応募者登録' : '応募者情報編集'}
           </CardTitle>
-          <Link to="/applicants">
+          <Link to={mode === 'create' ? '/applicants' : `/applicants/${applicant?.id}`}>
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              一覧に戻る
+              {mode === 'create' ? '一覧に戻る' : '詳細に戻る'}
             </Button>
           </Link>
         </div>
@@ -264,8 +264,147 @@ export function ApplicantForm({ applicant, mode }: ApplicantFormProps) {
               />
             </div>
 
+            {/* 詳細情報 */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">詳細情報</h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* 志望動機・就活の軸・他社状況・将来像 */}
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="motivation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>志望動機</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="御社を志望した理由や動機を記入してください" 
+                            className="min-h-[100px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="jobSearchAxis"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>就活の軸</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="就職活動で重視している軸や条件を記入してください" 
+                            className="min-h-[80px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="otherCompanyStatus"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>他社状況</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="他社の選考状況や内定状況を記入してください" 
+                            className="min-h-[80px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="futureVision"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>将来像</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="将来のキャリアビジョンや目標を記入してください" 
+                            className="min-h-[80px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* 長所・短所・経験・活動歴 */}
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="strengths"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>長所</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="自分の長所や強みを記入してください" 
+                            className="min-h-[80px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="weaknesses"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>短所</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="自分の短所や改善点を記入してください" 
+                            className="min-h-[80px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="experience"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>経験・活動歴</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="趣味、サークル活動、アルバイト、ボランティアなどの経験を記入してください" 
+                            className="min-h-[100px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="flex justify-end space-x-4 pt-6 border-t">
-              <Link to="/applicants">
+              <Link to={mode === 'create' ? '/applicants' : `/applicants/${applicant?.id}`}>
                 <Button type="button" variant="outline">
                   キャンセル
                 </Button>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メール送信APIテスト</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .session {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .test-buttons {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>メール送信APIテスト</h1>
+    
+    <div class="test-buttons">
+        <button onclick="testHealth()">ヘルスチェック</button>
+        <button onclick="testEmail()">テストメール送信</button>
+    </div>
+    
+    <form id="testForm">
+        <div class="form-group">
+            <label for="applicantId">応募者ID:</label>
+            <input type="text" id="applicantId" value="test-001" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="eventId">イベントID:</label>
+            <input type="text" id="eventId" value="event-001" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="applicantName">応募者名:</label>
+            <input type="text" id="applicantName" value="テスト太郎" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="eventName">イベント名:</label>
+            <input type="text" id="eventName" value="人事面接" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="eventStage">選考段階:</label>
+            <input type="text" id="eventStage" value="人事面接" required>
+        </div>
+        
+        <div class="form-group">
+            <label>セッション回答:</label>
+            <div id="sessions">
+                <div class="session">
+                    <label>セッション1:</label>
+                    <input type="text" class="sessionName" value="午前の部" placeholder="セッション名">
+                    <input type="text" class="sessionDate" value="2024/01/20" placeholder="日付">
+                    <input type="text" class="sessionTime" value="09:00-10:00" placeholder="時間">
+                    <input type="text" class="sessionVenue" value="会議室A" placeholder="会場">
+                    <select class="sessionStatus">
+                        <option value="participate">参加</option>
+                        <option value="not_participate">不参加</option>
+                        <option value="pending">保留</option>
+                    </select>
+                </div>
+                <div class="session">
+                    <label>セッション2:</label>
+                    <input type="text" class="sessionName" value="午後の部" placeholder="セッション名">
+                    <input type="text" class="sessionDate" value="2024/01/20" placeholder="日付">
+                    <input type="text" class="sessionTime" value="14:00-15:00" placeholder="時間">
+                    <input type="text" class="sessionVenue" value="会議室B" placeholder="会場">
+                    <select class="sessionStatus">
+                        <option value="participate">参加</option>
+                        <option value="not_participate" selected>不参加</option>
+                        <option value="pending">保留</option>
+                    </select>
+                </div>
+            </div>
+            <button type="button" onclick="addSession()">セッション追加</button>
+        </div>
+        
+        <button type="submit">送信テスト</button>
+    </form>
+    
+    <div id="response"></div>
+
+    <script>
+        async function testHealth() {
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = '<p>ヘルスチェック中...</p>';
+            
+            try {
+                const response = await fetch('/api/health');
+                const result = await response.json();
+                
+                responseDiv.innerHTML = `
+                    <div class="response success">
+                        <h3>ヘルスチェック成功</h3>
+                        <p>ステータス: ${result.status}</p>
+                        <p>時刻: ${result.timestamp}</p>
+                    </div>
+                `;
+            } catch (error) {
+                responseDiv.innerHTML = `
+                    <div class="response error">
+                        <h3>ヘルスチェック失敗</h3>
+                        <p>エラー: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testEmail() {
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = '<p>テストメール送信中...</p>';
+            
+            try {
+                const response = await fetch('/api/test-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    responseDiv.innerHTML = `
+                        <div class="response success">
+                            <h3>テストメール送信成功</h3>
+                            <p>${result.message}</p>
+                            <p>送信時刻: ${result.timestamp}</p>
+                            <p>メッセージID: ${result.messageId}</p>
+                        </div>
+                    `;
+                } else {
+                    responseDiv.innerHTML = `
+                        <div class="response error">
+                            <h3>テストメール送信失敗</h3>
+                            <p>${result.error}</p>
+                            <p>詳細: ${result.details}</p>
+                            <p>時刻: ${result.timestamp}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                responseDiv.innerHTML = `
+                    <div class="response error">
+                        <h3>エラー</h3>
+                        <p>送信中にエラーが発生しました: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function addSession() {
+            const sessionsDiv = document.getElementById('sessions');
+            const sessionCount = sessionsDiv.children.length + 1;
+            
+            const sessionDiv = document.createElement('div');
+            sessionDiv.className = 'session';
+            sessionDiv.innerHTML = `
+                <label>セッション${sessionCount}:</label>
+                <input type="text" class="sessionName" placeholder="セッション名">
+                <input type="text" class="sessionDate" placeholder="日付">
+                <input type="text" class="sessionTime" placeholder="時間">
+                <input type="text" class="sessionVenue" placeholder="会場">
+                <select class="sessionStatus">
+                    <option value="participate">参加</option>
+                    <option value="not_participate">不参加</option>
+                    <option value="pending">保留</option>
+                </select>
+                <button type="button" onclick="this.parentElement.remove()">削除</button>
+            `;
+            
+            sessionsDiv.appendChild(sessionDiv);
+        }
+
+        document.getElementById('testForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = '<p>送信中...</p>';
+            
+            // フォームデータを収集
+            const formData = {
+                applicantId: document.getElementById('applicantId').value,
+                eventId: document.getElementById('eventId').value,
+                applicantName: document.getElementById('applicantName').value,
+                eventName: document.getElementById('eventName').value,
+                eventStage: document.getElementById('eventStage').value,
+                responses: []
+            };
+            
+            // セッション回答を収集
+            const sessions = document.querySelectorAll('.session');
+            sessions.forEach((session, index) => {
+                const sessionName = session.querySelector('.sessionName').value;
+                const sessionDate = session.querySelector('.sessionDate').value;
+                const sessionTime = session.querySelector('.sessionTime').value;
+                const sessionVenue = session.querySelector('.sessionVenue').value;
+                const sessionStatus = session.querySelector('.sessionStatus').value;
+                
+                formData.responses.push({
+                    sessionId: `session-${index + 1}`,
+                    sessionName: sessionName,
+                    sessionDate: sessionDate,
+                    sessionTime: sessionTime,
+                    sessionVenue: sessionVenue,
+                    status: sessionStatus
+                });
+            });
+            
+            try {
+                const response = await fetch('/api/submit-form-response', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    responseDiv.innerHTML = `
+                        <div class="response success">
+                            <h3>送信成功</h3>
+                            <p>${result.message}</p>
+                            <p>送信時刻: ${result.timestamp}</p>
+                            <p>メッセージID: ${result.messageId}</p>
+                        </div>
+                    `;
+                } else {
+                    responseDiv.innerHTML = `
+                        <div class="response error">
+                            <h3>送信失敗</h3>
+                            <p>${result.error}</p>
+                            <p>詳細: ${result.details}</p>
+                            <p>時刻: ${result.timestamp}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                responseDiv.innerHTML = `
+                    <div class="response error">
+                        <h3>エラー</h3>
+                        <p>送信中にエラーが発生しました: ${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html> 

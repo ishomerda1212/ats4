@@ -33,6 +33,15 @@ export interface Applicant extends BaseEntity {
   phone: string; // 携帯電話
   email: string; // メール
   currentStage: SelectionStage; // 現在の選考段階
+  
+  // 詳細情報
+  motivation?: string; // 志望動機
+  jobSearchAxis?: string; // 就活の軸
+  otherCompanyStatus?: string; // 他社状況
+  futureVision?: string; // 将来像
+  strengths?: string; // 長所
+  weaknesses?: string; // 短所
+  experience?: string; // 経験・活動歴（趣味・サークル・アルバイト）
 }
 
 export interface SelectionHistory extends BaseEntity {
@@ -42,20 +51,6 @@ export interface SelectionHistory extends BaseEntity {
   endDate?: Date;
   status: SelectionStatus;
   notes?: string;
-}
-
-export interface Evaluation extends BaseEntity {
-  applicantId: string;
-  selectionHistoryId: string;
-  evaluatorName: string;
-  firstImpression: string;
-  communicationSkills: string;
-  logicalThinking: string;
-  initiative: string;
-  teamwork: string;
-  motivation: string;
-  technicalSkills: string;
-  overallEvaluation: string;
 }
 
 export type TaskStatus = '未着手' | '進行中' | '完了';

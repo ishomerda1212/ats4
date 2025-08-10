@@ -19,6 +19,14 @@ const applicantSchema = z.object({
   phone: z.string().min(1, '電話番号を入力してください'),
   email: z.string().email('有効なメールアドレスを入力してください'),
   currentStage: z.string().min(1, '選考段階を選択してください'),
+  // 詳細情報（オプション）
+  motivation: z.string().optional(),
+  jobSearchAxis: z.string().optional(),
+  otherCompanyStatus: z.string().optional(),
+  futureVision: z.string().optional(),
+  strengths: z.string().optional(),
+  weaknesses: z.string().optional(),
+  experience: z.string().optional(),
 });
 
 type ApplicantFormData = z.infer<typeof applicantSchema>;
@@ -42,6 +50,14 @@ export function useApplicantForm(applicant?: Applicant, mode: 'create' | 'edit' 
       phone: applicant.phone,
       email: applicant.email,
       currentStage: applicant.currentStage,
+      // 詳細情報
+      motivation: applicant.motivation || '',
+      jobSearchAxis: applicant.jobSearchAxis || '',
+      otherCompanyStatus: applicant.otherCompanyStatus || '',
+      futureVision: applicant.futureVision || '',
+      strengths: applicant.strengths || '',
+      weaknesses: applicant.weaknesses || '',
+      experience: applicant.experience || '',
     } : {
       source: '',
       name: '',
@@ -55,6 +71,14 @@ export function useApplicantForm(applicant?: Applicant, mode: 'create' | 'edit' 
       phone: '',
       email: '',
       currentStage: 'エントリー',
+      // 詳細情報
+      motivation: '',
+      jobSearchAxis: '',
+      otherCompanyStatus: '',
+      futureVision: '',
+      strengths: '',
+      weaknesses: '',
+      experience: '',
     },
   });
 
