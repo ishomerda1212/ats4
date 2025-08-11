@@ -48,7 +48,7 @@ export function EventSessionCard({
           
           {/* アクションボタン */}
           <div className="flex items-center space-x-2 ml-4">
-            <Link to={`/events/${session.eventId}/sessions/${session.id}`}>
+            <Link to={`/event/${session.eventId}/session/${session.id}`}>
               <Button size="sm" variant="outline">
                 <Eye className="h-3 w-3 mr-1" />
                 詳細

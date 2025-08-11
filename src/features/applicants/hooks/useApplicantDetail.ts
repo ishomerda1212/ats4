@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Applicant, SelectionHistory, Task } from '../types/applicant';
-import { Evaluation } from '@/features/evaluations/types/evaluation';
-import { mockApplicants, mockSelectionHistory, mockEvaluations, mockTasks, mockStageDetails } from '@/shared/data/mockData';
+import { mockApplicants, mockSelectionHistory, mockTasks } from '@/shared/data/mockData';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 
 export function useApplicantDetail(applicantId: string) {
@@ -11,38 +10,30 @@ export function useApplicantDetail(applicantId: string) {
     if (import.meta.env.DEV) {
       localStorage.removeItem('selectionHistory');
       localStorage.removeItem('applicants');
-      localStorage.removeItem('evaluations');
       localStorage.removeItem('tasks');
     }
   }, []);
 
   const [applicants] = useLocalStorage<Applicant[]>('applicants', mockApplicants);
   const [selectionHistory] = useLocalStorage<SelectionHistory[]>('selectionHistory', mockSelectionHistory);
-  const [evaluations] = useLocalStorage<Evaluation[]>('evaluations', mockEvaluations);
   const [tasks] = useLocalStorage<Task[]>('tasks', mockTasks);
   
   const [loading] = useState(false);
 
   const applicant = applicants.find(a => a.id === applicantId);
-  const history = selectionHistory.filter(h => h.applicantId === applicantId);
-  const applicantEvaluations = evaluations.filter(e => e.applicantId === applicantId);
+  const history = selectionHistory
+    .filter(h => h.applicantId === applicantId)
+    .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()); // 新しい日付を上に
   const applicantTasks = tasks.filter(t => 
     history.some(h => h.id === t.selectionHistoryId)
   );
 
-  // 各選考段階の詳細データを取得
-  const stageDetails: Record<string, Record<string, unknown>> = history.reduce((acc, stage) => {
-    const details = mockStageDetails[stage.id as keyof typeof mockStageDetails];
-    if (details) {
-      acc[stage.id] = details as Record<string, unknown>;
-    }
-    return acc;
-  }, {} as Record<string, Record<string, unknown>>);
+  // 各選考段階の詳細データを取得（現在は空のオブジェクト）
+  const stageDetails: Record<string, Record<string, unknown>> = {};
 
   return {
     applicant,
     history,
-    evaluations: applicantEvaluations,
     tasks: applicantTasks,
     stageDetails,
     loading

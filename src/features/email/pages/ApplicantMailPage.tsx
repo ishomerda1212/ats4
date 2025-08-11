@@ -1,6 +1,6 @@
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { useApplicantDetail } from '@/features/applicants/hooks/useApplicantDetail';
-import { ApplicantInfoPanel } from '@/features/evaluations/components/ApplicantInfoPanel';
+import { ApplicantInfoPanel } from '@/features/applicants/components/ApplicantInfoPanel';
 import { EmailSender } from '../components/EmailSender';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';

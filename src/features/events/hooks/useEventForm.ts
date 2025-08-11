@@ -73,7 +73,7 @@ export function useEventForm(event?: Event, mode: 'create' | 'edit' = 'create') 
           description: `${data.name}が正常に更新されました。`,
         });
 
-        navigate(`/events/${event.id}`);
+        navigate(`/event/${event.id}`);
       }
     } finally {
       setLoading(false);

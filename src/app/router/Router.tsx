@@ -1,27 +1,26 @@
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from '@/shared/components/layout/Layout';
 import { ApplicantListPage } from '@/features/applicants/pages/ApplicantListPage';
 import { ApplicantDetailPage } from '@/features/applicants/pages/ApplicantDetailPage';
 import { ApplicantCreatePage } from '@/features/applicants/pages/ApplicantCreatePage';
 import { ApplicantEditPage } from '@/features/applicants/pages/ApplicantEditPage';
-import { EvaluationPage } from '@/features/evaluations/pages/EvaluationPage';
-import { EvaluationViewPage } from '@/features/evaluations/pages/EvaluationViewPage';
 import { EventListPage } from '@/features/events/pages/EventListPage';
-import { EventDetailPage } from '@/features/events/pages/EventDetailPage';
 import { EventCreatePage } from '@/features/events/pages/EventCreatePage';
+import { EventDetailPage } from '@/features/events/pages/EventDetailPage';
 import { EventEditPage } from '@/features/events/pages/EventEditPage';
 import { EventRegistrationPage } from '@/features/events/pages/EventRegistrationPage';
 import { EventSessionDetailPage } from '@/features/events/pages/EventSessionDetailPage';
 import { EventSessionParticipantsPage } from '@/features/events/pages/EventSessionParticipantsPage';
-import { EmailTemplateManagementPage } from '@/features/tasks/pages/EmailTemplateManagementPage';
-import { TaskListPage } from '@/features/tasks/pages/TaskListPage';
-import { ApplicantMailPage } from '@/features/email/pages/ApplicantMailPage';
 import { ApplicantFormPage } from '@/features/applicant-form/pages/ApplicantFormPage';
 import { ApplicantResponseViewPage } from '@/features/applicant-form/pages/ApplicantResponseViewPage';
+import { TaskListPage } from '@/features/tasks/pages/TaskListPage';
+import { EmailTemplateManagementPage } from '@/features/tasks/pages/EmailTemplateManagementPage';
+import { ApplicantMailPage } from '@/features/email/pages/ApplicantMailPage';
+import { ReportPage } from '@/features/reports/pages/ReportPage';
 
 export function Router() {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/applicants" replace />} />
@@ -29,23 +28,21 @@ export function Router() {
           <Route path="applicants/create" element={<ApplicantCreatePage />} />
           <Route path="applicants/:id" element={<ApplicantDetailPage />} />
           <Route path="applicants/:id/edit" element={<ApplicantEditPage />} />
-          <Route path="applicants/:id/evaluation" element={<EvaluationPage />} />
-          <Route path="applicants/:id/evaluation/view" element={<EvaluationViewPage />} />
           <Route path="applicants/:id/mail" element={<ApplicantMailPage />} />
           <Route path="events" element={<EventListPage />} />
           <Route path="events/create" element={<EventCreatePage />} />
-          <Route path="events/:id" element={<EventDetailPage />} />
-          <Route path="events/:id/edit" element={<EventEditPage />} />
-          <Route path="events/:eventId/sessions/:sessionId" element={<EventSessionDetailPage />} />
-          <Route path="events/:eventId/sessions/:sessionId/participants" element={<EventSessionParticipantsPage />} />
-          <Route path="reports" element={<div>レポート（実装予定）</div>} />
+          <Route path="event/:id" element={<EventDetailPage />} />
+          <Route path="event/:id/edit" element={<EventEditPage />} />
+          <Route path="event/:id/registration" element={<EventRegistrationPage />} />
+          <Route path="event/:id/session/:sessionId" element={<EventSessionDetailPage />} />
+          <Route path="event/:id/session/:sessionId/participants" element={<EventSessionParticipantsPage />} />
           <Route path="tasks" element={<TaskListPage />} />
           <Route path="email-templates" element={<EmailTemplateManagementPage />} />
+          <Route path="reports" element={<ReportPage />} />
         </Route>
-        <Route path="register/:applicantId" element={<EventRegistrationPage />} />
         <Route path="applicant-form/:applicantId/:eventId" element={<ApplicantFormPage />} />
         <Route path="applicant-response/:applicantId/:eventId" element={<ApplicantResponseViewPage />} />
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   );
 }

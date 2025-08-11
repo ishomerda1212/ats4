@@ -89,7 +89,7 @@ export function EventDetailPage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>基本情報</CardTitle>
-            <Link to={`/events/${event.id}/edit`}>
+            <Link to={`/event/${event.id}/edit`}>
               <Button variant="outline" size="sm">
                 <Edit className="h-4 w-4 mr-2" />
                 編集

@@ -23,7 +23,7 @@ const mockTaskInstances: TaskInstance[] = [
     id: '2',
     applicantId: '1',
     taskId: 'entry-approach-2',
-    status: '進行中',
+    status: '未着手',
     assignedTo: '人事部 田中',
     dueDate: new Date('2024-01-25'),
     startedAt: new Date('2024-01-21'),
@@ -47,7 +47,7 @@ const mockTaskInstances: TaskInstance[] = [
     id: '4',
     applicantId: '1',
     taskId: 'entry-schedule-contact',
-    status: '進行中',
+    status: '返信待ち',
     contactStatus: '返信待ち',
     assignedTo: '人事部 田中',
     dueDate: new Date('2024-01-28'),
@@ -73,7 +73,7 @@ const mockTaskInstances: TaskInstance[] = [
     id: '6',
     applicantId: '2',
     taskId: 'document-schedule-contact',
-    status: '進行中',
+    status: '返信待ち',
     contactStatus: '○',
     assignedTo: '人事部 佐藤',
     dueDate: new Date('2024-01-30'),
@@ -112,7 +112,7 @@ const mockTaskInstances: TaskInstance[] = [
     id: '9',
     applicantId: '3',
     taskId: 'individual-remind-contact',
-    status: '進行中',
+    status: '返信待ち',
     contactStatus: '未',
     assignedTo: '人事部 山田',
     dueDate: new Date('2024-02-05'),
@@ -149,8 +149,19 @@ export const useTaskManagement = () => {
         };
         
         // 連絡系タスクの場合は初期ステータスを設定
-        if (['詳細連絡', '日程調整連絡', 'リマインド', '結果連絡'].includes(fixedTask.type)) {
+        if (['詳細連絡', '結果連絡'].includes(fixedTask.type)) {
           newInstance.contactStatus = '未';
+        }
+        
+        // 日程調整連絡とリマインドの場合は返信待ちステータスを設定
+        if (['日程調整連絡', 'リマインド'].includes(fixedTask.type)) {
+          newInstance.status = '返信待ち';
+          newInstance.contactStatus = '返信待ち';
+        }
+        
+        // 提出書類タスクの場合は初期ステータスを設定
+        if (fixedTask.type === '提出書類') {
+          newInstance.status = '提出待ち';
         }
         
         setTaskInstances(prev => [...prev, newInstance]);
@@ -182,8 +193,19 @@ export const useTaskManagement = () => {
         };
         
         // 連絡系タスクの場合は初期ステータスを設定
-        if (['詳細連絡', '日程調整連絡', 'リマインド', '結果連絡'].includes(fixedTask.type)) {
+        if (['詳細連絡', '結果連絡'].includes(fixedTask.type)) {
           newInstance.contactStatus = '未';
+        }
+        
+        // 日程調整連絡とリマインドの場合は返信待ちステータスを設定
+        if (['日程調整連絡', 'リマインド'].includes(fixedTask.type)) {
+          newInstance.status = '返信待ち';
+          newInstance.contactStatus = '返信待ち';
+        }
+        
+        // 提出書類タスクの場合は初期ステータスを設定
+        if (fixedTask.type === '提出書類') {
+          newInstance.status = '提出待ち';
         }
         
         setTaskInstances(prev => [...prev, newInstance]);
@@ -196,18 +218,20 @@ export const useTaskManagement = () => {
   const getNextTask = useCallback((applicant: Applicant): (FixedTask & TaskInstance) | null => {
     const tasks = getApplicantTasks(applicant);
     return tasks.find(task => task.status === '未着手') || 
-           tasks.find(task => task.status === '進行中') || 
+           tasks.find(task => task.status === '返信待ち') || 
+           tasks.find(task => task.status === '提出待ち') || 
            null;
   }, [getApplicantTasks]);
 
   // 次のタスクを取得（全段階）
   const getNextTaskAllStages = useCallback((applicant: Applicant): (FixedTask & TaskInstance) | null => {
-    const allStages = ['エントリー', '書類選考', '会社説明会', '適性検査', '職場見学', '仕事体験', '個別面接', '集団面接', 'CEOセミナー', '人事面接', '最終選考', '内定', '不採用'];
+    const allStages = ['エントリー', '書類選考', '会社説明会', '適性検査体験', '職場見学', '仕事体験', '人事面接', '集団面接', 'CEOセミナー', '人事面接', '最終選考', '内定面談', '不採用'];
     
     for (const stage of allStages) {
       const tasks = getApplicantTasksByStage(applicant, stage);
       const nextTask = tasks.find(task => task.status === '未着手') || 
-                      tasks.find(task => task.status === '進行中');
+                      tasks.find(task => task.status === '返信待ち') ||
+                      tasks.find(task => task.status === '提出待ち');
       if (nextTask) {
         return nextTask;
       }
@@ -229,7 +253,7 @@ export const useTaskManagement = () => {
           updatedAt: new Date()
         };
         
-        if (status === '進行中' && !task.startedAt) {
+        if (status === '返信待ち' && !task.startedAt) {
           updates.startedAt = new Date();
         }
         
@@ -242,7 +266,7 @@ export const useTaskManagement = () => {
           
           // 連絡系タスクの場合、連絡状況に応じてステータスを自動更新
           // タスクテンプレートから情報を取得して判定
-          const allStages = ['エントリー', '書類選考', '会社説明会', '適性検査', '職場見学', '仕事体験', '個別面接', '集団面接', 'CEOセミナー', '人事面接', '最終選考', '内定', '不採用'];
+          const allStages = ['エントリー', '書類選考', '会社説明会', '適性検査体験', '職場見学', '仕事体験', '人事面接', '集団面接', 'CEOセミナー', '人事面接', '最終選考', '内定面談', '不採用'];
           let isContactTask = false;
           
           for (const stage of allStages) {
@@ -261,7 +285,7 @@ export const useTaskManagement = () => {
                 updates.completedAt = new Date();
               }
             } else if (contactStatus === '返信待ち') {
-              updates.status = '進行中';
+              updates.status = '返信待ち';
               if (!task.startedAt) {
                 updates.startedAt = new Date();
               }

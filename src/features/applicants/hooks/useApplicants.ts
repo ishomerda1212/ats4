@@ -1,15 +1,24 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Applicant, SelectionStage } from '../types/applicant';
-import { mockApplicants } from '@/shared/data/mockData';
+import { mockApplicants, mockSelectionHistory } from '@/shared/data/mockData';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 
 export function useApplicants() {
   const [applicants, setApplicants] = useLocalStorage<Applicant[]>('applicants', mockApplicants);
+  const [selectionHistory] = useLocalStorage('selectionHistory', mockSelectionHistory);
   const [loading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStage, setSelectedStage] = useState<SelectionStage | 'all'>('all');
 
-  const filteredApplicants = applicants.filter((applicant) => {
+  // 応募者データに履歴を結合
+  const applicantsWithHistory = useMemo(() => {
+    return applicants.map(applicant => ({
+      ...applicant,
+      history: selectionHistory.filter(history => history.applicantId === applicant.id)
+    }));
+  }, [applicants, selectionHistory]);
+
+  const filteredApplicants = applicantsWithHistory.filter((applicant) => {
     const matchesSearch = applicant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          applicant.schoolName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStage = selectedStage === 'all' || applicant.currentStage === selectedStage;
@@ -18,7 +27,7 @@ export function useApplicants() {
   });
 
   const getStageCount = (stage: SelectionStage) => {
-    return applicants.filter(applicant => applicant.currentStage === stage).length;
+    return applicantsWithHistory.filter(applicant => applicant.currentStage === stage).length;
   };
 
   const updateApplicant = (id: string, updates: Partial<Applicant>) => {
@@ -51,6 +60,7 @@ export function useApplicants() {
     setSelectedStage,
     getStageCount,
     updateApplicant,
-    addApplicant
+    addApplicant,
+    selectionHistory
   };
 }

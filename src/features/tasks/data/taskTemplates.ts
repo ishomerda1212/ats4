@@ -66,24 +66,14 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
       order: 1
     },
     {
-      id: 'document-schedule-contact',
+      id: 'document-submit-documents',
       stage: '書類選考',
-      title: '日程調整連絡',
-      description: '書類選考の日程調整連絡',
-      type: '日程調整連絡',
+      title: '提出書類',
+      description: '書類選考の提出書類確認',
+      type: '提出書類',
       isRequired: true,
-      estimatedDuration: 20,
+      estimatedDuration: 30,
       order: 2
-    },
-    {
-      id: 'document-remind-contact',
-      stage: '書類選考',
-      title: 'リマインド',
-      description: '書類選考のリマインド連絡',
-      type: 'リマインド',
-      isRequired: true,
-      estimatedDuration: 10,
-      order: 3
     },
     {
       id: 'document-result-contact',
@@ -93,7 +83,7 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
       type: '結果連絡',
       isRequired: true,
       estimatedDuration: 15,
-      order: 4
+      order: 3
     }
   ],
   '会社説明会': [
@@ -138,12 +128,12 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
       order: 4
     }
   ],
-  '適性検査': [
+  '適性検査体験': [
     {
       id: 'aptitude-detail-contact',
-      stage: '適性検査',
+      stage: '適性検査体験',
       title: '詳細連絡',
-      description: '適性検査の詳細連絡',
+      description: '適性検査体験の詳細連絡',
       type: '詳細連絡',
       isRequired: true,
       estimatedDuration: 15,
@@ -151,9 +141,9 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
     },
     {
       id: 'aptitude-schedule-contact',
-      stage: '適性検査',
+      stage: '適性検査体験',
       title: '日程調整連絡',
-      description: '適性検査の日程調整連絡',
+      description: '適性検査体験の日程調整連絡',
       type: '日程調整連絡',
       isRequired: true,
       estimatedDuration: 20,
@@ -161,9 +151,9 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
     },
     {
       id: 'aptitude-remind-contact',
-      stage: '適性検査',
+      stage: '適性検査体験',
       title: 'リマインド',
-      description: '適性検査のリマインド連絡',
+      description: '適性検査体験のリマインド連絡',
       type: 'リマインド',
       isRequired: true,
       estimatedDuration: 10,
@@ -171,9 +161,9 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
     },
     {
       id: 'aptitude-result-contact',
-      stage: '適性検査',
+      stage: '適性検査体験',
       title: '結果連絡',
-      description: '適性検査の結果連絡',
+      description: '適性検査体験の結果連絡',
       type: '結果連絡',
       isRequired: true,
       estimatedDuration: 15,
@@ -264,43 +254,43 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
       order: 4
     }
   ],
-  '個別面接': [
+  '人事面接': [
     {
-      id: 'individual-detail-contact',
-      stage: '個別面接',
+      id: 'task-individual-interview-contact',
       title: '詳細連絡',
-      description: '個別面接の詳細連絡',
+      stage: '人事面接',
       type: '詳細連絡',
+      description: '人事面接の詳細連絡',
       isRequired: true,
       estimatedDuration: 15,
       order: 1
     },
     {
-      id: 'individual-schedule-contact',
-      stage: '個別面接',
+      id: 'task-individual-interview-schedule',
       title: '日程調整連絡',
-      description: '個別面接の日程調整連絡',
+      stage: '人事面接',
       type: '日程調整連絡',
+      description: '人事面接の日程調整連絡',
       isRequired: true,
       estimatedDuration: 20,
       order: 2
     },
     {
-      id: 'individual-remind-contact',
-      stage: '個別面接',
+      id: 'task-individual-interview-reminder',
       title: 'リマインド',
-      description: '個別面接のリマインド連絡',
+      stage: '人事面接',
       type: 'リマインド',
+      description: '人事面接のリマインド連絡',
       isRequired: true,
       estimatedDuration: 10,
       order: 3
     },
     {
-      id: 'individual-result-contact',
-      stage: '個別面接',
+      id: 'task-individual-interview-result',
       title: '結果連絡',
-      description: '個別面接の結果連絡',
+      stage: '人事面接',
       type: '結果連絡',
+      description: '人事面接の結果連絡',
       isRequired: true,
       estimatedDuration: 15,
       order: 4
@@ -390,48 +380,6 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
       order: 4
     }
   ],
-  '人事面接': [
-    {
-      id: 'hr-detail-contact',
-      stage: '人事面接',
-      title: '詳細連絡',
-      description: '人事面接の詳細連絡',
-      type: '詳細連絡',
-      isRequired: true,
-      estimatedDuration: 15,
-      order: 1
-    },
-    {
-      id: 'hr-schedule-contact',
-      stage: '人事面接',
-      title: '日程調整連絡',
-      description: '人事面接の日程調整連絡',
-      type: '日程調整連絡',
-      isRequired: true,
-      estimatedDuration: 20,
-      order: 2
-    },
-    {
-      id: 'hr-remind-contact',
-      stage: '人事面接',
-      title: 'リマインド',
-      description: '人事面接のリマインド連絡',
-      type: 'リマインド',
-      isRequired: true,
-      estimatedDuration: 10,
-      order: 3
-    },
-    {
-      id: 'hr-result-contact',
-      stage: '人事面接',
-      title: '結果連絡',
-      description: '人事面接の結果連絡',
-      type: '結果連絡',
-      isRequired: true,
-      estimatedDuration: 15,
-      order: 4
-    }
-  ],
   '最終選考': [
     {
       id: 'final-detail-contact',
@@ -454,6 +402,16 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
       order: 2
     },
     {
+      id: 'final-submit-documents',
+      stage: '最終選考',
+      title: '提出書類',
+      description: '最終選考の提出書類確認',
+      type: '提出書類',
+      isRequired: true,
+      estimatedDuration: 30,
+      order: 3
+    },
+    {
       id: 'final-remind-contact',
       stage: '最終選考',
       title: 'リマインド',
@@ -461,7 +419,7 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
       type: 'リマインド',
       isRequired: true,
       estimatedDuration: 10,
-      order: 3
+      order: 4
     },
     {
       id: 'final-result-contact',
@@ -471,15 +429,15 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
       type: '結果連絡',
       isRequired: true,
       estimatedDuration: 15,
-      order: 4
+      order: 5
     }
   ],
-  '内定': [
+  '内定面談': [
     {
       id: 'offer-detail-contact',
-      stage: '内定',
+      stage: '内定面談',
       title: '詳細連絡',
-      description: '内定の詳細連絡',
+      description: '内定面談の詳細連絡',
       type: '詳細連絡',
       isRequired: true,
       estimatedDuration: 15,
@@ -487,9 +445,9 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
     },
     {
       id: 'offer-schedule-contact',
-      stage: '内定',
+      stage: '内定面談',
       title: '日程調整連絡',
-      description: '内定の日程調整連絡',
+      description: '内定面談の日程調整連絡',
       type: '日程調整連絡',
       isRequired: true,
       estimatedDuration: 20,
@@ -497,9 +455,9 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
     },
     {
       id: 'offer-remind-contact',
-      stage: '内定',
+      stage: '内定面談',
       title: 'リマインド',
-      description: '内定のリマインド連絡',
+      description: '内定面談のリマインド連絡',
       type: 'リマインド',
       isRequired: true,
       estimatedDuration: 10,
@@ -507,9 +465,9 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
     },
     {
       id: 'offer-result-contact',
-      stage: '内定',
+      stage: '内定面談',
       title: '結果連絡',
-      description: '内定の結果連絡',
+      description: '内定面談の結果連絡',
       type: '結果連絡',
       isRequired: true,
       estimatedDuration: 15,

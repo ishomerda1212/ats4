@@ -1,34 +1,22 @@
 
-import { StageEntryDisplay } from './StageEntryDisplay';
-import { StageCompanyInfoDisplay } from './StageCompanyInfoDisplay';
-import { StageAptitudeTestDisplay } from './StageAptitudeTestDisplay';
+import { StageEntryDisplay, EntryStageData } from './StageEntryDisplay';
+import { StageDocumentScreeningDisplay, DocumentScreeningStageData } from './StageDocumentScreeningDisplay';
+import { StageCompanyInfoDisplay, CompanyInfoStageData } from './StageCompanyInfoDisplay';
+import { StageAptitudeTestDisplay, AptitudeTestStageData } from './StageAptitudeTestDisplay';
+import { StageWorkplaceVisitDisplay, WorkplaceVisitStageData } from './StageWorkplaceVisitDisplay';
+import { StageJobExperienceDisplay, JobExperienceStageData } from './StageJobExperienceDisplay';
+import { StageIndividualInterviewDisplay, IndividualInterviewStageData } from './StageIndividualInterviewDisplay';
 import { StageInterviewDisplay } from './StageInterviewDisplay';
-import { StageCEOSeminarDisplay } from './StageCEOSeminarDisplay';
-import { StageWorkplaceVisitDisplay } from './StageWorkplaceVisitDisplay';
-import { StageJobExperienceDisplay } from './StageJobExperienceDisplay';
-import { StageIndividualInterviewDisplay } from './StageIndividualInterviewDisplay';
-import { StageDocumentScreeningDisplay } from './StageDocumentScreeningDisplay';
-import { StageGroupInterviewDisplay } from './StageGroupInterviewDisplay';
-import { StageFinalSelectionDisplay } from './StageFinalSelectionDisplay';
-import { EntryStageData } from './StageEntryDisplay';
-import { FinalSelectionStageData } from './StageFinalSelectionDisplay';
-import { CEOSeminarStageData } from './StageCEOSeminarDisplay';
-import { DocumentScreeningStageData } from './StageDocumentScreeningDisplay';
-import { CompanyInfoStageData } from './StageCompanyInfoDisplay';
-import { AptitudeTestStageData } from './StageAptitudeTestDisplay';
-import { WorkplaceVisitStageData } from './StageWorkplaceVisitDisplay';
-import { JobExperienceStageData } from './StageJobExperienceDisplay';
-import { IndividualInterviewStageData } from './StageIndividualInterviewDisplay';
-import { GroupInterviewStageData } from './StageGroupInterviewDisplay';
+import { StageFinalSelectionDisplay, FinalSelectionStageData } from './StageFinalSelectionDisplay';
+import { StageCEOSeminarDisplay, CEOSeminarStageData } from './StageCEOSeminarDisplay';
 
 // 選考段階の型定義
-type StageType = 
+export type StageType = 
   | 'エントリー'
   | '書類選考'
   | '会社説明会'
   | '適性検査'
   | '職場見学'
-  | '職務体験'
   | '仕事体験'
   | '個別面接'
   | '集団面接'
@@ -40,7 +28,7 @@ type StageType =
 
 interface StageDisplayFactoryProps {
   stageType: StageType;
-  data?: unknown;
+  data?: Record<string, unknown>;
   applicantId?: string;
   applicantName?: string;
   applicantEmail?: string;
@@ -63,38 +51,21 @@ export function StageDisplayFactory({ stageType, data, applicantId, applicantNam
     case '個別面接':
       return <StageIndividualInterviewDisplay data={data as IndividualInterviewStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
     case '集団面接':
-      return <StageGroupInterviewDisplay data={data as GroupInterviewStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
+      return <StageInterviewDisplay stageType="グループ面接" data={data as Record<string, unknown>} />;
     case '人事面接':
       return <StageInterviewDisplay stageType={stageType} data={data as Record<string, unknown>} />;
     case '最終選考':
-      return <StageFinalSelectionDisplay data={data as FinalSelectionStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
+      return <StageFinalSelectionDisplay data={data as FinalSelectionStageData} />;
     case 'CEOセミナー':
-      return <StageCEOSeminarDisplay data={data as CEOSeminarStageData} applicantId={applicantId} applicantName={applicantName} applicantEmail={applicantEmail} />;
+      return <StageCEOSeminarDisplay data={data as CEOSeminarStageData} />;
     case '内定':
-      return (
-        <div className="p-4 border rounded-lg bg-gray-50">
-          <h4 className="font-medium text-lg">{stageType}情報</h4>
-          <p className="text-sm text-gray-600 mt-1">
-            {stageType}の表示コンポーネントは準備中です。
-          </p>
-          {data && typeof data === 'object' && data !== null && Object.keys(data).length > 0 ? (
-            <div className="mt-3">
-              <h5 className="text-sm font-medium">入力データ:</h5>
-              <pre className="text-xs bg-white p-2 rounded mt-1 overflow-auto">
-                {String(JSON.stringify(data, null, 2))}
-              </pre>
-            </div>
-          ) : null}
-        </div>
-      );
+    case '不採用':
+      return <div className="text-center py-4 text-muted-foreground">
+        {stageType}段階の詳細表示は実装予定です
+      </div>;
     default:
-      return (
-        <div className="p-4 border rounded-lg bg-gray-50">
-          <h4 className="font-medium text-lg">未対応の選考段階</h4>
-          <p className="text-sm text-gray-600 mt-1">
-            {stageType}段階の表示コンポーネントが未実装です。
-          </p>
-        </div>
-      );
+      return <div className="text-center py-4 text-muted-foreground">
+        未対応の選考段階です: {stageType}
+      </div>;
   }
 } 

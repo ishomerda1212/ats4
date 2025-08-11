@@ -10,9 +10,10 @@ export type TaskType =
   | '詳細連絡'
   | '日程調整連絡'
   | 'リマインド'
-  | '結果連絡';
+  | '結果連絡'
+  | '提出書類';
 
-export type TaskStatus = '未着手' | '進行中' | '完了';
+export type TaskStatus = '未着手' | '完了' | '提出待ち' | '返信待ち';
 export type TaskPriority = '低' | '中' | '高';
 export type ContactStatus = '未' | '済' | '返信待ち' | '○';
 
@@ -87,7 +88,8 @@ export const TASK_TYPES: { value: TaskType; label: string }[] = [
   { value: '詳細連絡', label: '詳細連絡' },
   { value: '日程調整連絡', label: '日程調整連絡' },
   { value: 'リマインド', label: 'リマインド' },
-  { value: '結果連絡', label: '結果連絡' }
+  { value: '結果連絡', label: '結果連絡' },
+  { value: '提出書類', label: '提出書類' }
 ];
 
 export const TASK_PRIORITIES: { value: TaskPriority; label: string; color: string }[] = [

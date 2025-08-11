@@ -20,14 +20,10 @@ export { StageAptitudeTestDisplay } from './StageAptitudeTestDisplay';
 export { StageWorkplaceVisitDisplay } from './StageWorkplaceVisitDisplay';
 export { StageJobExperienceDisplay } from './StageJobExperienceDisplay';
 export { StageIndividualInterviewDisplay } from './StageIndividualInterviewDisplay';
-export { StageGroupInterviewDisplay } from './StageGroupInterviewDisplay';
-export { StageFinalSelectionDisplay } from './StageFinalSelectionDisplay';
 export { StageInterviewDisplay } from './StageInterviewDisplay';
+export { StageFinalSelectionDisplay } from './StageFinalSelectionDisplay';
 export { StageCEOSeminarDisplay } from './StageCEOSeminarDisplay';
-export { StageDisplayFactory } from './StageDisplayFactory';
-
-// 既存のコンポーネント
 export { SelectionStageAccordion } from './SelectionStageAccordion';
-export { StageTemplateForm } from './StageTemplateForm';
 export { DefaultTaskForm } from './DefaultTaskForm';
+export { StageTemplateForm } from './StageTemplateForm';
 export { TaskList } from './TaskList'; 

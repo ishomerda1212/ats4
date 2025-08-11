@@ -1,6 +1,6 @@
 import { Applicant, SelectionHistory } from '@/features/applicants/types/applicant';
-import { Evaluation } from '@/features/evaluations/types/evaluation';
 import { Task } from '@/features/applicants/types/applicant';
+import { EvaluationForm } from '@/features/applicants/types/applicant';
 
 export const mockApplicants: Applicant[] = [
   {
@@ -33,7 +33,15 @@ export const mockApplicants: Applicant[] = [
     address: '東京都新宿区',
     phone: '090-2345-6789',
     email: 'sato@example.com',
-    currentStage: '会社説明会',
+    currentStage: '内定面談',
+    // 詳細情報
+    motivation: '御社のグローバル展開とイノベーションに興味を持っています。学生時代に国際交流プログラムに参加した経験を活かし、海外市場での事業展開に貢献したいと考えています。',
+    jobSearchAxis: 'グローバル事業、マーケティング、新規事業開発',
+    otherCompanyStatus: '外資系企業1社から内定、日系大手企業2社から最終選考中',
+    futureVision: '3年後には海外拠点での勤務を希望し、5年後にはグローバルマーケティングの専門家として活躍したい。',
+    strengths: '語学力（英語・中国語）、国際感覚、コミュニケーション能力、分析力、行動力',
+    weaknesses: '時々完璧を求めすぎる、細かい計画を立てすぎる傾向',
+    experience: '国際交流プログラム参加（中国・アメリカ）、インターンシップ（外資系企業）、ボランティア（国際協力NGO）、趣味（語学学習、旅行、料理）',
     createdAt: new Date('2024-01-16T10:15:00Z'),
     updatedAt: new Date('2024-01-18T16:45:00Z')
   },
@@ -84,7 +92,7 @@ export const mockApplicants: Applicant[] = [
     address: '埼玉県さいたま市',
     phone: '090-5678-9012',
     email: 'yamada@example.com',
-    currentStage: '内定',
+    currentStage: '内定面談',
     createdAt: new Date('2024-01-05T07:20:00Z'),
     updatedAt: new Date('2024-01-25T15:10:00Z')
   },
@@ -102,7 +110,7 @@ export const mockApplicants: Applicant[] = [
     address: '東京都千代田区',
     phone: '090-6789-0123',
     email: 'ito@example.com',
-    currentStage: '内定',
+    currentStage: '内定面談',
     // 詳細情報
     motivation: '御社の経営理念に共感し、特に人材育成の取り組みに興味を持っています。学生時代にリーダーシップを発揮した経験を活かし、チームの成長に貢献したいと考えています。',
     jobSearchAxis: '人材育成・組織開発、経営戦略、社会貢献',
@@ -158,19 +166,128 @@ export const mockSelectionHistory: SelectionHistory[] = [
     startDate: new Date('2024-01-16T10:15:00Z'),
     endDate: new Date('2024-01-16T18:00:00Z'),
     status: '完了',
-    notes: 'エントリーシート確認完了。商学部で経営学を専攻、優秀な成績',
+    notes: 'エントリーシート確認完了。商学部で経営学を専攻、優秀な成績。国際交流プログラムの経験が評価された',
     createdAt: new Date('2024-01-16T10:15:00Z'),
     updatedAt: new Date('2024-01-16T18:00:00Z')
   },
   {
     id: 'history-5',
     applicantId: mockApplicants[1].id,
+    stage: '書類選考',
+    startDate: new Date('2024-01-17T09:00:00Z'),
+    endDate: new Date('2024-01-17T17:00:00Z'),
+    status: '完了',
+    notes: '書類選考実施。語学力と国際感覚が高く評価された。英語・中国語のスキルが優秀',
+    createdAt: new Date('2024-01-17T09:00:00Z'),
+    updatedAt: new Date('2024-01-17T17:00:00Z')
+  },
+  {
+    id: 'history-5-1',
+    applicantId: mockApplicants[1].id,
     stage: '会社説明会',
     startDate: new Date('2024-01-18T16:45:00Z'),
     status: '進行中',
-    notes: '2024年2月15日の説明会に参加予定。積極的な質問が期待される',
+    notes: '2024年2月15日の説明会に参加予定。積極的な質問が期待される。グローバル事業への関心が高い',
     createdAt: new Date('2024-01-18T16:45:00Z'),
     updatedAt: new Date('2024-01-18T16:45:00Z')
+  },
+  {
+    id: 'history-5-2',
+    applicantId: mockApplicants[1].id,
+    stage: '適性検査',
+    startDate: new Date('2024-01-20T10:00:00Z'),
+    endDate: new Date('2024-01-20T12:00:00Z'),
+    status: '完了',
+    notes: 'Web適性検査実施。結果：優秀。論理的思考力と分析力が高い',
+    createdAt: new Date('2024-01-20T10:00:00Z'),
+    updatedAt: new Date('2024-01-20T12:00:00Z')
+  },
+  {
+    id: 'history-5-3',
+    applicantId: mockApplicants[1].id,
+    stage: '職場見学',
+    startDate: new Date('2024-01-22T13:00:00Z'),
+    endDate: new Date('2024-01-22T15:00:00Z'),
+    status: '完了',
+    notes: '本社オフィス見学実施。社員との交流も良好。グローバルチームへの関心が高い',
+    createdAt: new Date('2024-01-22T13:00:00Z'),
+    updatedAt: new Date('2024-01-22T15:00:00Z')
+  },
+  {
+    id: 'history-5-4',
+    applicantId: mockApplicants[1].id,
+    stage: '仕事体験',
+    startDate: new Date('2024-01-24T09:00:00Z'),
+    endDate: new Date('2024-01-24T17:00:00Z'),
+    status: '完了',
+    notes: '実際の業務を体験。マーケティング部門での実習。積極的な姿勢と語学力を活かした活躍',
+    createdAt: new Date('2024-01-24T09:00:00Z'),
+    updatedAt: new Date('2024-01-24T17:00:00Z')
+  },
+  {
+    id: 'history-5-5',
+    applicantId: mockApplicants[1].id,
+    stage: '人事面接',
+    startDate: new Date('2024-01-26T14:00:00Z'),
+    endDate: new Date('2024-01-26T15:30:00Z'),
+    status: '完了',
+    notes: '人事面接実施。志望動機とキャリアプランについて詳細に話し合った。海外勤務への意欲が高い',
+    createdAt: new Date('2024-01-26T14:00:00Z'),
+    updatedAt: new Date('2024-01-26T15:30:00Z')
+  },
+  {
+    id: 'history-5-6',
+    applicantId: mockApplicants[1].id,
+    stage: '集団面接',
+    startDate: new Date('2024-01-28T10:00:00Z'),
+    endDate: new Date('2024-01-28T12:00:00Z'),
+    status: '完了',
+    notes: '集団面接実施。リーダーシップと協調性を評価。国際的な視点での発言が印象的',
+    createdAt: new Date('2024-01-28T10:00:00Z'),
+    updatedAt: new Date('2024-01-28T12:00:00Z')
+  },
+  {
+    id: 'history-5-7',
+    applicantId: mockApplicants[1].id,
+    stage: 'CEOセミナー',
+    startDate: new Date('2024-01-30T18:00:00Z'),
+    endDate: new Date('2024-01-30T20:00:00Z'),
+    status: '完了',
+    notes: 'CEOセミナー参加。経営理念への理解が深い。グローバル戦略について鋭い質問',
+    createdAt: new Date('2024-01-30T18:00:00Z'),
+    updatedAt: new Date('2024-01-30T20:00:00Z')
+  },
+  {
+    id: 'history-5-8',
+    applicantId: mockApplicants[1].id,
+    stage: '人事面接',
+    startDate: new Date('2024-02-01T14:00:00Z'),
+    endDate: new Date('2024-02-01T15:30:00Z'),
+    status: '完了',
+    notes: '人事面接実施。企業文化への適合性を確認。海外勤務への適性も評価',
+    createdAt: new Date('2024-02-01T14:00:00Z'),
+    updatedAt: new Date('2024-02-01T15:30:00Z')
+  },
+  {
+    id: 'history-5-9',
+    applicantId: mockApplicants[1].id,
+    stage: '最終選考',
+    startDate: new Date('2024-02-05T10:00:00Z'),
+    endDate: new Date('2024-02-05T11:30:00Z'),
+    status: '完了',
+    notes: '最終選考実施。最終的な採用判断。グローバル事業での活躍が期待される',
+    createdAt: new Date('2024-02-05T10:00:00Z'),
+    updatedAt: new Date('2024-02-05T11:30:00Z')
+  },
+  {
+    id: 'history-5-10',
+    applicantId: mockApplicants[1].id,
+    stage: '内定面談',
+    startDate: new Date('2024-02-10T10:00:00Z'),
+    status: '進行中',
+    notes: '内定面談完了。入社予定日：2025年4月1日。グローバルマーケティング部門配属予定',
+    createdAt: new Date('2024-02-10T10:00:00Z'),
+    updatedAt: new Date('2024-02-10T10:00:00Z')
   },
   // 伊藤優子の全選考段階履歴
   {
@@ -242,11 +359,11 @@ export const mockSelectionHistory: SelectionHistory[] = [
   {
     id: 'history-9-6',
     applicantId: mockApplicants[5].id,
-    stage: '個別面接',
+    stage: '人事面接',
     startDate: new Date('2024-01-16T14:00:00Z'),
     endDate: new Date('2024-01-16T15:30:00Z'),
     status: '完了',
-    notes: '個別面接実施。志望動機とキャリアプランについて詳細に話し合った',
+    notes: '人事面接実施。志望動機とキャリアプランについて詳細に話し合った',
     createdAt: new Date('2024-01-16T14:00:00Z'),
     updatedAt: new Date('2024-01-16T15:30:00Z')
   },
@@ -297,215 +414,104 @@ export const mockSelectionHistory: SelectionHistory[] = [
   {
     id: 'history-13',
     applicantId: mockApplicants[5].id,
-    stage: '内定',
+    stage: '内定面談',
     startDate: new Date('2024-01-30T10:00:00Z'),
     status: '完了',
-    notes: '内定通知完了。入社予定日：2025年4月1日',
+    notes: '内定面談完了。入社予定日：2025年4月1日',
     createdAt: new Date('2024-01-30T10:00:00Z'),
     updatedAt: new Date('2024-01-30T16:00:00Z')
   }
 ];
 
-export const mockEvaluations: Evaluation[] = [
+// 評定表のモックデータ
+export const mockEvaluationForms: EvaluationForm[] = [
   {
-    id: 'evaluation-1',
-    applicantId: mockApplicants[0].id,
-    selectionHistoryId: mockSelectionHistory[1].id,
-    evaluatorName: '人事部 田中',
-    motivationReason: '志望動機が明確で、当社の経営理念への理解が深い。業界選択の理由も具体的で説得力がある。',
-    experienceBackground: '学生時代のリーダーシップ経験が豊富で、具体的な成果を挙げている。困難な状況での対応も適切。',
-    selfUnderstanding: '自分の強みと弱みを客観的に把握しており、改善への姿勢も見られる。',
-    problemSolving: '失敗経験を適切に分析し、改善策を考えている。課題解決への主体性が高い。',
-    futureVision: 'キャリアビジョンが明確で、当社での成長可能性が高い。',
-    reverseQuestion: '事前に十分な準備をしており、会社への興味が深い。',
-    createdAt: new Date('2024-01-17T16:30:00Z'),
-    updatedAt: new Date('2024-01-17T16:30:00Z')
+    id: 'eval-1',
+    applicantId: 'applicant-2', // 佐藤花子
+    title: '人事面接評定表',
+    stage: '人事面接',
+    evaluator: '田中部長',
+    overallRating: 'A',
+    createdAt: '2024-01-25T10:00:00Z',
+    updatedAt: '2024-01-25T10:00:00Z',
+    sections: {
+      motivation: {
+        companyMotivation: '貴社のグローバル展開に興味を持ち、特にアジア市場での事業拡大に携わりたいと考えています。学生時代の国際交流プログラムで得た経験を活かしたいです。',
+        industryMotivation: 'IT業界の急速な発展と、それに伴う社会への影響力に魅力を感じています。特に、グローバルな視点でのサービス展開に興味があります。',
+        jobMotivation: 'マーケティング職を志望する理由は、顧客のニーズを理解し、価値のあるサービスを提供することにやりがいを感じるからです。',
+        criteria: ['動機が具体的で一貫しているか', '会社や業界の理解度', '他社ではなく自社を選ぶ理由の説得力']
+      },
+      experience: {
+        pastExperience: '大学では国際交流プログラムに参加し、海外の学生との交流を通じて異文化理解力を身につけました。また、マーケティングのゼミで市場分析の基礎を学びました。',
+        focusedActivity: '国際交流プログラムでは、日本文化を紹介するイベントの企画・運営に力を入れました。参加者100名規模のイベントを成功させ、異文化間のコミュニケーションの重要性を学びました。',
+        learnedFromActivities: 'アルバイトでは、カフェでの接客を通じて顧客のニーズを理解することの大切さを学びました。また、チームワークの重要性も実感しました。',
+        criteria: ['成果や役割の具体性', '困難に対する行動プロセス', '自社の業務に活かせるスキルや姿勢']
+      },
+      selfUnderstanding: {
+        strengthsWeaknesses: '強みは語学力（英語・中国語）と異文化理解力です。弱みは完璧主義すぎることと、時々細かい計画を立てすぎることです。',
+        othersOpinion: '周りからは「国際的な視点を持っている」「責任感が強い」「リーダーシップがある」と言われます。',
+        criteria: ['自分の特徴を客観的に把握しているか', '弱みを改善する姿勢があるか', '強みが仕事で活かせるか']
+      },
+      problemSolving: {
+        failureExperience: '国際交流イベントで、参加者の集客が思うようにいかなかった経験があります。SNSでの宣伝を強化し、既存の参加者に紹介を依頼することで解決しました。',
+        difficultSituation: 'チーム内で意見が対立した際は、まず全員の意見を聞き、共通点を見つけることから始めました。結果として、より良いアイデアが生まれました。',
+        criteria: ['課題を分析する力', '解決への主体性', '再発防止や改善への意識']
+      },
+      futureVision: {
+        careerVision: '将来的には、グローバルマーケティングのスペシャリストとして、海外市場での事業展開に携わりたいと考えています。',
+        futurePosition: '3年後には、海外拠点でのマーケティング業務に携わり、5年後には、グローバルマーケティング戦略の立案に参加できる立場になりたいです。',
+        criteria: ['目標の明確さと現実性', '自社でのキャリアパスとの一致度']
+      },
+      reverseQuestion: {
+        questions: 'グローバル展開における現地の文化や習慣への配慮について、どのような取り組みをされていますか？また、海外拠点でのキャリアパスについて教えてください。',
+        criteria: ['準備度（事前に調べているか）', '会社や職務への興味の深さ', '自分の意思で判断する姿勢']
+      }
+    }
   },
-  // 伊藤優子のCEOセミナー評価
   {
-    id: 'evaluation-2',
-    applicantId: mockApplicants[5].id,
-    selectionHistoryId: 'history-10', // CEOセミナーの履歴ID
-    evaluatorName: '人事部 佐藤',
-    motivationReason: '経営理念への理解が深く、当社を選んだ理由が明確。業界・職種選択の理由も一貫している。',
-    experienceBackground: '経営研究会での活動経験が豊富で、リーダーシップを発揮している。具体的な成果も挙げている。',
-    selfUnderstanding: '自分の特徴を客観的に把握しており、強みを活かす姿勢が見られる。',
-    problemSolving: '困難な状況での対応力が高く、改善への意識も強い。',
-    futureVision: '将来像が明確で、当社でのキャリアパスと一致している。',
-    reverseQuestion: '準備度が高く、会社への興味が深い。自分の意思で判断する姿勢が見られる。',
-    createdAt: new Date('2024-01-15T20:30:00Z'),
-    updatedAt: new Date('2024-01-15T20:30:00Z')
+    id: 'eval-2',
+    applicantId: 'applicant-6', // 伊藤優子
+    title: '最終選考評定表',
+    stage: '最終選考',
+    evaluator: '山田部長',
+    overallRating: 'B',
+    createdAt: '2024-01-28T10:00:00Z',
+    updatedAt: '2024-01-28T10:00:00Z',
+    sections: {
+      motivation: {
+        companyMotivation: '貴社の経営理念と、社会貢献への取り組みに共感しています。特に、持続可能な成長を目指す姿勢が印象的です。',
+        industryMotivation: '製造業の技術革新と、それによる社会への貢献に魅力を感じています。ものづくりの大切さを理解しています。',
+        jobMotivation: '営業職を志望する理由は、顧客との直接的な関わりを通じて、社会に価値を提供することにやりがいを感じるからです。',
+        criteria: ['動機が具体的で一貫しているか', '会社や業界の理解度', '他社ではなく自社を選ぶ理由の説得力']
+      },
+      experience: {
+        pastExperience: '大学では経営学を専攻し、マーケティングや組織論を学びました。また、サークル活動では副会長を務め、組織運営の経験を積みました。',
+        focusedActivity: 'サークル活動では、新入生の勧誘活動に力を入れました。従来の方法を見直し、SNSを活用した新しいアプローチを導入し、入会者数を前年比150%に増加させました。',
+        learnedFromActivities: 'アルバイトでは、小売店での接客を通じて、顧客のニーズを理解し、適切な提案をすることの大切さを学びました。',
+        criteria: ['成果や役割の具体性', '困難に対する行動プロセス', '自社の業務に活かせるスキルや姿勢']
+      },
+      selfUnderstanding: {
+        strengthsWeaknesses: '強みはリーダーシップとコミュニケーション能力です。弱みは技術的な知識が不足していることと、時々感情的に判断してしまうことです。',
+        othersOpinion: '周りからは「リーダーシップがある」「責任感が強い」「面倒見が良い」と言われます。',
+        criteria: ['自分の特徴を客観的に把握しているか', '弱みを改善する姿勢があるか', '強みが仕事で活かせるか']
+      },
+      problemSolving: {
+        failureExperience: 'サークル活動で、イベントの企画が失敗した経験があります。原因を分析し、次回は事前の準備を徹底し、成功させることができました。',
+        difficultSituation: 'チーム内で意見が対立した際は、全員の意見を聞き、共通の目標を見つけることで解決しました。',
+        criteria: ['課題を分析する力', '解決への主体性', '再発防止や改善への意識']
+      },
+      futureVision: {
+        careerVision: '将来的には、営業部門のマネージャーとして、チームを率いて成果を上げたいと考えています。',
+        futurePosition: '3年後には、営業チームのリーダーとして、5年後には、営業部門のマネージャーとして活躍したいです。',
+        criteria: ['目標の明確さと現実性', '自社でのキャリアパスとの一致度']
+      },
+      reverseQuestion: {
+        questions: '営業部門でのキャリアパスについて教えてください。また、新入社員の教育制度についても詳しく聞かせてください。',
+        criteria: ['準備度（事前に調べているか）', '会社や職務への興味の深さ', '自分の意思で判断する姿勢']
+      }
+    }
   }
 ];
-
-// 選考段階の詳細データ（各段階の表示コンポーネントで使用）
-export const mockStageDetails = {
-  // 伊藤優子のCEOセミナー詳細データ
-  'history-10': {
-    sessionDate: new Date('2024-01-15T18:00:00Z'),
-    sessionName: 'CEOセミナー 第1回',
-    eventName: '2025年度新卒採用 CEOセミナー',
-    reservationStatus: '予約済み',
-    attendanceStatus: '参加',
-    impression: '経営理念への理解が深く、真剣に参加している。セミナー後の質疑応答での確な質問をしており、会社の未来について深く考えていることが伝わった。',
-    notes: '経営学専攻の知識を活かした視点が評価できる。他の参加者との交流も良好。',
-    tasks: {
-      detailedContact: { completed: true, completedAt: new Date('2024-01-10T14:30:00Z') },
-      reminder: { completed: true, completedAt: new Date('2024-01-14T16:00:00Z') }
-    }
-  },
-  // 伊藤優子のエントリー詳細データ
-  'history-6': {
-    approaches: {
-      approach1: { completed: true, completedAt: new Date('2024-01-01T10:00:00Z') },
-      approach2: { completed: true, completedAt: new Date('2024-01-02T14:30:00Z') },
-      approach3: { completed: false },
-      approach4: { completed: false },
-      approach5: { completed: false }
-    }
-  },
-  // 伊藤優子の書類選考詳細データ
-  'history-6-5': {
-    result: '合格',
-    resultDate: new Date('2024-01-04T17:00:00Z'),
-    evaluator: '人事部 田中',
-    evaluationNotes: '経営学の知識が豊富で、志望動機も明確。エントリーシートの内容も充実しており、次の段階に進めることを推奨。',
-    notes: '経営学の知識と志望動機が評価された。',
-    tasks: {
-      detailedContact: { completed: true, completedAt: new Date('2024-01-02T16:30:00Z') },
-      resultNotification: { completed: true, completedAt: new Date('2024-01-04T18:00:00Z') }
-    }
-  },
-  // 伊藤優子の適性検査詳細データ
-  'history-8': {
-    sessionDate: new Date('2024-01-08T10:00:00Z'),
-    sessionName: '適性検査 第1回',
-    eventName: '2025年度新卒採用 適性検査',
-    testType: 'Web適性検査',
-    score: 85,
-    result: '優秀',
-    notes: '論理的思考力と問題解決能力が高い。特に数理系の問題で優秀な成績。',
-    tasks: {
-      detailedContact: { completed: true, completedAt: new Date('2024-01-05T14:30:00Z') }
-    }
-  },
-  // 伊藤優子の人事面接詳細データ
-  'history-11': {
-    interviewer: '佐藤部長',
-    duration: '90分',
-    impression: '志望動機が明確で、会社への理解が深い。経営学の知識を活かした視点が評価できる。',
-    strengths: '論理的思考力、コミュニケーション能力、リーダーシップ',
-    weaknesses: '技術的な経験がやや不足',
-    overallRating: 'A',
-    notes: '次の段階に進めることを推奨。グループ面接でのリーダーシップ発揮を期待。'
-  },
-  // 伊藤優子の最終選考詳細データ
-  'history-12': {
-    candidateDates: [
-      new Date('2024-01-25T10:00:00Z'),
-      new Date('2024-01-26T10:00:00Z'),
-      new Date('2024-01-27T10:00:00Z')
-    ],
-    result: '合格',
-    resultDate: new Date('2024-01-28T17:00:00Z'),
-    evaluator: '田中社長、人事部 佐藤部長',
-    comments: '最終選考で総合的な評価を実施。志望動機、キャリアプラン、企業文化への適合性すべてにおいて高評価。リーダーシップとコミュニケーション能力も優秀。',
-    notes: '最終選考実施。最終的な採用判断',
-    tasks: {
-      detailedContact: { completed: true, completedAt: new Date('2024-01-24T16:30:00Z') },
-      documentCollection: { completed: true, completedAt: new Date('2024-01-26T14:00:00Z') },
-      resultNotification: { completed: true, completedAt: new Date('2024-01-28T18:00:00Z') }
-    }
-  },
-  // 伊藤優子の職場見学詳細データ
-  'history-9': {
-    sessionDate: new Date('2024-01-12T13:00:00Z'),
-    sessionName: '職場見学 第1回',
-    eventName: '2025年度新卒採用 職場見学',
-    location: '本社オフィス（東京都渋谷区）',
-    attendanceStatus: '参加',
-    impression: '本社オフィス見学実施。社員との交流も良好で、職場の雰囲気を理解できた。',
-    notes: '社員との交流も良好。職場の雰囲気を理解できた。',
-    tasks: {
-      detailedContact: { completed: true, completedAt: new Date('2024-01-10T16:30:00Z') }
-    }
-  },
-  // 伊藤優子の仕事体験詳細データ
-  'history-9-5': {
-    sessionDate: new Date('2024-01-14T09:00:00Z'),
-    sessionName: '仕事体験 第1回',
-    eventName: '2025年度新卒採用 仕事体験',
-    location: '本社オフィス（東京都渋谷区）',
-    attendanceStatus: '参加',
-    impression: '実際の業務を体験。積極的な姿勢で取り組み、チームワークも良好。実務経験を通じて会社への理解が深まった。',
-    notes: '積極的な姿勢が評価された。実務経験を通じて会社への理解が深まった。',
-    tasks: {
-      detailedContact: { completed: true, completedAt: new Date('2024-01-12T14:30:00Z') }
-    }
-  },
-  // 伊藤優子の会社説明会詳細データ
-  'history-7': {
-    sessionDate: new Date('2024-01-05T14:00:00Z'),
-    sessionName: '会社説明会 第1回',
-    eventName: '2025年度新卒採用 会社説明会',
-    location: '本社オフィス（東京都渋谷区）',
-    attendanceStatus: '参加',
-    impression: '会社説明会に参加。企業理念や事業内容について理解を深めた。',
-    notes: '企業理念や事業内容について理解を深めた。',
-    tasks: {
-      detailedContact: { completed: true, completedAt: new Date('2024-01-03T16:30:00Z') }
-    }
-  },
-  // 田中太郎の会社説明会詳細データ
-  'history-2': {
-    sessionDate: new Date('2024-01-17T14:00:00Z'),
-    sessionName: '会社説明会 第2回',
-    eventName: '2025年度新卒採用 会社説明会',
-    location: '本社オフィス（東京都渋谷区）',
-    attendanceStatus: '参加',
-    impression: '会社説明会に参加。技術的な質問が多く、関心の高さが伺える。',
-    notes: '技術的な質問が多く、関心の高さが伺える。',
-    tasks: {
-      detailedContact: { completed: true, completedAt: new Date('2024-01-15T16:30:00Z') }
-    }
-  },
-  // 伊藤優子の個別面接詳細データ
-  'history-9-6': {
-    interviewDate: new Date('2024-01-16T14:00:00Z'),
-    interviewTime: '14:00-15:30',
-    location: '本社オフィス（東京都渋谷区）',
-    attendanceStatus: '参加',
-    interviewer: '田中部長',
-    impression: '志望動機とキャリアプランについて詳細に話し合った。将来のビジョンが明確で、会社への理解も深い。',
-    notes: '志望動機とキャリアプランについて詳細に話し合った。将来のビジョンが明確。',
-    tasks: {
-      detailedContact: { completed: true, completedAt: new Date('2024-01-14T16:30:00Z') }
-    }
-  },
-  // 伊藤優子の集団面接詳細データ
-  'history-9-7': {
-    sessionDate: new Date('2024-01-17T10:00:00Z'),
-    sessionName: '集団面接 第1回',
-    eventName: '2025年度新卒採用 集団面接',
-    location: '本社オフィス（東京都渋谷区）',
-    candidateDates: [
-      new Date('2024-01-17T10:00:00Z'),
-      new Date('2024-01-18T10:00:00Z'),
-      new Date('2024-01-19T10:00:00Z')
-    ],
-    attendanceStatus: '参加',
-    result: '合格',
-    resultDate: new Date('2024-01-20T17:00:00Z'),
-    groupSize: 5,
-    evaluator: '人事部 佐藤、営業部 田中',
-    impression: '集団面接でリーダーシップを発揮。他の参加者の意見も引き出し、チームワークを重視する姿勢が評価された。',
-    notes: '集団面接実施。リーダーシップと協調性を評価。',
-    tasks: {
-      detailedContact: { completed: true, completedAt: new Date('2024-01-15T16:30:00Z') },
-      resultNotification: { completed: true, completedAt: new Date('2024-01-20T18:00:00Z') }
-    }
-  }
-};
 
 export const mockTasks: Task[] = [
   // エントリー段階のタスク

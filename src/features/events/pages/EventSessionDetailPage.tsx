@@ -65,7 +65,7 @@ export function EventSessionDetailPage() {
     if (window.confirm('このセッションを削除しますか？')) {
       deleteEventSession(session.id);
       // 削除後はイベント詳細ページに戻る
-      window.location.href = `/events/${eventId}`;
+              window.location.href = `/event/${eventId}`;
     }
   };
 
@@ -113,7 +113,7 @@ export function EventSessionDetailPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
-        <Link to={`/events/${eventId}`}>
+        <Link to={`/event/${eventId}`}>
           <Button variant="outline" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
             イベント詳細に戻る
@@ -295,7 +295,7 @@ export function EventSessionDetailPage() {
       {/* 参加者一覧 */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold">参加者一覧 ({participants.length}名)</h2>
-        <Link to={`/events/${eventId}/sessions/${sessionId}/participants`}>
+        <Link to={`/event/${eventId}/session/${sessionId}/participants`}>
           <Button size="sm">
             <FileText className="h-4 w-4 mr-2" />
             評定表管理

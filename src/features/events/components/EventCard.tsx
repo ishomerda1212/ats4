@@ -46,7 +46,7 @@ export function EventCard({ event, participantCount, sessionCount }: EventCardPr
           </div>
           
           <div className="flex items-center space-x-2">
-            <Link to={`/events/${event.id}`}>
+            <Link to={`/event/${event.id}`}>
               <Button size="sm" variant="outline">
                 <Eye className="h-3 w-3 mr-1" />
                 詳細

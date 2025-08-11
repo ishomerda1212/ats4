@@ -27,11 +27,11 @@ export const mockEvents: Event[] = [
   },
   {
     id: 'event-individual-interview',
-    name: '個別面接',
-    description: '採用担当者との1対1の面接です。',
-    stage: '個別面接',
-    createdAt: new Date('2024-01-18T09:00:00Z'),
-    updatedAt: new Date('2024-01-18T09:00:00Z')
+    name: '人事面接',
+    description: '人事面接を実施します。志望動機やキャリアプランについて詳しく話し合います。',
+    stage: '人事面接',
+    createdAt: new Date('2024-01-15T09:00:00Z'),
+    updatedAt: new Date('2024-01-15T09:00:00Z')
   },
   {
     id: 'event-group-interview',
@@ -75,9 +75,9 @@ export const mockEvents: Event[] = [
   },
   {
     id: 'event-offer',
-    name: '内定',
+    name: '内定面談',
     description: '内定通知と入社手続きの案内を行います。',
-    stage: '内定',
+    stage: '内定面談',
     createdAt: new Date('2024-01-25T09:00:00Z'),
     updatedAt: new Date('2024-01-25T09:00:00Z')
   }
@@ -135,48 +135,48 @@ export const mockEventSessions: EventSession[] = [
     createdAt: new Date('2024-01-15T11:00:00Z'),
     updatedAt: new Date('2024-01-15T11:00:00Z')
   },
-  // 個別面接のセッション（上限1名）
+  // 人事面接のセッション（上限1名）
   {
     id: 'session-individual-interview-a',
     eventId: 'event-individual-interview',
-    name: '個別面接 A日程',
+    name: '人事面接 A日程',
     start: new Date('2024-03-10T10:00:00Z'),
     end: new Date('2024-03-10T11:00:00Z'),
     venue: '面接室A',
     format: '対面',
-    maxParticipants: 1, // 個別面接なので1名まで
+    maxParticipants: 1, // 人事面接なので1名まで
     participants: [],
     recruiter: '田中部長',
-    createdAt: new Date('2024-01-18T09:00:00Z'),
-    updatedAt: new Date('2024-01-18T09:00:00Z')
+    createdAt: new Date('2024-01-15T09:00:00Z'),
+    updatedAt: new Date('2024-01-15T09:00:00Z')
   },
   {
     id: 'session-individual-interview-b',
     eventId: 'event-individual-interview',
-    name: '個別面接 B日程',
+    name: '人事面接 B日程',
     start: new Date('2024-03-10T14:00:00Z'),
     end: new Date('2024-03-10T15:00:00Z'),
     venue: '面接室B',
     format: 'オンライン',
-    maxParticipants: 1, // 個別面接なので1名まで
+    maxParticipants: 1, // 人事面接なので1名まで
     participants: [],
     recruiter: '佐藤課長',
-    createdAt: new Date('2024-01-18T09:00:00Z'),
-    updatedAt: new Date('2024-01-18T09:00:00Z')
+    createdAt: new Date('2024-01-15T09:00:00Z'),
+    updatedAt: new Date('2024-01-15T09:00:00Z')
   },
   {
     id: 'session-individual-interview-c',
     eventId: 'event-individual-interview',
-    name: '個別面接 C日程',
+    name: '人事面接 C日程',
     start: new Date('2024-03-12T13:00:00Z'),
     end: new Date('2024-03-12T14:00:00Z'),
     venue: '面接室A',
     format: '対面',
-    maxParticipants: 1, // 個別面接なので1名まで
+    maxParticipants: 1, // 人事面接なので1名まで
     participants: [],
     recruiter: '鈴木マネージャー',
-    createdAt: new Date('2024-01-18T09:00:00Z'),
-    updatedAt: new Date('2024-01-18T09:00:00Z')
+    createdAt: new Date('2024-01-15T09:00:00Z'),
+    updatedAt: new Date('2024-01-15T09:00:00Z')
   },
   // 集団面接のセッション（上限8名）
   {
@@ -246,10 +246,10 @@ export const mockEventParticipants: EventParticipant[] = [
     createdAt: new Date('2024-01-21T15:20:00Z'),
     updatedAt: new Date('2024-01-21T15:20:00Z')
   },
-  // 個別面接（上限1名）の参加者サンプル
+  // 人事面接（上限1名）の参加者サンプル
   {
     id: 'participant-5',
-    eventId: 'session-individual-interview-a', // 個別面接A日程
+    eventId: 'session-individual-interview-a', // 人事面接A日程
     applicantId: 'applicant-1', // 田中太郎
     status: '申込',
     joinedAt: new Date('2024-02-01T10:00:00Z'),
