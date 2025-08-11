@@ -7,6 +7,7 @@ import { formatDateTime } from '@/shared/utils/date';
 interface ApplicantInfoPanelProps {
   applicant: Applicant;
   history?: SelectionHistory[];
+  selectionHistory?: SelectionHistory;
 }
 
 export function ApplicantInfoPanel({ applicant, history = [] }: ApplicantInfoPanelProps) {

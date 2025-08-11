@@ -12,6 +12,7 @@ interface ApplicantResponseViewProps {
   applicant: Applicant;
   eventData: EventFormData;
   response: ApplicantEventResponse;
+  isReadOnly?: boolean;
   onBack?: () => void;
 }
 

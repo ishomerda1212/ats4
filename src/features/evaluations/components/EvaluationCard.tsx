@@ -29,9 +29,9 @@ export function EvaluationCard({ evaluation, applicantId, onView, onEdit }: Eval
         
         <div className="space-y-2 mb-4">
           <div>
-            <p className="text-sm font-medium">総合評価</p>
+            <p className="text-sm font-medium">志望理由</p>
             <p className="text-sm text-muted-foreground line-clamp-2">
-              {evaluation.overallEvaluation}
+              {evaluation.motivationReason}
             </p>
           </div>
         </div>

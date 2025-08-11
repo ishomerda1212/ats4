@@ -49,8 +49,8 @@ export const useApplicantResponseView = (applicantId: string, eventId: string) =
       const sessionFormData: SessionFormData[] = sessions.map(session => ({
         sessionId: session.id,
         sessionName: session.name,
-        startDate: new Date(session.startDate),
-        endDate: new Date(session.endDate),
+        startDate: new Date(session.start),
+        endDate: new Date(session.end),
         venue: session.venue,
         format: session.format,
         maxParticipants: session.maxParticipants,

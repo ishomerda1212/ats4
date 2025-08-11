@@ -10,6 +10,7 @@ import { EVALUATION_FIELDS } from '../types/evaluation';
 
 interface EvaluationFormProps {
   applicantId: string;
+  selectionHistoryId?: string;
 }
 
 export function EvaluationForm({ applicantId }: EvaluationFormProps) {

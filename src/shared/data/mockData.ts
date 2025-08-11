@@ -1,4 +1,5 @@
-import { Applicant, SelectionHistory, Evaluation } from '@/features/applicants/types/applicant';
+import { Applicant, SelectionHistory } from '@/features/applicants/types/applicant';
+import { Evaluation } from '@/features/evaluations/types/evaluation';
 import { Task } from '@/features/applicants/types/applicant';
 
 export const mockApplicants: Applicant[] = [

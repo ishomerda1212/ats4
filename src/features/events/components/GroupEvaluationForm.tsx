@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Save, Clock, CheckCircle, ArrowRight } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller, Control } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Applicant } from '@/features/applicants/types/applicant';
@@ -18,14 +18,12 @@ import { toast } from '@/hooks/use-toast';
 
 const evaluationSchema = z.object({
   evaluatorName: z.string().min(1, '評価者名を入力してください'),
-  firstImpression: z.string().min(1, '第一印象を入力してください'),
-  communicationSkills: z.string().min(1, 'コミュニケーション能力を入力してください'),
-  logicalThinking: z.string().min(1, '論理的思考力を入力してください'),
-  initiative: z.string().min(1, '積極性・主体性を入力してください'),
-  teamwork: z.string().min(1, '協調性を入力してください'),
-  motivation: z.string().min(1, '志望動機・熱意を入力してください'),
-  technicalSkills: z.string().min(1, '技術的スキルを入力してください'),
-  overallEvaluation: z.string().min(1, '総合評価を入力してください'),
+  motivationReason: z.string().optional(),
+  experienceBackground: z.string().optional(),
+  selfUnderstanding: z.string().optional(),
+  problemSolving: z.string().optional(),
+  futureVision: z.string().optional(),
+  reverseQuestion: z.string().optional(),
 });
 
 interface GroupEvaluationFormProps {
@@ -50,14 +48,12 @@ export function GroupEvaluationForm({
   const draftKey = `draft-evaluation-${applicant.id}-${sessionId}`;
   const emptyEvaluation: EvaluationFormData = {
     evaluatorName: '',
-    firstImpression: '',
-    communicationSkills: '',
-    logicalThinking: '',
-    initiative: '',
-    teamwork: '',
-    motivation: '',
-    technicalSkills: '',
-    overallEvaluation: '',
+    motivationReason: '',
+    experienceBackground: '',
+    selfUnderstanding: '',
+    problemSolving: '',
+    futureVision: '',
+    reverseQuestion: '',
   };
   const [draftData, setDraftData] = useLocalStorage<EvaluationFormData>(draftKey, emptyEvaluation);
 
@@ -65,14 +61,12 @@ export function GroupEvaluationForm({
     resolver: zodResolver(evaluationSchema),
     defaultValues: {
       evaluatorName: draftData.evaluatorName || '',
-      firstImpression: draftData.firstImpression || '',
-      communicationSkills: draftData.communicationSkills || '',
-      logicalThinking: draftData.logicalThinking || '',
-      initiative: draftData.initiative || '',
-      teamwork: draftData.teamwork || '',
-      motivation: draftData.motivation || '',
-      technicalSkills: draftData.technicalSkills || '',
-      overallEvaluation: draftData.overallEvaluation || '',
+      motivationReason: draftData.motivationReason || '',
+      experienceBackground: draftData.experienceBackground || '',
+      selfUnderstanding: draftData.selfUnderstanding || '',
+      problemSolving: draftData.problemSolving || '',
+      futureVision: draftData.futureVision || '',
+      reverseQuestion: draftData.reverseQuestion || '',
     },
   });
 
@@ -98,14 +92,12 @@ export function GroupEvaluationForm({
     if (existingEvaluation) {
       form.reset({
         evaluatorName: existingEvaluation.evaluatorName,
-        firstImpression: existingEvaluation.firstImpression,
-        communicationSkills: existingEvaluation.communicationSkills,
-        logicalThinking: existingEvaluation.logicalThinking,
-        initiative: existingEvaluation.initiative,
-        teamwork: existingEvaluation.teamwork,
-        motivation: existingEvaluation.motivation,
-        technicalSkills: existingEvaluation.technicalSkills,
-        overallEvaluation: existingEvaluation.overallEvaluation,
+        motivationReason: existingEvaluation.motivationReason || '',
+        experienceBackground: existingEvaluation.experienceBackground || '',
+        selfUnderstanding: existingEvaluation.selfUnderstanding || '',
+        problemSolving: existingEvaluation.problemSolving || '',
+        futureVision: existingEvaluation.futureVision || '',
+        reverseQuestion: existingEvaluation.reverseQuestion || '',
       });
       setIsDraft(false);
     }
@@ -200,9 +192,9 @@ export function GroupEvaluationForm({
       <CardContent className="space-y-4 overflow-y-auto max-h-[600px]">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
+            <Controller
               name="evaluatorName"
+              control={form.control as Control<EvaluationFormData>}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>評価者名 *</FormLabel>
@@ -217,7 +209,7 @@ export function GroupEvaluationForm({
             {EVALUATION_FIELDS.map((fieldConfig) => (
               <FormField
                 key={fieldConfig.key}
-                control={form.control}
+                control={form.control as Control<EvaluationFormData>}
                 name={fieldConfig.key as keyof EvaluationFormData}
                 render={({ field }) => (
                   <FormItem>

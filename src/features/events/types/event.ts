@@ -20,6 +20,7 @@ export interface EventSession extends BaseEntity {
   reportReminderDate?: string;
   participantReportDate?: string;
   maxParticipants?: number; // 参加者上限数（未設定の場合は無制限）
+  currentParticipants?: number; // 現在の参加者数
 }
 
 export type ParticipationStatus = '参加' | '不参加' | '未定' | '申込' | '欠席';
