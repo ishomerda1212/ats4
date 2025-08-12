@@ -127,7 +127,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
       // 各セッションの現在の参加者数を計算
       const sessionFormData: SessionFormData[] = sessions.map(session => {
         const participantCount = eventParticipants.filter(
-          p => p.eventId === session.id && (p.status === '参加' || p.status === '申込')
+          p => p.sessionId === session.id && (p.status === '参加' || p.status === '申込')
         ).length;
 
         return {
@@ -267,7 +267,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
       sessionResponses.forEach(sessionResponse => {
         // 既存の参加情報を削除
         const existingIndex = updatedParticipants.findIndex(
-          p => p.applicantId === applicantId && p.eventId === sessionResponse.sessionId
+          p => p.applicantId === applicantId && p.sessionId === sessionResponse.sessionId
         );
         
         if (existingIndex >= 0) {
@@ -278,7 +278,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
         if (sessionResponse.status === 'participate') {
           const newParticipant: EventParticipant = {
             id: generateId(),
-            eventId: sessionResponse.sessionId,
+            sessionId: sessionResponse.sessionId,
             applicantId,
             status: '申込',
             joinedAt: new Date(),

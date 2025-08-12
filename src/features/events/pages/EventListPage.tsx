@@ -30,7 +30,7 @@ export function EventListPage() {
     try {
       // 1. イベント参加者として登録
       registerParticipant({
-        eventId: formData.selectedSessionId,
+        sessionId: formData.selectedSessionId,
         applicantId: formData.selectedApplicantId,
         status: '申込'
       });

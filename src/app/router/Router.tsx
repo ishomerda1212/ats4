@@ -16,7 +16,7 @@ import { ApplicantResponseViewPage } from '@/features/applicant-form/pages/Appli
 import { TaskListPage } from '@/features/tasks/pages/TaskListPage';
 import { EmailTemplateManagementPage } from '@/features/tasks/pages/EmailTemplateManagementPage';
 import { ApplicantMailPage } from '@/features/email/pages/ApplicantMailPage';
-import { ReportPage } from '@/features/reports/pages/ReportPage';
+import { ReportPage } from '@/features/reports/pages/ReportPage/index';
 
 export function Router() {
   return (

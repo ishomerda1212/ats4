@@ -8,7 +8,7 @@ import { Save, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Task, TaskType, TaskPriority, TASK_TYPES, TASK_PRIORITIES } from '../types/task';
+import { Task, TaskType, TASK_TYPES } from '../types/task';
 import { useTasks } from '../hooks/useTasks';
 import { toast } from '@/hooks/use-toast';
 
@@ -39,15 +39,15 @@ export function TaskForm({ selectionHistoryId, task, onCancel, onSuccess }: Task
       title: task.title,
       description: task.description,
       type: task.type,
-      priority: task.priority,
-      assignee: task.assignee || '',
+
+
       dueDate: task.dueDate ? new Date(task.dueDate).toISOString().slice(0, 16) : '', // datetime-local format
     } : {
       title: '',
       description: '',
       type: 'general',
-      priority: '中',
-      assignee: '',
+
+
       dueDate: '',
     },
   });
@@ -58,7 +58,6 @@ export function TaskForm({ selectionHistoryId, task, onCancel, onSuccess }: Task
         updateTask(task.id, {
           ...data,
           type: data.type as TaskType,
-          priority: data.priority as TaskPriority,
           dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
         });
         toast({
@@ -71,7 +70,6 @@ export function TaskForm({ selectionHistoryId, task, onCancel, onSuccess }: Task
           applicantId: '', // 一時的に空文字列を設定
           ...data,
           type: data.type as TaskType,
-          priority: data.priority as TaskPriority,
           status: '未着手',
           dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
         });
@@ -143,30 +141,7 @@ export function TaskForm({ selectionHistoryId, task, onCancel, onSuccess }: Task
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="priority"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>優先度 *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="優先度を選択" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {TASK_PRIORITIES.map((priority) => (
-                          <SelectItem key={priority.value} value={priority.value}>
-                            {priority.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
             </div>
 
             <FormField
@@ -188,19 +163,7 @@ export function TaskForm({ selectionHistoryId, task, onCancel, onSuccess }: Task
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="assignee"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>担当者</FormLabel>
-                    <FormControl>
-                      <Input placeholder="担当者名" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
 
               <FormField
                 control={form.control}

@@ -23,7 +23,7 @@ export { StageIndividualInterviewDisplay } from './StageIndividualInterviewDispl
 export { StageInterviewDisplay } from './StageInterviewDisplay';
 export { StageFinalSelectionDisplay } from './StageFinalSelectionDisplay';
 export { StageCEOSeminarDisplay } from './StageCEOSeminarDisplay';
-export { SelectionStageAccordion } from './SelectionStageAccordion';
+export { SelectionStageAccordion } from './SelectionStageAccordion/index';
 // 未使用コンポーネントをコメントアウト
 // export { DefaultTaskForm } from './DefaultTaskForm';
 // export { StageTemplateForm } from './StageTemplateForm';

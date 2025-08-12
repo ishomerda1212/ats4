@@ -4,6 +4,9 @@ import { getFixedTasksByStage } from '../data/taskTemplates';
 import { generateId } from '@/shared/utils/date';
 import { Applicant, SelectionStage } from '@/features/applicants/types/applicant';
 
+// FixedTaskとTaskInstanceを組み合わせた型
+type TaskWithFixedData = FixedTask & TaskInstance;
+
 // モックデータ（実際の実装ではAPIやストレージを使用）
 const mockTaskInstances: TaskInstance[] = [
   // 応募者1のエントリー段階タスク
@@ -12,7 +15,6 @@ const mockTaskInstances: TaskInstance[] = [
     applicantId: '1',
     taskId: 'entry-approach-1',
     status: '完了',
-    assignedTo: '人事部 田中',
     dueDate: new Date('2024-01-20'),
     startedAt: new Date('2024-01-18'),
     completedAt: new Date('2024-01-20'),
@@ -24,7 +26,6 @@ const mockTaskInstances: TaskInstance[] = [
     applicantId: '1',
     taskId: 'entry-approach-2',
     status: '未着手',
-    assignedTo: '人事部 田中',
     dueDate: new Date('2024-01-25'),
     startedAt: new Date('2024-01-21'),
     createdAt: new Date('2024-01-15'),
@@ -36,7 +37,6 @@ const mockTaskInstances: TaskInstance[] = [
     taskId: 'entry-detail-contact',
     status: '完了',
     contactStatus: '済',
-    assignedTo: '人事部 田中',
     dueDate: new Date('2024-01-22'),
     startedAt: new Date('2024-01-20'),
     completedAt: new Date('2024-01-22'),
@@ -49,7 +49,6 @@ const mockTaskInstances: TaskInstance[] = [
     taskId: 'entry-schedule-contact',
     status: '返信待ち',
     contactStatus: '返信待ち',
-    assignedTo: '人事部 田中',
     dueDate: new Date('2024-01-28'),
     startedAt: new Date('2024-01-23'),
     createdAt: new Date('2024-01-15'),
@@ -62,7 +61,6 @@ const mockTaskInstances: TaskInstance[] = [
     taskId: 'document-detail-contact',
     status: '完了',
     contactStatus: '済',
-    assignedTo: '人事部 佐藤',
     dueDate: new Date('2024-01-18'),
     startedAt: new Date('2024-01-16'),
     completedAt: new Date('2024-01-18'),
@@ -75,7 +73,6 @@ const mockTaskInstances: TaskInstance[] = [
     taskId: 'document-schedule-contact',
     status: '返信待ち',
     contactStatus: '○',
-    assignedTo: '人事部 佐藤',
     dueDate: new Date('2024-01-30'),
     startedAt: new Date('2024-01-25'),
     createdAt: new Date('2024-01-10'),
@@ -88,7 +85,6 @@ const mockTaskInstances: TaskInstance[] = [
     taskId: 'individual-detail-contact',
     status: '完了',
     contactStatus: '済',
-    assignedTo: '人事部 山田',
     dueDate: new Date('2024-01-15'),
     startedAt: new Date('2024-01-13'),
     completedAt: new Date('2024-01-15'),
@@ -101,7 +97,6 @@ const mockTaskInstances: TaskInstance[] = [
     taskId: 'individual-schedule-contact',
     status: '完了',
     contactStatus: '済',
-    assignedTo: '人事部 山田',
     dueDate: new Date('2024-01-20'),
     startedAt: new Date('2024-01-18'),
     completedAt: new Date('2024-01-20'),
@@ -114,7 +109,6 @@ const mockTaskInstances: TaskInstance[] = [
     taskId: 'individual-remind-contact',
     status: '返信待ち',
     contactStatus: '未',
-    assignedTo: '人事部 山田',
     dueDate: new Date('2024-02-05'),
     startedAt: new Date('2024-01-30'),
     createdAt: new Date('2024-01-05'),
@@ -126,11 +120,11 @@ export const useTaskManagement = () => {
   const [taskInstances, setTaskInstances] = useState<TaskInstance[]>(mockTaskInstances);
 
   // 応募者のタスクを取得
-  const getApplicantTasks = useCallback((applicant: Applicant): (FixedTask & TaskInstance)[] => {
+  const getApplicantTasks = useCallback((applicant: Applicant): TaskWithFixedData[] => {
     const currentStage = applicant.currentStage;
     const fixedTasks = getFixedTasksByStage(currentStage);
     
-    return fixedTasks.map(fixedTask => {
+    return fixedTasks.map((fixedTask: FixedTask) => {
       const instance = taskInstances.find(
         ti => ti.applicantId === applicant.id && ti.taskId === fixedTask.id
       );
@@ -167,14 +161,14 @@ export const useTaskManagement = () => {
         setTaskInstances(prev => [...prev, newInstance]);
         return { ...fixedTask, ...newInstance };
       }
-    }).sort((a, b) => a.order - b.order);
+    }).sort((a: TaskWithFixedData, b: TaskWithFixedData) => a.order - b.order);
   }, [taskInstances]);
 
   // 応募者の特定段階のタスクを取得
-  const getApplicantTasksByStage = useCallback((applicant: Applicant, stage: string): (FixedTask & TaskInstance)[] => {
+  const getApplicantTasksByStage = useCallback((applicant: Applicant, stage: string): TaskWithFixedData[] => {
     const fixedTasks = getFixedTasksByStage(stage as SelectionStage);
     
-    return fixedTasks.map(fixedTask => {
+    return fixedTasks.map((fixedTask: FixedTask) => {
       const instance = taskInstances.find(
         ti => ti.applicantId === applicant.id && ti.taskId === fixedTask.id
       );
@@ -211,11 +205,11 @@ export const useTaskManagement = () => {
         setTaskInstances(prev => [...prev, newInstance]);
         return { ...fixedTask, ...newInstance };
       }
-    }).sort((a, b) => a.order - b.order);
+    }).sort((a: TaskWithFixedData, b: TaskWithFixedData) => a.order - b.order);
   }, [taskInstances]);
 
   // 次のタスクを取得（現在の段階のみ）
-  const getNextTask = useCallback((applicant: Applicant): (FixedTask & TaskInstance) | null => {
+  const getNextTask = useCallback((applicant: Applicant): TaskWithFixedData | null => {
     const tasks = getApplicantTasks(applicant);
     return tasks.find(task => task.status === '未着手') || 
            tasks.find(task => task.status === '返信待ち') || 
@@ -224,7 +218,7 @@ export const useTaskManagement = () => {
   }, [getApplicantTasks]);
 
   // 次のタスクを取得（全段階）
-  const getNextTaskAllStages = useCallback((applicant: Applicant): (FixedTask & TaskInstance) | null => {
+  const getNextTaskAllStages = useCallback((applicant: Applicant): TaskWithFixedData | null => {
     const allStages = ['エントリー', '書類選考', '会社説明会', '適性検査体験', '職場見学', '仕事体験', '人事面接', '集団面接', 'CEOセミナー', '人事面接', '最終選考', '内定面談', '不採用'];
     
     for (const stage of allStages) {
@@ -310,14 +304,7 @@ export const useTaskManagement = () => {
     ));
   }, []);
 
-  // タスクに担当者を割り当て
-  const assignTask = useCallback((taskInstanceId: string, assignedTo: string) => {
-    setTaskInstances(prev => prev.map(task => 
-      task.id === taskInstanceId 
-        ? { ...task, assignedTo, updatedAt: new Date() }
-        : task
-    ));
-  }, []);
+
 
   // 期限が近いタスクを取得
   const getUpcomingTasks = useCallback((days: number = 7) => {
@@ -369,7 +356,7 @@ export const useTaskManagement = () => {
     getNextTaskAllStages,
     updateTaskStatus,
     setTaskDueDate,
-    assignTask,
+
     getUpcomingTasks,
     getOverdueTasks,
     getDaysUntilDue,

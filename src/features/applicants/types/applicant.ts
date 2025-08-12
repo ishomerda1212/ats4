@@ -117,15 +117,13 @@ export interface SelectionHistory extends BaseEntity {
   notes?: string;
 }
 
-export type TaskStatus = '未着手' | '進行中' | '完了' | '提出待ち' | '返信待ち';
+export type TaskStatus = '未着手' | '完了' | '提出待ち' | '返信待ち';
 
 export interface Task extends BaseEntity {
   selectionHistoryId: string;
   title: string;
   description: string;
   status: TaskStatus;
-  priority?: '低' | '中' | '高';
-  assignee?: string;
   dueDate?: Date;
   completedAt?: Date;
   type?: 'general' | 'email' | 'document' | 'interview' | 'evaluation';

@@ -17,7 +17,6 @@ const defaultStageTemplates: SelectionStageTemplate[] = [
         title: 'エントリーシート確認',
         description: '提出されたエントリーシートの内容確認',
         type: 'document',
-        priority: '高',
         dueOffsetDays: 1,
         isRequired: true
       },
@@ -26,7 +25,6 @@ const defaultStageTemplates: SelectionStageTemplate[] = [
         title: '基本要件チェック',
         description: '学歴、専攻、卒業予定年度の確認',
         type: 'general',
-        priority: '高',
         dueOffsetDays: 1,
         isRequired: true
       }
@@ -48,7 +46,6 @@ const defaultStageTemplates: SelectionStageTemplate[] = [
         title: '参加者名簿作成',
         description: '説明会参加者の名簿作成',
         type: 'document',
-        priority: '中',
         dueOffsetDays: 2,
         isRequired: true
       },
@@ -57,7 +54,6 @@ const defaultStageTemplates: SelectionStageTemplate[] = [
         title: '参加確認メール送信',
         description: '説明会の詳細と参加確認のメール送信',
         type: 'email',
-        priority: '高',
         dueOffsetDays: 1,
         isRequired: true
       }
@@ -157,8 +153,8 @@ export function useSelectionStages() {
       description: defaultTask.description,
       type: defaultTask.type,
       status: '未着手' as const,
-      priority: defaultTask.priority,
-      assignee: defaultTask.assignee,
+
+
       dueDate: defaultTask.dueOffsetDays 
         ? new Date(Date.now() + defaultTask.dueOffsetDays * 24 * 60 * 60 * 1000)
         : undefined,

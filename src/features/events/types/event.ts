@@ -13,7 +13,7 @@ export interface EventSession extends BaseEntity {
   start: Date;
   end: Date;
   venue: string;
-  format: '対面' | 'オンライン' | 'ハイブリッド'; // 開催形式
+  format: '対面' | 'オンライン'; // 開催形式
   participants: EventParticipant[];
   notes?: string;
   recruiter?: string;
@@ -26,7 +26,7 @@ export interface EventSession extends BaseEntity {
 export type ParticipationStatus = '参加' | '不参加' | '未定' | '申込' | '欠席';
 
 export interface EventParticipant extends BaseEntity {
-  eventId: string;
+  sessionId: string;
   applicantId: string;
   status: ParticipationStatus;
   joinedAt?: Date;

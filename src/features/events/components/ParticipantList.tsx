@@ -31,8 +31,7 @@ export function ParticipantList({ participants, applicants, session, onStatusCha
         return <Badge className="bg-blue-100 text-blue-800 flex items-center gap-1"><Users className="w-3 h-3" />対面</Badge>;
       case 'オンライン':
         return <Badge className="bg-purple-100 text-purple-800 flex items-center gap-1"><Monitor className="w-3 h-3" />オンライン</Badge>;
-      case 'ハイブリッド':
-        return <Badge className="bg-orange-100 text-orange-800 flex items-center gap-1"><Users className="w-3 h-3" />ハイブリッド</Badge>;
+
       default:
         return <Badge className="bg-gray-100 text-gray-800">未定</Badge>;
     }

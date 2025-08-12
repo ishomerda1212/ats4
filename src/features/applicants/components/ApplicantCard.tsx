@@ -21,8 +21,7 @@ export function ApplicantCard({ applicant }: ApplicantCardProps) {
     switch (status) {
       case '完了':
         return <CheckCircle className="h-3 w-3 text-green-600" />;
-      case '進行中':
-        return <Clock className="h-3 w-3 text-yellow-600" />;
+
       case '未着手':
         return <AlertCircle className="h-3 w-3 text-gray-400" />;
       default:
@@ -34,8 +33,7 @@ export function ApplicantCard({ applicant }: ApplicantCardProps) {
     switch (status) {
       case '完了':
         return 'bg-green-100 text-green-800';
-      case '進行中':
-        return 'bg-yellow-100 text-yellow-800';
+
       case '未着手':
         return 'bg-gray-100 text-gray-800';
       default:

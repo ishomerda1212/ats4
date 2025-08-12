@@ -212,7 +212,7 @@ export const mockEventSessions: EventSession[] = [
 export const mockEventParticipants: EventParticipant[] = [
   {
     id: 'participant-1',
-    eventId: 'session-company-info-1',
+    sessionId: 'session-company-info-1',
     applicantId: 'applicant-1', // 田中太郎
     status: '未定',
     joinedAt: new Date('2024-01-20T10:00:00Z'),
@@ -221,7 +221,7 @@ export const mockEventParticipants: EventParticipant[] = [
   },
   {
     id: 'participant-2',
-    eventId: 'session-company-info-1',
+    sessionId: 'session-company-info-1',
     applicantId: 'applicant-2', // 佐藤花子
     status: '参加',
     joinedAt: new Date('2024-01-18T14:30:00Z'),
@@ -230,7 +230,7 @@ export const mockEventParticipants: EventParticipant[] = [
   },
   {
     id: 'participant-3',
-    eventId: 'session-workplace-tour-1',
+    sessionId: 'session-workplace-tour-1',
     applicantId: 'applicant-3', // 鈴木次郎
     status: '未定',
     joinedAt: new Date('2024-01-22T09:15:00Z'),
@@ -239,7 +239,7 @@ export const mockEventParticipants: EventParticipant[] = [
   },
   {
     id: 'participant-4',
-    eventId: 'session-company-info-1',
+    sessionId: 'session-company-info-1',
     applicantId: 'applicant-4', // 高橋美咲
     status: '未定',
     joinedAt: new Date('2024-01-21T15:20:00Z'),
@@ -249,7 +249,7 @@ export const mockEventParticipants: EventParticipant[] = [
   // 人事面接（上限1名）の参加者サンプル
   {
     id: 'participant-5',
-    eventId: 'session-individual-interview-a', // 人事面接A日程
+    sessionId: 'session-individual-interview-a', // 人事面接A日程
     applicantId: 'applicant-1', // 田中太郎
     status: '申込',
     joinedAt: new Date('2024-02-01T10:00:00Z'),
@@ -259,7 +259,7 @@ export const mockEventParticipants: EventParticipant[] = [
   // 集団面接（上限8名）の参加者サンプル
   {
     id: 'participant-6',
-    eventId: 'session-group-interview-1', // 集団面接第1回
+    sessionId: 'session-group-interview-1', // 集団面接第1回
     applicantId: 'applicant-2', // 佐藤花子
     status: '申込',
     joinedAt: new Date('2024-02-05T14:00:00Z'),
@@ -268,7 +268,7 @@ export const mockEventParticipants: EventParticipant[] = [
   },
   {
     id: 'participant-7',
-    eventId: 'session-group-interview-1', // 集団面接第1回
+    sessionId: 'session-group-interview-1', // 集団面接第1回
     applicantId: 'applicant-3', // 鈴木次郎
     status: '参加',
     joinedAt: new Date('2024-02-06T09:00:00Z'),

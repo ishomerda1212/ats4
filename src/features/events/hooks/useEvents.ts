@@ -14,7 +14,7 @@ export function useEvents() {
   };
 
   const getParticipantsBySession = (sessionId: string) => {
-    return eventParticipants.filter(participant => participant.eventId === sessionId);
+    return eventParticipants.filter(participant => participant.sessionId === sessionId);
   };
 
   const getEventParticipantCount = (eventId: string) => {
@@ -51,7 +51,7 @@ export function useEvents() {
     const sessionIds = eventSessions.filter(session => session.eventId === id).map(s => s.id);
     setEventSessions(current => current.filter(session => session.eventId !== id));
     setEventParticipants(current => 
-      current.filter(participant => !sessionIds.includes(participant.eventId))
+      current.filter(participant => !sessionIds.includes(participant.sessionId))
     );
   };
 
@@ -79,7 +79,7 @@ export function useEvents() {
   const deleteEventSession = (id: string) => {
     setEventSessions(current => current.filter(session => session.id !== id));
     setEventParticipants(current => 
-      current.filter(participant => participant.eventId !== id)
+      current.filter(participant => participant.sessionId !== id)
     );
   };
 

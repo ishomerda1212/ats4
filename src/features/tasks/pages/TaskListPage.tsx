@@ -5,6 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Clock, 
   CheckCircle, 
@@ -35,7 +38,7 @@ interface FilterOptions {
 }
 
 export function TaskListPage() {
-  const { getDaysUntilDue, getDueStatus, getApplicantTasksByStage } = useTaskManagement();
+  const { getDaysUntilDue, getDueStatus, getApplicantTasksByStage, updateTaskStatus, setTaskDueDate } = useTaskManagement();
   const { applicants } = useApplicants();
   
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
@@ -50,6 +53,13 @@ export function TaskListPage() {
   const [sortBy, setSortBy] = useState<SortBy>('dueDate');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+  // タスク編集関連の状態
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<(FixedTask & TaskInstance) | null>(null);
+  const [taskStatus, setTaskStatus] = useState<TaskStatus>('未着手');
+  const [dueDate, setDueDate] = useState('');
+  const [notes, setNotes] = useState('');
 
   // 全タスクを取得
   const allTasks = useMemo(() => {
@@ -82,6 +92,37 @@ export function TaskListPage() {
 
     return tasks;
   }, [applicants, getApplicantTasksByStage, getDaysUntilDue, getDueStatus]);
+
+  // タスク編集を開始
+  const handleEditTask = (task: FixedTask & TaskInstance) => {
+    setEditingTask(task);
+    setTaskStatus(task.status);
+    setDueDate(task.dueDate ? task.dueDate.toISOString().split('T')[0] : '');
+    setNotes(task.notes || '');
+    setIsEditDialogOpen(true);
+  };
+
+  // タスクを保存
+  const handleSaveTask = () => {
+    if (!editingTask) return;
+
+    // タスクステータスの更新
+    updateTaskStatus(editingTask.id, taskStatus);
+    
+    // 期限の更新
+    if (dueDate) {
+      setTaskDueDate(editingTask.id, new Date(dueDate));
+    }
+
+    // メモの更新（実装予定）
+    // console.log('Notes updated:', notes);
+
+    setIsEditDialogOpen(false);
+    setEditingTask(null);
+    setTaskStatus('未着手');
+    setDueDate('');
+    setNotes('');
+  };
 
   // フィルタリングとソート
   const filteredAndSortedTasks = useMemo(() => {
@@ -128,10 +169,7 @@ export function TaskListPage() {
       filtered = filtered.filter(({ task }) => task.dueDate && task.dueDate <= toDate);
     }
 
-    // 担当者フィルター
-    if (filterOptions.assignedTo) {
-      filtered = filtered.filter(({ task }) => task.assignedTo === filterOptions.assignedTo);
-    }
+
 
     // 検索フィルター
     if (searchQuery) {
@@ -500,10 +538,7 @@ export function TaskListPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => {
-                              // タスク編集機能（実装予定）
-                              // console.log('Edit task:', task.id);
-                            }}
+                            onClick={() => handleEditTask(task)}
                           >
                             <Edit className="h-3 w-3" />
                           </Button>
@@ -524,6 +559,82 @@ export function TaskListPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* タスク編集ダイアログ */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>タスク編集</DialogTitle>
+          </DialogHeader>
+          {editingTask && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="taskTitle">タスク名</Label>
+                <Input
+                  id="taskTitle"
+                  value={editingTask.title}
+                  disabled
+                  className="bg-gray-50"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="taskDescription">説明</Label>
+                <Input
+                  id="taskDescription"
+                  value={editingTask.description}
+                  disabled
+                  className="bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="taskStatus">ステータス</Label>
+                <Select value={taskStatus} onValueChange={(value: TaskStatus) => setTaskStatus(value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="未着手">未着手</SelectItem>
+                    <SelectItem value="完了">完了</SelectItem>
+                    <SelectItem value="提出待ち">提出待ち</SelectItem>
+                    <SelectItem value="返信待ち">返信待ち</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="dueDate">期限</Label>
+                <Input
+                  id="dueDate"
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="notes">メモ</Label>
+                <Textarea
+                  id="notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="タスクに関するメモを入力"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                  キャンセル
+                </Button>
+                <Button onClick={handleSaveTask}>
+                  保存
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 

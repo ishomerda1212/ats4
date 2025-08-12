@@ -11,10 +11,14 @@ export type TaskType =
   | '日程調整連絡'
   | 'リマインド'
   | '結果連絡'
-  | '提出書類';
+  | '提出書類'
+  | 'email'
+  | 'document'
+  | 'general'
+  | 'interview'
+  | '不採用通知';
 
-export type TaskStatus = '未着手' | '進行中' | '完了' | '提出待ち' | '返信待ち';
-export type TaskPriority = '低' | '中' | '高';
+export type TaskStatus = '未着手' | '完了' | '提出待ち' | '返信待ち';
 export type ContactStatus = '未' | '済' | '返信待ち' | '○';
 
 // 固定タスクテンプレート
@@ -35,7 +39,6 @@ export interface TaskInstance extends BaseEntity {
   taskId: string; // FixedTaskのID
   status: TaskStatus;
   contactStatus?: ContactStatus; // 連絡系タスク用
-  assignedTo?: string;
   dueDate?: Date; // 任意の期限
   startedAt?: Date;
   completedAt?: Date;
@@ -48,15 +51,14 @@ export interface Task {
   title: string;
   description?: string;
   type: TaskType;
-  priority: TaskPriority;
   status: TaskStatus;
-  assignee?: string;
   dueDate?: Date;
   completedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
-  selectionHistoryId: string;
-  applicantId: string;
+  selectionHistoryId?: string;
+  applicantId?: string;
+  stage?: string;
 }
 
 export interface EmailTemplate extends BaseEntity {
@@ -89,13 +91,12 @@ export const TASK_TYPES: { value: TaskType; label: string }[] = [
   { value: '日程調整連絡', label: '日程調整連絡' },
   { value: 'リマインド', label: 'リマインド' },
   { value: '結果連絡', label: '結果連絡' },
-  { value: '提出書類', label: '提出書類' }
-];
-
-export const TASK_PRIORITIES: { value: TaskPriority; label: string; color: string }[] = [
-  { value: '低', label: '低', color: 'bg-gray-100 text-gray-800' },
-  { value: '中', label: '中', color: 'bg-yellow-100 text-yellow-800' },
-  { value: '高', label: '高', color: 'bg-red-100 text-red-800' }
+  { value: '提出書類', label: '提出書類' },
+  { value: 'email', label: 'メール' },
+  { value: 'document', label: '書類' },
+  { value: 'general', label: '一般' },
+  { value: 'interview', label: '面接' },
+  { value: '不採用通知', label: '不採用通知' }
 ];
 
 export const CONTACT_STATUSES: { value: ContactStatus; label: string; color: string }[] = [

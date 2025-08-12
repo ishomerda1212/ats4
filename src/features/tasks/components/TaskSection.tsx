@@ -12,8 +12,7 @@ import {
   CheckCircle, 
   AlertCircle, 
   Calendar,
-  Edit,
-  User
+  Edit
 } from 'lucide-react';
 import { useTaskManagement } from '../hooks/useTaskManagement';
 import { Applicant } from '@/features/applicants/types/applicant';
@@ -29,7 +28,6 @@ export function TaskSection({ applicant }: TaskSectionProps) {
     getApplicantTasks, 
     updateTaskStatus, 
     setTaskDueDate, 
-    assignTask,
     getDaysUntilDue,
     getDueStatus
   } = useTaskManagement();
@@ -37,7 +35,7 @@ export function TaskSection({ applicant }: TaskSectionProps) {
   const [editingTask, setEditingTask] = useState<TaskInstance | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [dueDate, setDueDate] = useState('');
-  const [assignedTo, setAssignedTo] = useState('');
+
   const [notes, setNotes] = useState('');
 
   const tasks = getApplicantTasks(applicant);
@@ -46,8 +44,7 @@ export function TaskSection({ applicant }: TaskSectionProps) {
     switch (status) {
       case '完了':
         return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case '進行中':
-        return <Clock className="h-4 w-4 text-yellow-600" />;
+
       case '未着手':
         return <AlertCircle className="h-4 w-4 text-gray-400" />;
       default:
@@ -59,8 +56,7 @@ export function TaskSection({ applicant }: TaskSectionProps) {
     switch (status) {
       case '完了':
         return 'bg-green-100 text-green-800';
-      case '進行中':
-        return 'bg-yellow-100 text-yellow-800';
+
       case '未着手':
         return 'bg-gray-100 text-gray-800';
       default:
@@ -99,7 +95,6 @@ export function TaskSection({ applicant }: TaskSectionProps) {
   const handleEditTask = (task: TaskInstance) => {
     setEditingTask(task);
     setDueDate(task.dueDate ? formatDate(task.dueDate, 'YYYY-MM-DD') : '');
-    setAssignedTo(task.assignedTo || '');
     setNotes(task.notes || '');
     setIsEditDialogOpen(true);
   };
@@ -109,10 +104,6 @@ export function TaskSection({ applicant }: TaskSectionProps) {
 
     if (dueDate) {
       setTaskDueDate(editingTask.id, new Date(dueDate));
-    }
-    
-    if (assignedTo) {
-      assignTask(editingTask.id, assignedTo);
     }
 
     setIsEditDialogOpen(false);
@@ -124,7 +115,7 @@ export function TaskSection({ applicant }: TaskSectionProps) {
   };
 
   const handleContactStatusChange = (taskId: string, contactStatus: ContactStatus) => {
-    updateTaskStatus(taskId, '進行中', contactStatus);
+    updateTaskStatus(taskId, '返信待ち', contactStatus);
   };
 
   const isContactTask = (taskType: string) => {
@@ -179,11 +170,12 @@ export function TaskSection({ applicant }: TaskSectionProps) {
                         <SelectTrigger className="w-32">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="未着手">未着手</SelectItem>
-                          <SelectItem value="進行中">進行中</SelectItem>
-                          <SelectItem value="完了">完了</SelectItem>
-                        </SelectContent>
+                          <SelectContent>
+                           <SelectItem value="未着手">未着手</SelectItem>
+                           <SelectItem value="完了">完了</SelectItem>
+                           <SelectItem value="提出待ち">提出待ち</SelectItem>
+                           <SelectItem value="返信待ち">返信待ち</SelectItem>
+                         </SelectContent>
                       </Select>
                     </div>
 
@@ -234,12 +226,7 @@ export function TaskSection({ applicant }: TaskSectionProps) {
                         </div>
                       )}
                       
-                      {task.assignedTo && (
-                        <div className="flex items-center space-x-2">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          <span>{task.assignedTo}</span>
-                        </div>
-                      )}
+                      
                     </div>
 
                     <div className="text-muted-foreground">
@@ -268,15 +255,7 @@ export function TaskSection({ applicant }: TaskSectionProps) {
                   onChange={(e) => setDueDate(e.target.value)}
                 />
               </div>
-              <div>
-                <Label htmlFor="assignedTo">担当者</Label>
-                <Input
-                  id="assignedTo"
-                  value={assignedTo}
-                  onChange={(e) => setAssignedTo(e.target.value)}
-                  placeholder="担当者名を入力"
-                />
-              </div>
+              
               <div>
                 <Label htmlFor="notes">メモ</Label>
                 <Textarea

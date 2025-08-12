@@ -17,8 +17,6 @@ export interface DefaultTask {
   title: string;
   description: string;
   type: 'general' | 'email' | 'document' | 'interview' | 'evaluation';
-  priority: '低' | '中' | '高';
-  assignee?: string;
   dueOffsetDays?: number; // 段階開始からの日数
   isRequired: boolean;
   emailTemplateId?: string;
