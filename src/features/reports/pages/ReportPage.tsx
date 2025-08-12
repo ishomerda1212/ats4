@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { useApplicants } from '@/features/applicants/hooks/useApplicants';
 import { SelectionStage } from '@/features/applicants/types/applicant';
-import { SELECTION_STAGES, STAGE_GROUPS, StageGroup } from '@/shared/utils/constants';
+import { SELECTION_STAGES, STAGE_GROUPS } from '@/shared/utils/constants';
 import { RecruitmentChart } from '../components/RecruitmentChart';
 
 interface StageResult {

@@ -4,6 +4,7 @@ export const SELECTION_STAGES = [
   'エントリー',
   '書類選考',
   '会社説明会',
+  '適性検査',
   '適性検査体験',
   '職場見学',
   '仕事体験',
@@ -19,7 +20,7 @@ export const SELECTION_STAGES = [
 export const STAGE_GROUPS: Record<string, readonly SelectionStage[]> = {
   'エントリー': ['エントリー'],
   'インターンシップ': ['CEOセミナー', '仕事体験', '適性検査体験', '会社説明会', '職場見学'],
-  '選考': ['書類選考', '集団面接', '人事面接', '最終選考', '内定面談'],
+  '選考': ['書類選考', '適性検査', '集団面接', '人事面接', '最終選考', '内定面談'],
   'その他': ['不採用']
 } as const;
 
@@ -74,6 +75,7 @@ export const STAGE_COLORS: Record<SelectionStage, string> = {
   'エントリー': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
   '書類選考': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
   '会社説明会': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
+  '適性検査': 'bg-lime-100 text-lime-800 dark:bg-lime-900/30 dark:text-lime-300',
   '適性検査体験': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
   '職場見学': 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
   '仕事体験': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
@@ -89,6 +91,7 @@ export const STAGE_TASKS: Record<SelectionStage, string[]> = {
   'エントリー': ['詳細連絡'],
   '書類選考': ['詳細連絡', '提出書類', '結果連絡'],
   '会社説明会': ['詳細連絡', 'リマインド'],
+  '適性検査': ['詳細連絡', '提出書類', '結果連絡'],
   '適性検査体験': ['詳細連絡'],
   '職場見学': ['詳細連絡'],
   '仕事体験': ['詳細連絡'],

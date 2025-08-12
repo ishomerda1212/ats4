@@ -13,7 +13,7 @@ export type TaskType =
   | '結果連絡'
   | '提出書類';
 
-export type TaskStatus = '未着手' | '完了' | '提出待ち' | '返信待ち';
+export type TaskStatus = '未着手' | '進行中' | '完了' | '提出待ち' | '返信待ち';
 export type TaskPriority = '低' | '中' | '高';
 export type ContactStatus = '未' | '済' | '返信待ち' | '○';
 

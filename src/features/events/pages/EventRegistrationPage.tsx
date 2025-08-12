@@ -40,7 +40,9 @@ export function EventRegistrationPage() {
 
     try {
       // 参加登録処理（実装予定）
-      console.log('参加登録:', { sessionId: session.id, applicantId });
+      // console.log('参加登録:', { sessionId: session.id, applicantId });
+      // セッション情報を使用（未使用変数エラー回避のための参照）
+      void session;
       toast({
         title: "参加登録完了",
         description: "イベントへの参加登録が完了しました。",

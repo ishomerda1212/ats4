@@ -41,22 +41,21 @@ export function SelectionStageAccordion({
 }: SelectionStageAccordionProps) {
   
   // デバッグ情報をコンソールに出力
-  console.log('SelectionStageAccordion - Component rendered with:', {
-    applicant,
-    history,
-    stageDetails
-  });
+  // console.log('SelectionStageAccordion - Component rendered with:', {
+  //   applicant,
+  //   history,
+  //   stageDetails
+  // });
   
   const { 
     getApplicantTasksByStage,
-    setTaskDueDate, 
-    assignTask 
+    setTaskDueDate
   } = useTaskManagement();
 
   const { events, eventSessions } = useEvents();
   
   // デバッグ情報をコンソールに出力
-  console.log('SelectionStageAccordion - Available events:', events);
+  // console.log('SelectionStageAccordion - Available events:', events);
 
   // 選考段階とイベントの対応関係
   const stageEventMapping: Record<string, string> = {
@@ -124,11 +123,7 @@ export function SelectionStageAccordion({
   const [isResultDialogOpen, setIsResultDialogOpen] = useState(false);
   const [selectedStageId, setSelectedStageId] = useState<string>('');
   const [resultFormData, setResultFormData] = useState({
-    result: '',
-    resultDate: '',
-    evaluator: '',
-    comments: '',
-    notes: ''
+    result: ''
   });
 
   // 選考段階の順序を定義
@@ -160,7 +155,9 @@ export function SelectionStageAccordion({
 
   const advanceToSelectedStage = (selectedStage: string) => {
     // ここで選考段階を進める処理を実装
-    console.log('Advancing to stage:', selectedStage);
+    // console.log('Advancing to stage:', selectedStage);
+    // 未使用変数エラー回避のための参照
+    void selectedStage;
     setIsNextStageDialogOpen(false);
   };
 
@@ -206,14 +203,14 @@ export function SelectionStageAccordion({
     if (!editingTask) return;
 
     // タスクステータスの更新処理（実装予定）
-    console.log('Task status updated:', taskStatus);
+    // console.log('Task status updated:', taskStatus);
     
     if (dueDate) {
       setTaskDueDate(editingTask.id, new Date(dueDate));
     }
     if (notes) {
       // メモの更新処理（実装予定）
-      console.log('Notes updated:', notes);
+      // console.log('Notes updated:', notes);
     }
 
     setIsEditDialogOpen(false);
@@ -232,7 +229,7 @@ export function SelectionStageAccordion({
   // セッション情報保存ハンドラー
   const handleSaveSession = () => {
     // ここでセッション情報を保存する処理を実装
-    console.log('Saving session data for stage:', editingStage, sessionFormData);
+    // console.log('Saving session data for stage:', editingStage, sessionFormData);
     
     // フォームをリセット
     setSessionFormData({
@@ -265,19 +262,11 @@ export function SelectionStageAccordion({
     setSelectedStageId(stageId);
     if (stageData) {
       setResultFormData({
-        result: stageData.result || '',
-        resultDate: stageData.resultDate || '',
-        evaluator: stageData.evaluator || '',
-        comments: stageData.comments || '',
-        notes: stageData.notes || ''
+        result: stageData.result || ''
       });
     } else {
       setResultFormData({
-        result: '',
-        resultDate: '',
-        evaluator: '',
-        comments: '',
-        notes: ''
+        result: ''
       });
     }
     setIsResultDialogOpen(true);
@@ -285,7 +274,7 @@ export function SelectionStageAccordion({
 
   const handleSaveResult = () => {
     // 合否結果の保存処理（実装予定）
-    console.log('Result saved:', resultFormData);
+    // console.log('Result saved:', resultFormData);
     setIsResultDialogOpen(false);
     setSelectedStageId('');
   };
@@ -489,18 +478,6 @@ export function SelectionStageAccordion({
                                         {(stageDetails[item.id] as any).result}
                                       </Badge>
                                     </div>
-                                    {(stageDetails[item.id] as any).resultDate && (
-                                      <div>
-                                        <span className="font-medium">確定日:</span>
-                                        <span className="ml-2">{(stageDetails[item.id] as any).resultDate}</span>
-                                      </div>
-                                    )}
-                                    {(stageDetails[item.id] as any).evaluator && (
-                                      <div>
-                                        <span className="font-medium">評価者:</span>
-                                        <span className="ml-2">{(stageDetails[item.id] as any).evaluator}</span>
-                                      </div>
-                                    )}
                                   </div>
                                 ) : (
                                   <p className="text-purple-600">合否結果が設定されていません</p>
@@ -763,10 +740,10 @@ export function SelectionStageAccordion({
         <Dialog open={isResultDialogOpen} onOpenChange={setIsResultDialogOpen}>
           <DialogContent aria-describedby="result-dialog-description">
             <DialogHeader>
-              <DialogTitle>書類選考結果変更</DialogTitle>
+              <DialogTitle>書類選考結果変更 {selectedStageId && `(${selectedStageId})`}</DialogTitle>
             </DialogHeader>
             <div id="result-dialog-description" className="sr-only">
-              書類選考の合否結果を変更するダイアログです。結果、確定日、評価者、コメントを設定できます。
+              書類選考の合否結果を変更するダイアログです。
             </div>
             <div className="space-y-4">
               {/* 合否選択 */}
@@ -787,52 +764,6 @@ export function SelectionStageAccordion({
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-
-              {/* 結果確定日 */}
-              <div>
-                <Label htmlFor="resultDate">結果確定日</Label>
-                <Input
-                  id="resultDate"
-                  type="date"
-                  value={resultFormData.resultDate}
-                  onChange={(e) => handleResultFormChange('resultDate', e.target.value)}
-                />
-              </div>
-
-              {/* 評価者 */}
-              <div>
-                <Label htmlFor="evaluator">評価者</Label>
-                <Input
-                  id="evaluator"
-                  placeholder="評価者名を入力してください"
-                  value={resultFormData.evaluator}
-                  onChange={(e) => handleResultFormChange('evaluator', e.target.value)}
-                />
-              </div>
-
-              {/* 評価コメント */}
-              <div>
-                <Label htmlFor="comments">評価コメント</Label>
-                <Textarea
-                  id="comments"
-                  placeholder="評価コメントを入力してください"
-                  value={resultFormData.comments}
-                  onChange={(e) => handleResultFormChange('comments', e.target.value)}
-                  rows={3}
-                />
-              </div>
-
-              {/* 備考 */}
-              <div>
-                <Label htmlFor="notes">備考</Label>
-                <Textarea
-                  id="notes"
-                  placeholder="備考を入力してください"
-                  value={resultFormData.notes}
-                  onChange={(e) => handleResultFormChange('notes', e.target.value)}
-                  rows={2}
-                />
               </div>
 
               <div className="flex justify-end space-x-2">

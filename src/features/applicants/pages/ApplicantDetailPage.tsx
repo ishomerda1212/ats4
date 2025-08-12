@@ -295,7 +295,7 @@ export function ApplicantDetailPage() {
   // PDF保存機能
   const handleSavePdf = () => {
     // ここでPDFデータを保存する処理を実装
-    console.log('PDF保存:', pdfFormData);
+    // console.log('PDF保存:', pdfFormData);
     
     // フォームをリセット
     setPdfFormData({

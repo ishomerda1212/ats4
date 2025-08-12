@@ -14,7 +14,7 @@ export const ApplicantEventForm: React.FC<ApplicantFormProps> = ({
   eventId 
 }) => {
   // デバッグ情報をコンソールに出力
-  console.log('ApplicantEventForm - Props:', { applicantId, eventId });
+  // console.log('ApplicantEventForm - Props:', { applicantId, eventId });
   
   const {
     loading,

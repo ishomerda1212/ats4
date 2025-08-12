@@ -128,6 +128,38 @@ export const FIXED_TASK_TEMPLATES: Record<SelectionStage, FixedTask[]> = {
       order: 4
     }
   ],
+  '適性検査': [
+    {
+      id: 'aptitude-test-detail-contact',
+      stage: '適性検査',
+      title: '詳細連絡',
+      description: '適性検査の詳細連絡',
+      type: '詳細連絡',
+      isRequired: true,
+      estimatedDuration: 15,
+      order: 1
+    },
+    {
+      id: 'aptitude-test-submit-documents',
+      stage: '適性検査',
+      title: '提出書類',
+      description: '適性検査の提出書類確認',
+      type: '提出書類',
+      isRequired: true,
+      estimatedDuration: 30,
+      order: 2
+    },
+    {
+      id: 'aptitude-test-result-contact',
+      stage: '適性検査',
+      title: '結果連絡',
+      description: '適性検査の結果連絡',
+      type: '結果連絡',
+      isRequired: true,
+      estimatedDuration: 15,
+      order: 3
+    }
+  ],
   '適性検査体験': [
     {
       id: 'aptitude-detail-contact',

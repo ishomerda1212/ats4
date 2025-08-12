@@ -10,7 +10,7 @@ import { mockApplicantResponses } from '@/shared/data/mockApplicantResponseData'
 
 export const useApplicantForm = (applicantId: string, eventId: string) => {
   // デバッグ情報をコンソールに出力
-  console.log('useApplicantForm - Parameters:', { applicantId, eventId });
+  // console.log('useApplicantForm - Parameters:', { applicantId, eventId });
   
   const [events] = useLocalStorage<Event[]>('events', mockEvents);
   const [eventSessions] = useLocalStorage<EventSession[]>('eventSessions', mockEventSessions);
@@ -28,9 +28,9 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
     try {
       setLoading(true);
       
-      console.log('loadEventAndApplicantData - Starting with:', { applicantId, eventId });
-      console.log('Available events:', events);
-      console.log('Available applicants:', applicants);
+      // console.log('loadEventAndApplicantData - Starting with:', { applicantId, eventId });
+      // console.log('Available events:', events);
+      // console.log('Available applicants:', applicants);
       
       // サンプルモードかどうかを判定
       const isSampleMode = applicantId === 'sample';

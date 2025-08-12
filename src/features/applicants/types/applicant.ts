@@ -7,6 +7,7 @@ export type SelectionStage =
   | 'エントリー'
   | '書類選考'
   | '会社説明会'
+  | '適性検査'
   | '適性検査体験'
   | '職場見学'
   | '仕事体験'
@@ -116,7 +117,7 @@ export interface SelectionHistory extends BaseEntity {
   notes?: string;
 }
 
-export type TaskStatus = '未着手' | '完了' | '提出待ち' | '返信待ち';
+export type TaskStatus = '未着手' | '進行中' | '完了' | '提出待ち' | '返信待ち';
 
 export interface Task extends BaseEntity {
   selectionHistoryId: string;

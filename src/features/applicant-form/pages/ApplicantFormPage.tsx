@@ -9,7 +9,7 @@ export const ApplicantFormPage: React.FC = () => {
   }>();
 
   // デバッグ情報をコンソールに出力
-  console.log('ApplicantFormPage - URL Parameters:', { applicantId, eventId });
+  // console.log('ApplicantFormPage - URL Parameters:', { applicantId, eventId });
 
   if (!applicantId || !eventId) {
     return (
