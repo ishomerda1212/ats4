@@ -206,6 +206,95 @@ export const mockEventSessions: EventSession[] = [
     recruiter: '人事部一同',
     createdAt: new Date('2024-01-20T09:00:00Z'),
     updatedAt: new Date('2024-01-20T09:00:00Z')
+  },
+  // 書類選考のセッション
+  {
+    id: 'session-document-screening-1',
+    eventId: 'event-document-screening',
+    name: '書類選考 第1回',
+    start: new Date('2024-02-01T09:00:00Z'),
+    end: new Date('2024-02-01T17:00:00Z'),
+    venue: '人事部',
+    format: '対面',
+    maxParticipants: 20,
+    participants: [],
+    recruiter: '人事部',
+    createdAt: new Date('2024-01-08T09:00:00Z'),
+    updatedAt: new Date('2024-01-08T09:00:00Z')
+  },
+  // 適性検査のセッション
+  {
+    id: 'session-aptitude-test-1',
+    eventId: 'event-aptitude-test',
+    name: '適性検査 第1回',
+    start: new Date('2024-02-05T10:00:00Z'),
+    end: new Date('2024-02-05T12:00:00Z'),
+    venue: '会議室A',
+    format: '対面',
+    maxParticipants: 15,
+    participants: [],
+    recruiter: '人事部',
+    createdAt: new Date('2024-01-09T09:00:00Z'),
+    updatedAt: new Date('2024-01-09T09:00:00Z')
+  },
+  {
+    id: 'session-aptitude-test-2',
+    eventId: 'event-aptitude-test',
+    name: '適性検査 第2回',
+    start: new Date('2024-02-07T14:00:00Z'),
+    end: new Date('2024-02-07T16:00:00Z'),
+    venue: 'オンライン',
+    format: 'オンライン',
+    maxParticipants: 15,
+    participants: [],
+    recruiter: '人事部',
+    createdAt: new Date('2024-01-09T09:00:00Z'),
+    updatedAt: new Date('2024-01-09T09:00:00Z')
+  },
+  // 仕事体験のセッション
+  {
+    id: 'session-job-experience-1',
+    eventId: 'event-job-experience',
+    name: '仕事体験 第1回',
+    start: new Date('2024-02-28T09:00:00Z'),
+    end: new Date('2024-02-28T17:00:00Z'),
+    venue: '開発フロア',
+    format: '対面',
+    maxParticipants: 5,
+    participants: [],
+    recruiter: '開発部',
+    createdAt: new Date('2024-01-14T09:00:00Z'),
+    updatedAt: new Date('2024-01-14T09:00:00Z')
+  },
+  // 最終選考のセッション
+  {
+    id: 'session-final-selection-1',
+    eventId: 'event-final-selection',
+    name: '最終選考 第1回',
+    start: new Date('2024-03-25T10:00:00Z'),
+    end: new Date('2024-03-25T12:00:00Z'),
+    venue: '大会議室',
+    format: '対面',
+    maxParticipants: 3,
+    participants: [],
+    recruiter: '代表取締役',
+    createdAt: new Date('2024-01-22T09:00:00Z'),
+    updatedAt: new Date('2024-01-22T09:00:00Z')
+  },
+  // 内定面談のセッション
+  {
+    id: 'session-offer-1',
+    eventId: 'event-offer',
+    name: '内定面談 第1回',
+    start: new Date('2024-04-01T14:00:00Z'),
+    end: new Date('2024-04-01T15:00:00Z'),
+    venue: '人事部',
+    format: '対面',
+    maxParticipants: 1,
+    participants: [],
+    recruiter: '人事部長',
+    createdAt: new Date('2024-01-25T09:00:00Z'),
+    updatedAt: new Date('2024-01-25T09:00:00Z')
   }
 ];
 
@@ -274,5 +363,69 @@ export const mockEventParticipants: EventParticipant[] = [
     joinedAt: new Date('2024-02-06T09:00:00Z'),
     createdAt: new Date('2024-02-06T09:00:00Z'),
     updatedAt: new Date('2024-02-06T09:00:00Z')
+  },
+  // 追加の参加者データ
+  {
+    id: 'participant-8',
+    sessionId: 'session-company-info-2',
+    applicantId: 'applicant-5', // 山田健一
+    status: '申込',
+    joinedAt: new Date('2024-02-08T16:45:00Z'),
+    createdAt: new Date('2024-02-08T16:45:00Z'),
+    updatedAt: new Date('2024-02-08T16:45:00Z')
+  },
+  {
+    id: 'participant-9',
+    sessionId: 'session-aptitude-test-1',
+    applicantId: 'applicant-1', // 田中太郎
+    status: '申込',
+    joinedAt: new Date('2024-02-03T09:15:00Z'),
+    createdAt: new Date('2024-02-03T09:15:00Z'),
+    updatedAt: new Date('2024-02-03T09:15:00Z')
+  },
+  {
+    id: 'participant-10',
+    sessionId: 'session-aptitude-test-1',
+    applicantId: 'applicant-2', // 佐藤花子
+    status: '申込',
+    joinedAt: new Date('2024-02-03T10:30:00Z'),
+    createdAt: new Date('2024-02-03T10:30:00Z'),
+    updatedAt: new Date('2024-02-03T10:30:00Z')
+  },
+  {
+    id: 'participant-11',
+    sessionId: 'session-job-experience-1',
+    applicantId: 'applicant-1', // 田中太郎
+    status: '申込',
+    joinedAt: new Date('2024-02-25T14:20:00Z'),
+    createdAt: new Date('2024-02-25T14:20:00Z'),
+    updatedAt: new Date('2024-02-25T14:20:00Z')
+  },
+  {
+    id: 'participant-12',
+    sessionId: 'session-final-selection-1',
+    applicantId: 'applicant-1', // 田中太郎
+    status: '申込',
+    joinedAt: new Date('2024-03-20T11:00:00Z'),
+    createdAt: new Date('2024-03-20T11:00:00Z'),
+    updatedAt: new Date('2024-03-20T11:00:00Z')
+  },
+  {
+    id: 'participant-13',
+    sessionId: 'session-final-selection-1',
+    applicantId: 'applicant-2', // 佐藤花子
+    status: '申込',
+    joinedAt: new Date('2024-03-20T13:45:00Z'),
+    createdAt: new Date('2024-03-20T13:45:00Z'),
+    updatedAt: new Date('2024-03-20T13:45:00Z')
+  },
+  {
+    id: 'participant-14',
+    sessionId: 'session-offer-1',
+    applicantId: 'applicant-1', // 田中太郎
+    status: '申込',
+    joinedAt: new Date('2024-03-28T15:30:00Z'),
+    createdAt: new Date('2024-03-28T15:30:00Z'),
+    updatedAt: new Date('2024-03-28T15:30:00Z')
   }
 ];

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, FileText, UserCheck, ClipboardList, Monitor } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, UserCheck, ClipboardList, Monitor } from 'lucide-react';
 import { EventSessionForm } from '../components/EventSessionForm';
 import { ParticipantList } from '../components/ParticipantList';
 import { useEvents } from '../hooks/useEvents';
@@ -14,7 +14,10 @@ import { formatDateTime, formatDate } from '@/shared/utils/date';
 import { EventSession, ParticipationStatus } from '../types/event';
 
 export function EventSessionDetailPage() {
-  const { eventId, sessionId } = useParams<{ eventId: string; sessionId: string }>();
+  const params = useParams<{ id: string; sessionId: string }>();
+  const eventId = params.id; // URLパラメータは 'id' として定義されている
+  const sessionId = params.sessionId;
+  
   const {
     events,
     getEventSessions,
@@ -29,10 +32,31 @@ export function EventSessionDetailPage() {
   const [showSessionForm, setShowSessionForm] = useState(false);
   const [editingSession, setEditingSession] = useState<EventSession | null>(null);
 
+  // URLパラメータのデバッグ
+  console.log('URL Params Debug:', {
+    params,
+    eventId,
+    sessionId,
+    eventsFromHook: events.length
+  });
+
   const event = events.find(e => e.id === eventId);
   const sessions = event ? getEventSessions(event.id) : [];
   const session = sessions.find(s => s.id === sessionId);
   const participants = session ? getParticipantsBySession(session.id) : [];
+
+  // デバッグ情報
+  console.log('EventSessionDetailPage Debug:', {
+    eventId,
+    sessionId,
+    eventsCount: events.length,
+    event,
+    sessionsCount: sessions.length,
+    session,
+    participantsCount: participants.length,
+    allSessions: sessions.map(s => ({ id: s.id, name: s.name })),
+    allEvents: events.map(e => ({ id: e.id, name: e.name }))
+  });
 
   // 参加者数のカウント
   const registrationCount = participants.filter(p => p.status === '申込').length;
@@ -51,7 +75,22 @@ export function EventSessionDetailPage() {
     return (
       <div className="text-center py-8">
         <p className="text-muted-foreground">セッションが見つかりませんでした。</p>
-        <Link to={`/events/${eventId}`}>
+        <div className="mt-4 p-4 bg-gray-100 rounded-lg text-left max-w-md mx-auto">
+          <h3 className="font-medium mb-2">デバッグ情報:</h3>
+          <p className="text-sm">eventId: {eventId || '(空)'}</p>
+          <p className="text-sm">sessionId: {sessionId || '(空)'}</p>
+          <p className="text-sm">イベント数: {events.length}</p>
+          <p className="text-sm">イベント: {event ? '見つかりました' : '見つかりません'}</p>
+          <p className="text-sm">セッション数: {sessions.length}</p>
+          <p className="text-sm">セッション: {session ? '見つかりました' : '見つかりません'}</p>
+          <div className="mt-2 p-2 bg-white rounded text-xs">
+            <p className="font-medium">解決方法:</p>
+            <p>1. ブラウザのコンソールで以下を実行:</p>
+            <code className="block bg-gray-200 p-1 rounded mt-1">window.debugUtils.forceLoadMockData()</code>
+            <p className="mt-1">2. ページを再読み込み</p>
+          </div>
+        </div>
+        <Link to={`/event/${eventId}`}>
           <Button className="mt-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             イベント詳細に戻る
@@ -112,6 +151,7 @@ export function EventSessionDetailPage() {
 
   return (
     <div className="space-y-6">
+      {/* ヘッダー */}
       <div className="flex items-center space-x-4">
         <Link to={`/event/${eventId}`}>
           <Button variant="outline" size="sm">
@@ -125,182 +165,184 @@ export function EventSessionDetailPage() {
         </div>
       </div>
 
-      {/* セッション基本情報 */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>セッション情報</CardTitle>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" onClick={handleEditSession}>
-                <Edit className="h-4 w-4 mr-2" />
-                編集
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleDeleteSession}>
-                <Trash2 className="h-4 w-4 mr-2" />
-                削除
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {showSessionForm && (
-            <div className="mb-4">
-              <EventSessionForm
-                eventId={event.id}
-                session={editingSession || undefined}
-                mode={editingSession ? 'edit' : 'create'}
-                onCancel={handleSessionFormCancel}
-                onSuccess={handleSessionFormSuccess}
-              />
-            </div>
-          )}
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <h3 className="font-medium">開始日時</h3>
-                  <p className="text-muted-foreground">{formatDateTime(session.start)}</p>
+      {/* セッション情報と管理情報を横並びで表示 */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* セッション情報 - 左側 */}
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>セッション情報</CardTitle>
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" size="sm" onClick={handleEditSession}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    編集
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={handleDeleteSession}>
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    削除
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {showSessionForm && (
+                <div className="mb-4">
+                  <EventSessionForm
+                    eventId={event.id}
+                    session={editingSession || undefined}
+                    mode={editingSession ? 'edit' : 'create'}
+                    onCancel={handleSessionFormCancel}
+                    onSuccess={handleSessionFormSuccess}
+                  />
+                </div>
+              )}
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">開始日時</p>
+                      <p className="text-sm text-muted-foreground">{formatDateTime(session.start)}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">終了日時</p>
+                      <p className="text-sm text-muted-foreground">{formatDateTime(session.end)}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">開催場所</p>
+                      <p className="text-sm text-muted-foreground">{session.venue}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Monitor className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">開催形式</p>
+                      <p className="text-sm text-muted-foreground">{session.format || '未設定'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">参加者数</p>
+                      <p className="text-sm text-muted-foreground">{participants.length}名</p>
+                    </div>
+                  </div>
                 </div>
               </div>
               
-              <div className="flex items-center space-x-3">
-                <Clock className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <h3 className="font-medium">終了日時</h3>
-                  <p className="text-muted-foreground">{formatDateTime(session.end)}</p>
+              {session.notes && (
+                <div className="pt-4 mt-4 border-t">
+                  <p className="text-sm font-medium mb-1">備考</p>
+                  <p className="text-sm text-muted-foreground">{session.notes}</p>
                 </div>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <MapPin className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <h3 className="font-medium">開催場所</h3>
-                  <p className="text-muted-foreground">{session.venue}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <Monitor className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <h3 className="font-medium">開催形式</h3>
-                  <p className="text-muted-foreground">{session.format || '未設定'}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <Users className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <h3 className="font-medium">参加者数</h3>
-                  <p className="text-muted-foreground">{participants.length}名</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {session.notes && (
-            <div className="pt-4 border-t">
-              <h3 className="font-medium mb-2">備考</h3>
-              <p className="text-muted-foreground">{session.notes}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* 管理情報 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ClipboardList className="h-5 w-5" />
-            管理情報
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* リクルーター */}
-          <div className="space-y-2">
-            <Label htmlFor="recruiter">リクルーター</Label>
-            <Input
-              id="recruiter"
-              value={session.recruiter || ''}
-              onChange={(e) => handleRecruiterChange(e.target.value)}
-              placeholder="リクルーター名を入力してください"
-            />
-          </div>
-
-          {/* チェックボックス */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <Checkbox
-                id="reportReminder"
-                checked={!!session.reportReminderDate}
-                onCheckedChange={handleReportReminderChange}
-              />
-              <div className="flex-1">
-                <Label htmlFor="reportReminder" className="text-base font-medium">
-                  開催報告とリマインド
-                </Label>
-                {session.reportReminderDate && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    完了日: {formatDate(session.reportReminderDate)}
-                  </p>
-                )}
+        {/* 管理情報 - 右側 */}
+        <div className="lg:col-span-1">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <ClipboardList className="h-4 w-4" />
+                管理情報
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* リクルーター */}
+              <div className="space-y-2">
+                <Label htmlFor="recruiter" className="text-sm">リクルーター</Label>
+                <Input
+                  id="recruiter"
+                  value={session.recruiter || ''}
+                  onChange={(e) => handleRecruiterChange(e.target.value)}
+                  placeholder="リクルーター名を入力"
+                  className="text-sm"
+                />
               </div>
-            </div>
 
-            <div className="flex items-center space-x-3">
-              <Checkbox
-                id="participantReport"
-                checked={!!session.participantReportDate}
-                onCheckedChange={handleParticipantReportChange}
-              />
-              <div className="flex-1">
-                <Label htmlFor="participantReport" className="text-base font-medium">
-                  人数報告
-                </Label>
-                {session.participantReportDate && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    完了日: {formatDate(session.participantReportDate)}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
+              {/* チェックボックス */}
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="reportReminder"
+                    checked={!!session.reportReminderDate}
+                    onCheckedChange={handleReportReminderChange}
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor="reportReminder" className="text-sm font-medium">
+                      開催報告とリマインド
+                    </Label>
+                    {session.reportReminderDate && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        完了: {formatDate(session.reportReminderDate)}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
-          {/* 参加者数統計 */}
-          <div className="pt-4 border-t">
-            <h3 className="font-medium mb-3">参加者数統計</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center space-x-3 p-3 border rounded-lg">
-                <UserCheck className="h-5 w-5 text-blue-600" />
-                <div>
-                  <p className="text-sm text-muted-foreground">予約数（申込数）</p>
-                  <p className="text-2xl font-bold text-blue-600">{registrationCount}名</p>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="participantReport"
+                    checked={!!session.participantReportDate}
+                    onCheckedChange={handleParticipantReportChange}
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor="participantReport" className="text-sm font-medium">
+                      人数報告
+                    </Label>
+                    {session.participantReportDate && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        完了: {formatDate(session.participantReportDate)}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center space-x-3 p-3 border rounded-lg">
-                <Users className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="text-sm text-muted-foreground">参加数</p>
-                  <p className="text-2xl font-bold text-green-600">{participationCount}名</p>
+
+              {/* 参加者数統計 */}
+              <div className="pt-3 border-t">
+                <p className="text-sm font-medium mb-2">参加者数統計</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-blue-50 rounded">
+                    <div className="flex items-center space-x-2">
+                      <UserCheck className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm text-muted-foreground">予約数</span>
+                    </div>
+                    <span className="text-lg font-bold text-blue-600">{registrationCount}名</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-green-50 rounded">
+                    <div className="flex items-center space-x-2">
+                      <Users className="h-4 w-4 text-green-600" />
+                      <span className="text-sm text-muted-foreground">参加数</span>
+                    </div>
+                    <span className="text-lg font-bold text-green-600">{participationCount}名</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       {/* 参加者一覧 */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4">
         <h2 className="text-2xl font-bold">参加者一覧 ({participants.length}名)</h2>
-        <Link to={`/event/${eventId}/session/${sessionId}/participants`}>
-          <Button size="sm">
-            <FileText className="h-4 w-4 mr-2" />
-            評定表管理
-          </Button>
-        </Link>
       </div>
       
       <ParticipantList
