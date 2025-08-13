@@ -15,7 +15,7 @@ export function ExportSection({
   stageResults, 
   sourceResults, 
   groupResults, 
-  overallStats 
+  overallStats
 }: ExportSectionProps) {
   const { isExporting, exportToCSV, exportToPDF } = useReportExport();
 

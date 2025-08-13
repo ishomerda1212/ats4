@@ -68,10 +68,18 @@ export function checkEventSessionData(eventId: string, sessionId: string) {
   // セッションデータ確認
   const sessionsData = localStorage.getItem('eventSessions');
   if (sessionsData) {
-    const sessions = JSON.parse(sessionsData) as Array<{ id: string; eventId: string; name: string }>;
+    const sessions = JSON.parse(sessionsData) as Array<{ id: string; eventId: string; name: string; start: unknown; end: unknown }>;
     console.log('全セッション:', sessions.map((s) => ({ id: s.id, eventId: s.eventId, name: s.name })));
     const session = sessions.find((s) => s.id === sessionId);
-    console.log('セッション:', session ? '見つかりました' : '見つかりません', session);
+    if (session) {
+      console.log('セッション:', '見つかりました', session);
+      console.log('start type:', typeof session.start, session.start);
+      console.log('end type:', typeof session.end, session.end);
+      console.log('start is Date:', session.start instanceof Date);
+      console.log('end is Date:', session.end instanceof Date);
+    } else {
+      console.log('セッション:', '見つかりません');
+    }
   } else {
     console.log('セッションデータ: ローカルストレージに存在しません');
   }
@@ -150,3 +158,8 @@ export function setupDebugHelpers() {
     console.log('- window.debugUtils.forceLoadMockData()');
   }
 }
+
+export const logWithTimestamp = (message: string, data?: unknown) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${message}`, data);
+};

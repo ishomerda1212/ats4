@@ -7,10 +7,13 @@ import {
   calculateOverallStats,
   calculateThisMonthEntries,
   calculateThisMonthInterviews,
+  calculateCurrentStageResults,
+  calculatePipelineAnalysis,
   type StageResult,
   type SourceResult,
   type GroupResult,
-  type OverallStats
+  type OverallStats,
+  type CurrentStageResult
 } from '../utils/reportCalculations';
 
 export const useReportData = () => {
@@ -46,6 +49,16 @@ export const useReportData = () => {
     return calculateThisMonthInterviews(applicants);
   }, [applicants]);
 
+  // 現在の選考段階別集計（リアルタイム）
+  const currentStageResults = useMemo((): CurrentStageResult[] => {
+    return calculateCurrentStageResults(applicants);
+  }, [applicants]);
+
+  // パイプライン分析
+  const pipelineAnalysis = useMemo(() => {
+    return calculatePipelineAnalysis(applicants);
+  }, [applicants]);
+
   return {
     applicants,
     stageResults,
@@ -53,6 +66,8 @@ export const useReportData = () => {
     groupResults,
     overallStats,
     thisMonthEntries,
-    thisMonthInterviews
+    thisMonthInterviews,
+    currentStageResults,
+    pipelineAnalysis
   };
 };

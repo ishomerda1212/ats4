@@ -1,11 +1,11 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, UserCheck, ClipboardList, Monitor } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, UserCheck, ClipboardList, Monitor, Video, ExternalLink } from 'lucide-react';
 import { EventSessionForm } from '../components/EventSessionForm';
 import { ParticipantList } from '../components/ParticipantList';
 import { useEvents } from '../hooks/useEvents';
@@ -15,8 +15,12 @@ import { EventSession, ParticipationStatus } from '../types/event';
 
 export function EventSessionDetailPage() {
   const params = useParams<{ id: string; sessionId: string }>();
+  const [searchParams] = useSearchParams();
   const eventId = params.id; // URLパラメータは 'id' として定義されている
   const sessionId = params.sessionId;
+  
+  // URLパラメータから応募者情報を取得
+  const fromApplicant = searchParams.get('fromApplicant');
   
   const {
     events,
@@ -149,16 +153,42 @@ export function EventSessionDetailPage() {
     });
   };
 
+  // Googleカレンダー登録用URLを生成
+  const generateGoogleCalendarUrl = () => {
+    // session.startとsession.endが文字列の場合はDateオブジェクトに変換
+    const startDate = (session.start instanceof Date ? session.start : new Date(session.start)).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    const endDate = (session.end instanceof Date ? session.end : new Date(session.end)).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: session.name,
+      dates: `${startDate}/${endDate}`,
+      details: `${session.notes || ''}\n\n会場: ${session.venue}\n開催形式: ${session.format}${session.zoomUrl ? `\nZOOM URL: ${session.zoomUrl}` : ''}`,
+      location: session.venue,
+    });
+
+    return `https://www.google.com/calendar/render?${params.toString()}`;
+  };
+
   return (
     <div className="space-y-6">
       {/* ヘッダー */}
       <div className="flex items-center space-x-4">
-        <Link to={`/event/${eventId}`}>
-          <Button variant="outline" size="sm">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            イベント詳細に戻る
-          </Button>
-        </Link>
+        {fromApplicant ? (
+          <Link to={`/applicants/${fromApplicant}`}>
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              応募者詳細に戻る
+            </Button>
+          </Link>
+        ) : (
+          <Link to={`/event/${eventId}`}>
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              イベント詳細に戻る
+            </Button>
+          </Link>
+        )}
         <div>
           <h1 className="text-3xl font-bold">セッション詳細</h1>
           <p className="text-muted-foreground mt-1">{event.name}</p>
@@ -234,6 +264,24 @@ export function EventSessionDetailPage() {
                     </div>
                   </div>
                   
+                  {session.zoomUrl && (
+                    <div className="flex items-center space-x-2">
+                      <Video className="h-4 w-4 text-muted-foreground" />
+                      <div>
+                        <p className="text-sm font-medium">ZOOM URL</p>
+                        <a 
+                          href={session.zoomUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:text-blue-800 underline flex items-center"
+                        >
+                          ZOOM参加
+                          <ExternalLink className="h-3 w-3 ml-1" />
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <div>
@@ -242,6 +290,20 @@ export function EventSessionDetailPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+              
+              {/* Googleカレンダー登録ボタン */}
+              <div className="pt-4 mt-4 border-t">
+                <a 
+                  href={generateGoogleCalendarUrl()} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outline" className="w-full">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Googleカレンダーに登録
+                  </Button>
+                </a>
               </div>
               
               {session.notes && (

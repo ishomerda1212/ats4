@@ -93,6 +93,65 @@ export function EventForm({ event, mode }: EventFormProps) {
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="venue"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>開催場所 *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="本社オフィス" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="maxParticipants"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>最大参加者数 *</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        placeholder="50" 
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ステータス *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="ステータスを選択" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="予定">予定</SelectItem>
+                        <SelectItem value="開催中">開催中</SelectItem>
+                        <SelectItem value="終了">終了</SelectItem>
+                        <SelectItem value="キャンセル">キャンセル</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <div className="flex justify-end space-x-4 pt-6 border-t">
               <Link to="/events">
                 <Button type="button" variant="outline">

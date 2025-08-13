@@ -9,12 +9,36 @@ export function useEvents() {
   const [eventParticipants, setEventParticipants] = useLocalStorage<EventParticipant[]>('eventParticipants', mockEventParticipants);
   const [loading] = useState(false);
 
+  // LocalStorageから読み込んだデータのDateオブジェクトを復元
+  const normalizeSessions = (sessions: EventSession[]): EventSession[] => {
+    return sessions.map(session => ({
+      ...session,
+      start: session.start instanceof Date ? session.start : new Date(session.start),
+      end: session.end instanceof Date ? session.end : new Date(session.end),
+      createdAt: session.createdAt instanceof Date ? session.createdAt : new Date(session.createdAt),
+      updatedAt: session.updatedAt instanceof Date ? session.updatedAt : new Date(session.updatedAt),
+    }));
+  };
+
+  const normalizeParticipants = (participants: EventParticipant[]): EventParticipant[] => {
+    return participants.map(participant => ({
+      ...participant,
+      joinedAt: participant.joinedAt ? (participant.joinedAt instanceof Date ? participant.joinedAt : new Date(participant.joinedAt)) : undefined,
+      createdAt: participant.createdAt instanceof Date ? participant.createdAt : new Date(participant.createdAt),
+      updatedAt: participant.updatedAt instanceof Date ? participant.updatedAt : new Date(participant.updatedAt),
+    }));
+  };
+
+  // 正規化されたセッションと参加者データ
+  const normalizedSessions = normalizeSessions(eventSessions);
+  const normalizedParticipants = normalizeParticipants(eventParticipants);
+
   const getEventSessions = (eventId: string) => {
-    return eventSessions.filter(session => session.eventId === eventId);
+    return normalizedSessions.filter(session => session.eventId === eventId);
   };
 
   const getParticipantsBySession = (sessionId: string) => {
-    return eventParticipants.filter(participant => participant.sessionId === sessionId);
+    return normalizedParticipants.filter(participant => participant.sessionId === sessionId);
   };
 
   const getEventParticipantCount = (eventId: string) => {
@@ -48,7 +72,7 @@ export function useEvents() {
   const deleteEvent = (id: string) => {
     setEvents(current => current.filter(event => event.id !== id));
     // 関連するセッションと参加者も削除
-    const sessionIds = eventSessions.filter(session => session.eventId === id).map(s => s.id);
+    const sessionIds = normalizedSessions.filter(session => session.eventId === id).map(s => s.id);
     setEventSessions(current => current.filter(session => session.eventId !== id));
     setEventParticipants(current => 
       current.filter(participant => !sessionIds.includes(participant.sessionId))

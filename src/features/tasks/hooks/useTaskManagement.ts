@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { TaskInstance, FixedTask, TaskStatus, ContactStatus } from '../types/task';
+import { TaskInstance, FixedTask, TaskStatus } from '../types/task';
 import { getFixedTasksByStage } from '../data/taskTemplates';
 import { generateId } from '@/shared/utils/date';
 import { Applicant, SelectionStage } from '@/features/applicants/types/applicant';
@@ -9,111 +9,114 @@ type TaskWithFixedData = FixedTask & TaskInstance;
 
 // モックデータ（実際の実装ではAPIやストレージを使用）
 const mockTaskInstances: TaskInstance[] = [
-  // 応募者1のエントリー段階タスク
   {
-    id: '1',
-    applicantId: '1',
-    taskId: 'entry-approach-1',
+    id: 'task-1',
+    applicantId: 'applicant-1',
+    taskId: 'fixed-task-1',
     status: '完了',
     dueDate: new Date('2024-01-20'),
-    startedAt: new Date('2024-01-18'),
-    completedAt: new Date('2024-01-20'),
+    completedAt: new Date('2024-01-18'),
+    notes: '完了しました',
     createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-20')
+    updatedAt: new Date('2024-01-18'),
   },
   {
-    id: '2',
-    applicantId: '1',
-    taskId: 'entry-approach-2',
+    id: 'task-2',
+    applicantId: 'applicant-1',
+    taskId: 'fixed-task-2',
     status: '未着手',
     dueDate: new Date('2024-01-25'),
-    startedAt: new Date('2024-01-21'),
+    notes: '未着手です',
     createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-21')
+    updatedAt: new Date('2024-01-21'),
   },
   {
-    id: '3',
-    applicantId: '1',
-    taskId: 'entry-detail-contact',
+    id: 'task-3',
+    applicantId: 'applicant-2',
+    taskId: 'fixed-task-1',
     status: '完了',
-    contactStatus: '済',
     dueDate: new Date('2024-01-22'),
-    startedAt: new Date('2024-01-20'),
-    completedAt: new Date('2024-01-22'),
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-22')
-  },
-  {
-    id: '4',
-    applicantId: '1',
-    taskId: 'entry-schedule-contact',
-    status: '返信待ち',
-    contactStatus: '返信待ち',
-    dueDate: new Date('2024-01-28'),
-    startedAt: new Date('2024-01-23'),
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-23')
-  },
-  // 応募者2の書類選考段階タスク
-  {
-    id: '5',
-    applicantId: '2',
-    taskId: 'document-detail-contact',
-    status: '完了',
-    contactStatus: '済',
-    dueDate: new Date('2024-01-18'),
-    startedAt: new Date('2024-01-16'),
-    completedAt: new Date('2024-01-18'),
-    createdAt: new Date('2024-01-10'),
-    updatedAt: new Date('2024-01-18')
-  },
-  {
-    id: '6',
-    applicantId: '2',
-    taskId: 'document-schedule-contact',
-    status: '返信待ち',
-    contactStatus: '○',
-    dueDate: new Date('2024-01-30'),
-    startedAt: new Date('2024-01-25'),
-    createdAt: new Date('2024-01-10'),
-    updatedAt: new Date('2024-01-25')
-  },
-  // 応募者3の面接段階タスク
-  {
-    id: '7',
-    applicantId: '3',
-    taskId: 'individual-detail-contact',
-    status: '完了',
-    contactStatus: '済',
-    dueDate: new Date('2024-01-15'),
-    startedAt: new Date('2024-01-13'),
-    completedAt: new Date('2024-01-15'),
-    createdAt: new Date('2024-01-05'),
-    updatedAt: new Date('2024-01-15')
-  },
-  {
-    id: '8',
-    applicantId: '3',
-    taskId: 'individual-schedule-contact',
-    status: '完了',
-    contactStatus: '済',
-    dueDate: new Date('2024-01-20'),
-    startedAt: new Date('2024-01-18'),
     completedAt: new Date('2024-01-20'),
-    createdAt: new Date('2024-01-05'),
-    updatedAt: new Date('2024-01-20')
+    notes: '完了しました',
+    createdAt: new Date('2024-01-16'),
+    updatedAt: new Date('2024-01-20'),
   },
   {
-    id: '9',
-    applicantId: '3',
-    taskId: 'individual-remind-contact',
-    status: '返信待ち',
-    contactStatus: '未',
-    dueDate: new Date('2024-02-05'),
-    startedAt: new Date('2024-01-30'),
-    createdAt: new Date('2024-01-05'),
-    updatedAt: new Date('2024-01-30')
-  }
+    id: 'task-4',
+    applicantId: 'applicant-2',
+    taskId: 'fixed-task-3',
+    status: '完了',
+    dueDate: new Date('2024-01-28'),
+    completedAt: new Date('2024-01-25'),
+    notes: '完了しました',
+    createdAt: new Date('2024-01-16'),
+    updatedAt: new Date('2024-01-25'),
+  },
+  {
+    id: 'task-5',
+    applicantId: 'applicant-3',
+    taskId: 'fixed-task-1',
+    status: '完了',
+    dueDate: new Date('2024-01-24'),
+    completedAt: new Date('2024-01-22'),
+    notes: '完了しました',
+    createdAt: new Date('2024-01-17'),
+    updatedAt: new Date('2024-01-22'),
+  },
+  {
+    id: 'task-6',
+    applicantId: 'applicant-3',
+    taskId: 'fixed-task-2',
+    status: '完了',
+    dueDate: new Date('2024-01-30'),
+    completedAt: new Date('2024-01-28'),
+    notes: '完了しました',
+    createdAt: new Date('2024-01-17'),
+    updatedAt: new Date('2024-01-28'),
+  },
+  {
+    id: 'task-7',
+    applicantId: 'applicant-4',
+    taskId: 'fixed-task-1',
+    status: '完了',
+    dueDate: new Date('2024-01-26'),
+    completedAt: new Date('2024-01-24'),
+    notes: '完了しました',
+    createdAt: new Date('2024-01-18'),
+    updatedAt: new Date('2024-01-24'),
+  },
+  {
+    id: 'task-8',
+    applicantId: 'applicant-4',
+    taskId: 'fixed-task-3',
+    status: '完了',
+    dueDate: new Date('2024-01-30'),
+    completedAt: new Date('2024-01-28'),
+    notes: '完了しました',
+    createdAt: new Date('2024-01-18'),
+    updatedAt: new Date('2024-01-28'),
+  },
+  {
+    id: 'task-9',
+    applicantId: 'applicant-5',
+    taskId: 'fixed-task-1',
+    status: '完了',
+    dueDate: new Date('2024-01-28'),
+    completedAt: new Date('2024-01-26'),
+    notes: '完了しました',
+    createdAt: new Date('2024-01-19'),
+    updatedAt: new Date('2024-01-26'),
+  },
+  {
+    id: 'task-10',
+    applicantId: 'applicant-5',
+    taskId: 'fixed-task-2',
+    status: '未着手',
+    dueDate: new Date('2024-02-02'),
+    notes: '未着手です',
+    createdAt: new Date('2024-01-19'),
+    updatedAt: new Date('2024-01-19'),
+  },
 ];
 
 export const useTaskManagement = () => {
@@ -138,19 +141,15 @@ export const useTaskManagement = () => {
           applicantId: applicant.id,
           taskId: fixedTask.id,
           status: '未着手',
+          dueDate: new Date(),
+          notes: '',
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         };
-        
-        // 連絡系タスクの場合は初期ステータスを設定
-        if (['詳細連絡', '結果連絡'].includes(fixedTask.type)) {
-          newInstance.contactStatus = '未';
-        }
         
         // 日程調整連絡とリマインドの場合は返信待ちステータスを設定
         if (['日程調整連絡', 'リマインド'].includes(fixedTask.type)) {
           newInstance.status = '返信待ち';
-          newInstance.contactStatus = '返信待ち';
         }
         
         // 提出書類タスクの場合は初期ステータスを設定
@@ -182,19 +181,15 @@ export const useTaskManagement = () => {
           applicantId: applicant.id,
           taskId: fixedTask.id,
           status: '未着手',
+          dueDate: new Date(),
+          notes: '',
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         };
-        
-        // 連絡系タスクの場合は初期ステータスを設定
-        if (['詳細連絡', '結果連絡'].includes(fixedTask.type)) {
-          newInstance.contactStatus = '未';
-        }
         
         // 日程調整連絡とリマインドの場合は返信待ちステータスを設定
         if (['日程調整連絡', 'リマインド'].includes(fixedTask.type)) {
           newInstance.status = '返信待ち';
-          newInstance.contactStatus = '返信待ち';
         }
         
         // 提出書類タスクの場合は初期ステータスを設定
@@ -237,8 +232,7 @@ export const useTaskManagement = () => {
   // タスクステータスを更新
   const updateTaskStatus = useCallback((
     taskInstanceId: string, 
-    status: TaskStatus,
-    contactStatus?: ContactStatus
+    status: TaskStatus
   ) => {
     setTaskInstances(prev => prev.map(task => {
       if (task.id === taskInstanceId) {
@@ -247,46 +241,8 @@ export const useTaskManagement = () => {
           updatedAt: new Date()
         };
         
-        if (status === '返信待ち' && !task.startedAt) {
-          updates.startedAt = new Date();
-        }
-        
         if (status === '完了' && !task.completedAt) {
           updates.completedAt = new Date();
-        }
-        
-        if (contactStatus) {
-          updates.contactStatus = contactStatus;
-          
-          // 連絡系タスクの場合、連絡状況に応じてステータスを自動更新
-          // タスクテンプレートから情報を取得して判定
-          const allStages = ['エントリー', '書類選考', '会社説明会', '適性検査体験', '職場見学', '仕事体験', '人事面接', '集団面接', 'CEOセミナー', '人事面接', '最終選考', '内定面談', '不採用'];
-          let isContactTask = false;
-          
-          for (const stage of allStages) {
-            const fixedTasks = getFixedTasksByStage(stage as SelectionStage);
-            const fixedTask = fixedTasks.find(ft => ft.id === task.taskId);
-            if (fixedTask && ['詳細連絡', '日程調整連絡', 'リマインド', '結果連絡'].includes(fixedTask.type)) {
-              isContactTask = true;
-              break;
-            }
-          }
-          
-          if (isContactTask) {
-            if (contactStatus === '済' || contactStatus === '○') {
-              updates.status = '完了';
-              if (!task.completedAt) {
-                updates.completedAt = new Date();
-              }
-            } else if (contactStatus === '返信待ち') {
-              updates.status = '返信待ち';
-              if (!task.startedAt) {
-                updates.startedAt = new Date();
-              }
-            } else {
-              updates.status = '未着手';
-            }
-          }
         }
         
         return { ...task, ...updates };

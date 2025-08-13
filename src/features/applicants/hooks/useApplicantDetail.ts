@@ -24,7 +24,7 @@ export function useApplicantDetail(applicantId: string) {
   const applicant = applicants.find(a => a.id === applicantId);
   const history = selectionHistory
     .filter(h => h.applicantId === applicantId)
-    .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()); // 新しい日付を上に
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); // 新しい日付を上に
   const applicantTasks = tasks.filter(t => 
     t.selectionHistoryId && history.some(h => h.id === t.selectionHistoryId)
   );

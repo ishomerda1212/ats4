@@ -168,7 +168,7 @@ export function ApplicantForm({ applicant, mode }: ApplicantFormProps) {
                   name="faculty"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>学部 *</FormLabel>
+                      <FormLabel>学部</FormLabel>
                       <FormControl>
                         <Input placeholder="工学部" {...field} />
                       </FormControl>
@@ -182,7 +182,7 @@ export function ApplicantForm({ applicant, mode }: ApplicantFormProps) {
                   name="department"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>学科・コース *</FormLabel>
+                      <FormLabel>学科・コース</FormLabel>
                       <FormControl>
                         <Input placeholder="情報工学科" {...field} />
                       </FormControl>
@@ -247,13 +247,31 @@ export function ApplicantForm({ applicant, mode }: ApplicantFormProps) {
 
               <FormField
                 control={form.control}
-                name="address"
+                name="currentAddress"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>住所 *</FormLabel>
+                    <FormLabel>現住所 *</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="東京都渋谷区..." 
+                        className="min-h-[80px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="hometownAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>帰省先住所</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="北海道札幌市..." 
                         className="min-h-[80px]"
                         {...field} 
                       />

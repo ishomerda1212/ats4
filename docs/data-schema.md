@@ -131,7 +131,7 @@ type TaskStatus = '未着手' | '完了' | '提出待ち' | '返信待ち';
 #### 4.5 連絡ステータス（ContactStatus）
 
 ```typescript
-type ContactStatus = '未' | '済' | '返信待ち' | '○';
+type ContactStatus = '未' | '済' | '返信待ち';
 ```
 
 ### 5. イベント管理

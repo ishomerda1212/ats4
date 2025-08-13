@@ -60,7 +60,7 @@ export function RecruitmentChart({ period, chartType }: RecruitmentChartProps) {
                  // その日の面接数（面接段階の履歴がある応募者）
          const dayInterviews = applicants.filter(applicant => {
            return applicant.history?.some(history => {
-             const historyDate = new Date(history.startDate);
+             const historyDate = new Date(history.createdAt);
              return historyDate.toDateString() === date.toDateString() && 
                     (history.stage.includes('面接') || history.stage === 'CEOセミナー' || history.stage === '最終選考');
            });
@@ -85,7 +85,7 @@ export function RecruitmentChart({ period, chartType }: RecruitmentChartProps) {
                  // その月の面接数
          const monthInterviews = applicants.filter(applicant => {
            return applicant.history?.some(history => {
-             const historyDate = new Date(history.startDate);
+             const historyDate = new Date(history.createdAt);
              return historyDate.getFullYear() === date.getFullYear() && 
                     historyDate.getMonth() === date.getMonth() &&
                     (history.stage.includes('面接') || history.stage === 'CEOセミナー' || history.stage === '最終選考');

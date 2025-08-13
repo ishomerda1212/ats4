@@ -1,12 +1,6 @@
-// タスクテンプレートの再エクスポート
-export { FIXED_TASK_TEMPLATES } from './templates';
+import { FixedTask } from '../types/task';
+import { stageTaskTemplates } from './templates';
 
-import { FIXED_TASK_TEMPLATES } from './templates';
-import { SelectionStage } from '@/features/applicants/types/applicant';
-
-/**
- * 選考段階に応じた固定タスクを取得する
- */
-export const getFixedTasksByStage = (stage: SelectionStage) => {
-  return FIXED_TASK_TEMPLATES[stage] || [];
+export const getFixedTasksByStage = (stage: string): FixedTask[] => {
+  return stageTaskTemplates[stage] || [];
 }; 

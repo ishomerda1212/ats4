@@ -87,10 +87,11 @@ export interface Applicant extends BaseEntity {
   nameKana: string; // フリガナ
   gender: Gender; // 性別
   schoolName: string; // 学校名
-  faculty: string; // 学部
-  department: string; // 学科・コース
+  faculty?: string; // 学部
+  department?: string; // 学科・コース
   graduationYear: number; // 卒業年度
-  address: string; // 現住所
+  currentAddress: string; // 現住所
+  hometownAddress?: string; // 帰省先住所
   phone: string; // 携帯電話
   email: string; // メール
   currentStage: SelectionStage; // 現在の選考段階
@@ -111,7 +112,6 @@ export interface Applicant extends BaseEntity {
 export interface SelectionHistory extends BaseEntity {
   applicantId: string;
   stage: SelectionStage;
-  startDate: Date;
   endDate?: Date;
   status: SelectionStatus;
   notes?: string;

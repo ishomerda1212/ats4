@@ -5,6 +5,9 @@ export interface Event extends BaseEntity {
   name: string;
   description: string;
   stage: SelectionStage;
+  venue: string;
+  maxParticipants: number;
+  status: '予定' | '開催中' | '終了' | 'キャンセル';
 }
 
 export interface EventSession extends BaseEntity {
@@ -13,7 +16,8 @@ export interface EventSession extends BaseEntity {
   start: Date;
   end: Date;
   venue: string;
-  format: '対面' | 'オンライン'; // 開催形式
+  format: '対面' | 'オンライン' | 'ハイブリッド'; // 開催形式
+  zoomUrl?: string; // ZOOM URL
   participants: EventParticipant[];
   notes?: string;
   recruiter?: string;

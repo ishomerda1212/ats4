@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Users, Users as UsersIcon } from 'lucide-react';
+import { Calendar, MapPin, Users, Users as UsersIcon, ExternalLink } from 'lucide-react';
 import { formatDateTime } from '@/shared/utils/date';
 import { STAGES_WITH_SESSION } from '@/shared/utils/constants';
 import { Event, EventSession } from '@/features/events/types/event';
+import { Link } from 'react-router-dom';
 
 interface SessionInfo {
   event: Event;
@@ -14,12 +15,14 @@ interface SessionBookingFormProps {
   stage: string;
   sessionInfo: SessionInfo | null;
   onOpenSessionDialog: (stage: string) => void;
+  applicantId?: string; // 応募者IDを追加
 }
 
 export function SessionBookingForm({ 
   stage, 
   sessionInfo, 
-  onOpenSessionDialog 
+  onOpenSessionDialog,
+  applicantId
 }: SessionBookingFormProps) {
   if (sessionInfo) {
     return (
@@ -29,14 +32,26 @@ export function SessionBookingForm({
             <Calendar className="h-4 w-4 mr-2" />
             セッション情報
           </h4>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onOpenSessionDialog(stage)}
-          >
-            <Calendar className="h-3 w-3 mr-1" />
-            編集
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Link to={`/event/${sessionInfo.event.id}/session/${sessionInfo.session.id}${applicantId ? `?fromApplicant=${applicantId}` : ''}`}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+              >
+                <ExternalLink className="h-3 w-3 mr-1" />
+                詳細
+              </Button>
+            </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onOpenSessionDialog(stage)}
+            >
+              <Calendar className="h-3 w-3 mr-1" />
+              編集
+            </Button>
+          </div>
         </div>
         <div className="p-3 border rounded-lg bg-gray-50">
           <div className="space-y-2">

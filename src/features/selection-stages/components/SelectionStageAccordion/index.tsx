@@ -69,7 +69,8 @@ export function SelectionStageAccordion({
     getStageSessionInfoForStage,
     getAvailableSessionsForStageWithData,
     getApplicantTasksForStage,
-    setTaskDueDate
+    setTaskDueDate,
+    createNewSession
   } = useStageOperations();
 
   return (
@@ -114,6 +115,7 @@ export function SelectionStageAccordion({
                         stage={item.stage}
                         sessionInfo={sessionInfo}
                         onOpenSessionDialog={handleOpenSessionDialog}
+                        applicantId={applicant.id}
                       />
 
                       {/* 書類選考の合否変更機能 */}
@@ -151,7 +153,7 @@ export function SelectionStageAccordion({
           onSave={() => handleSaveTask(setTaskDueDate)}
         />
 
-        {/* セッション情報登録・編集ダイアログ */}
+        {/* セッション情報登録ダイアログ */}
         <SessionDialog
           isOpen={isSessionDialogOpen}
           onOpenChange={setIsSessionDialogOpen}
@@ -160,7 +162,7 @@ export function SelectionStageAccordion({
           availableSessions={getAvailableSessionsForStageWithData(editingStage)}
           onSessionSelection={handleSessionSelection}
           onSessionFormChange={handleSessionFormChange}
-          onSave={handleSaveSession}
+          onSave={() => handleSaveSession(createNewSession)}
         />
 
         {/* 書類選考合否変更ダイアログ */}

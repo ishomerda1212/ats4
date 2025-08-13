@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 import { useApplicantDetail } from '@/features/applicants/hooks/useApplicantDetail';
 import { ApplicantBasicInfo } from '@/features/applicants/components/ApplicantBasicInfo';
 import { ApplicantDetailTabs } from './components/ApplicantDetailTabs';
@@ -8,8 +10,13 @@ import { usePDFStorage } from './hooks/usePDFStorage';
 
 export function ApplicantDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const { applicant, history, stageDetails, loading } = useApplicantDetail(id!);
   const [activeTab, setActiveTab] = useState('selection-history');
+  
+  // URLパラメータから前のページの情報を取得
+  const fromEvent = searchParams.get('fromEvent');
+  const fromSession = searchParams.get('fromSession');
   
   // フックを使用して状態管理を分離
   const evaluationFormsHook = useEvaluationForms(id!);
@@ -34,7 +41,24 @@ export function ApplicantDetailPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-4">
+        {/* 戻るボタン */}
+        {fromEvent && fromSession ? (
+          <Link to={`/event/${fromEvent}/session/${fromSession}`}>
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              セッション詳細に戻る
+            </Button>
+          </Link>
+        ) : (
+          <Link to="/applicants">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              応募者一覧に戻る
+            </Button>
+          </Link>
+        )}
+        
         <div>
           <h1 className="text-3xl font-bold">{applicant.name}</h1>
           <p className="text-muted-foreground mt-1">

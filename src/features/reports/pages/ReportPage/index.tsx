@@ -12,6 +12,7 @@ import { RecruitmentMetrics } from './components/RecruitmentMetrics';
 import { StageAnalysis } from './components/StageAnalysis';
 import { ApplicantAnalysis } from './components/ApplicantAnalysis';
 import { ExportSection } from './components/ExportSection';
+import { PipelineAnalysis } from './components/PipelineAnalysis';
 import { useReportData } from './hooks/useReportData';
 
 export function ReportPage() {
@@ -21,7 +22,9 @@ export function ReportPage() {
     groupResults,
     overallStats,
     thisMonthEntries,
-    thisMonthInterviews
+    thisMonthInterviews,
+    currentStageResults,
+    pipelineAnalysis
   } = useReportData();
 
   const [activeTab, setActiveTab] = useState('group-summary');
@@ -44,7 +47,7 @@ export function ReportPage() {
 
       {/* タブコンテンツ */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="group-summary" className="flex items-center space-x-2">
             <BarChart3 className="h-4 w-4" />
             <span>グループ別集計</span>
@@ -52,6 +55,10 @@ export function ReportPage() {
           <TabsTrigger value="stage-summary" className="flex items-center space-x-2">
             <BarChart3 className="h-4 w-4" />
             <span>選考段階別集計</span>
+          </TabsTrigger>
+          <TabsTrigger value="pipeline-analysis" className="flex items-center space-x-2">
+            <TrendingUp className="h-4 w-4" />
+            <span>パイプライン分析</span>
           </TabsTrigger>
           <TabsTrigger value="source-summary" className="flex items-center space-x-2">
             <PieChart className="h-4 w-4" />
@@ -77,7 +84,15 @@ export function ReportPage() {
 
         {/* 選考段階別集計タブ */}
         <TabsContent value="stage-summary" className="mt-6">
-          <StageAnalysis stageResults={stageResults} />
+          <StageAnalysis 
+            stageResults={stageResults} 
+            currentStageResults={currentStageResults}
+          />
+        </TabsContent>
+
+        {/* パイプライン分析タブ */}
+        <TabsContent value="pipeline-analysis" className="mt-6">
+          <PipelineAnalysis pipelineAnalysis={pipelineAnalysis} />
         </TabsContent>
 
         {/* 反響元別集計タブ */}

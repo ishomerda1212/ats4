@@ -50,21 +50,24 @@ graph TB
 ┌─────────────────────────────────────────────────────────────┐
 │                        applicants                          │
 ├─────────────────────────────────────────────────────────────┤
-│ PK  id                    VARCHAR(36)    NOT NULL          │
-│     name                  VARCHAR(100)   NOT NULL          │
-│     name_kana             VARCHAR(100)   NOT NULL          │
-│     email                 VARCHAR(255)   NOT NULL UNIQUE   │
-│     phone                 VARCHAR(20)                      │
-│     address               TEXT                             │
-│     education             VARCHAR(100)   NOT NULL          │
-│     graduation_year       VARCHAR(4)     NOT NULL          │
-│     source                VARCHAR(50)    NOT NULL          │
-│     gender                ENUM           NOT NULL          │
-│     current_stage         ENUM           NOT NULL          │
-│     status                ENUM           NOT NULL          │
-│     notes                 TEXT                             │
-│     created_at            TIMESTAMP      NOT NULL          │
-│     updated_at            TIMESTAMP      NOT NULL          │
+│ PK  id                    VARCHAR(36)    NOT NULL          │ -- 応募者ID
+│     name                  VARCHAR(100)   NOT NULL          │ -- 氏名
+│     name_kana             VARCHAR(100)   NOT NULL          │ -- 氏名（カナ）
+│     email                 VARCHAR(255)   NOT NULL UNIQUE   │ -- メールアドレス
+│     phone                 VARCHAR(20)                      │ -- 電話番号
+│     current_address       TEXT                             │ -- 現住所
+│     hometown_address      TEXT                             │ -- 帰省先住所
+│     school_name           VARCHAR(100)   NOT NULL          │ -- 学校名
+│     faculty               VARCHAR(100)                      │ -- 学部
+│     department            VARCHAR(100)                      │ -- 学科・コース
+│     graduation_year       VARCHAR(4)     NOT NULL          │ -- 卒業年
+│     source                VARCHAR(50)    NOT NULL          │ -- 応募経路
+│     gender                ENUM           NOT NULL          │ -- 性別
+│     current_stage         ENUM           NOT NULL          │ -- 現在の選考段階
+│     status                ENUM           NOT NULL          │ -- 応募状況
+│     notes                 TEXT                             │ -- 備考
+│     created_at            TIMESTAMP      NOT NULL          │ -- 作成日時
+│     updated_at            TIMESTAMP      NOT NULL          │ -- 更新日時
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -80,16 +83,14 @@ graph TB
 ┌─────────────────────────────────────────────────────────────┐
 │                   selection_histories                      │
 ├─────────────────────────────────────────────────────────────┤
-│ PK  id                    VARCHAR(36)    NOT NULL          │
-│ FK  applicant_id          VARCHAR(36)    NOT NULL          │
-│     stage                 ENUM           NOT NULL          │
-│     start_date            TIMESTAMP      NOT NULL          │
-│     end_date              TIMESTAMP                        │
-│     status                ENUM           NOT NULL          │
-│     result                ENUM                             │
-│     notes                 TEXT                             │
-│     created_at            TIMESTAMP      NOT NULL          │
-│     updated_at            TIMESTAMP      NOT NULL          │
+│ PK  id                    VARCHAR(36)    NOT NULL          │ -- 選考履歴ID
+│ FK  applicant_id          VARCHAR(36)    NOT NULL          │ -- 応募者ID
+│     stage                 ENUM           NOT NULL          │ -- 選考段階
+│     end_date              TIMESTAMP                        │ -- 終了日時
+│     status                ENUM           NOT NULL          │ -- 選考状況・結果
+│     notes                 TEXT                             │ -- 備考
+│     created_at            TIMESTAMP      NOT NULL          │ -- 作成日時
+│     updated_at            TIMESTAMP      NOT NULL          │ -- 更新日時
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -97,7 +98,6 @@ graph TB
 - `PRIMARY KEY (id)`
 - `INDEX idx_applicant_id (applicant_id)`
 - `INDEX idx_stage (stage)`
-- `INDEX idx_start_date (start_date)`
 
 ### 3. 固定タスクテーブル（fixed_tasks）
 
@@ -105,14 +105,12 @@ graph TB
 ┌─────────────────────────────────────────────────────────────┐
 │                      fixed_tasks                           │
 ├─────────────────────────────────────────────────────────────┤
-│ PK  id                    VARCHAR(36)    NOT NULL          │
-│     stage                 ENUM           NOT NULL          │
-│     title                 VARCHAR(200)   NOT NULL          │
-│     description           TEXT           NOT NULL          │
-│     type                  ENUM           NOT NULL          │
-│     is_required           BOOLEAN        NOT NULL          │
-│     estimated_duration    INT            NOT NULL          │
-│     order                 INT            NOT NULL          │
+│ PK  id                    VARCHAR(36)    NOT NULL          │ -- タスクID
+│     stage                 ENUM           NOT NULL          │ -- 対象選考段階
+│     title                 VARCHAR(200)   NOT NULL          │ -- タスクタイトル
+│     description           TEXT           NOT NULL          │ -- タスク説明
+│     type                  ENUM           NOT NULL          │ -- タスクタイプ
+│     order                 INT            NOT NULL          │ -- 表示順序
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -127,17 +125,15 @@ graph TB
 ┌─────────────────────────────────────────────────────────────┐
 │                    task_instances                          │
 ├─────────────────────────────────────────────────────────────┤
-│ PK  id                    VARCHAR(36)    NOT NULL          │
-│ FK  applicant_id          VARCHAR(36)    NOT NULL          │
-│ FK  task_id               VARCHAR(36)    NOT NULL          │
-│     status                ENUM           NOT NULL          │
-│     contact_status        ENUM                             │
-│     due_date              TIMESTAMP                        │
-│     started_at            TIMESTAMP                        │
-│     completed_at          TIMESTAMP                        │
-│     notes                 TEXT                             │
-│     created_at            TIMESTAMP      NOT NULL          │
-│     updated_at            TIMESTAMP      NOT NULL          │
+│ PK  id                    VARCHAR(36)    NOT NULL          │ -- タスクインスタンスID
+│ FK  applicant_id          VARCHAR(36)    NOT NULL          │ -- 応募者ID
+│ FK  task_id               VARCHAR(36)    NOT NULL          │ -- 固定タスクID
+│     status                ENUM           NOT NULL          │ -- タスク状況
+│     due_date              TIMESTAMP                        │ -- 期限日時
+│     completed_at          TIMESTAMP                        │ -- 完了日時
+│     notes                 TEXT                             │ -- 備考
+│     created_at            TIMESTAMP      NOT NULL          │ -- 作成日時
+│     updated_at            TIMESTAMP      NOT NULL          │ -- 更新日時
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -154,23 +150,20 @@ graph TB
 ┌─────────────────────────────────────────────────────────────┐
 │                         events                             │
 ├─────────────────────────────────────────────────────────────┤
-│ PK  id                    VARCHAR(36)    NOT NULL          │
-│     title                 VARCHAR(200)   NOT NULL          │
-│     description           TEXT           NOT NULL          │
-│     type                  ENUM           NOT NULL          │
-│     start_date            TIMESTAMP      NOT NULL          │
-│     end_date              TIMESTAMP      NOT NULL          │
-│     venue                 VARCHAR(200)   NOT NULL          │
-│     max_participants      INT            NOT NULL          │
-│     status                ENUM           NOT NULL          │
-│     created_at            TIMESTAMP      NOT NULL          │
-│     updated_at            TIMESTAMP      NOT NULL          │
+│ PK  id                    VARCHAR(36)    NOT NULL          │ -- イベントID
+│     title                 VARCHAR(200)   NOT NULL          │ -- イベントタイトル
+│     description           TEXT           NOT NULL          │ -- イベント説明
+│     type                  ENUM           NOT NULL          │ -- イベントタイプ
+│     venue                 VARCHAR(200)   NOT NULL          │ -- 開催場所
+│     max_participants      INT            NOT NULL          │ -- 最大参加者数
+│     status                ENUM           NOT NULL          │ -- イベント状況
+│     created_at            TIMESTAMP      NOT NULL          │ -- 作成日時
+│     updated_at            TIMESTAMP      NOT NULL          │ -- 更新日時
 └─────────────────────────────────────────────────────────────┘
 ```
 
 **インデックス:**
 - `PRIMARY KEY (id)`
-- `INDEX idx_start_date (start_date)`
 - `INDEX idx_status (status)`
 
 ### 6. イベントセッションテーブル（event_sessions）
@@ -179,14 +172,16 @@ graph TB
 ┌─────────────────────────────────────────────────────────────┐
 │                   event_sessions                           │
 ├─────────────────────────────────────────────────────────────┤
-│ PK  id                    VARCHAR(36)    NOT NULL          │
-│ FK  event_id              VARCHAR(36)    NOT NULL          │
-│     title                 VARCHAR(200)   NOT NULL          │
-│     description           TEXT           NOT NULL          │
-│     start                 TIMESTAMP      NOT NULL          │
-│     end                   TIMESTAMP      NOT NULL          │
-│     venue                 VARCHAR(200)   NOT NULL          │
-│     format                ENUM           NOT NULL          │
+│ PK  id                    VARCHAR(36)    NOT NULL          │ -- セッションID
+│ FK  event_id              VARCHAR(36)    NOT NULL          │ -- イベントID
+│     title                 VARCHAR(200)   NOT NULL          │ -- セッションタイトル
+│     description           TEXT           NOT NULL          │ -- セッション説明
+│     start                 TIMESTAMP      NOT NULL          │ -- 開始時刻
+│     end                   TIMESTAMP      NOT NULL          │ -- 終了時刻
+│     venue                 VARCHAR(200)   NOT NULL          │ -- 開催場所
+│     format                ENUM           NOT NULL          │ -- 開催形式
+│     zoom_url              VARCHAR(500)                     │ -- ZOOM URL
+│     notes                 TEXT                             │ -- 備考
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -201,13 +196,13 @@ graph TB
 ┌─────────────────────────────────────────────────────────────┐
 │                 event_participants                         │
 ├─────────────────────────────────────────────────────────────┤
-│ PK  id                    VARCHAR(36)    NOT NULL          │
-│ FK  session_id            VARCHAR(36)    NOT NULL          │
-│ FK  applicant_id          VARCHAR(36)    NOT NULL          │
-│     status                ENUM           NOT NULL          │
-│     joined_at             TIMESTAMP                        │
-│     created_at            TIMESTAMP      NOT NULL          │
-│     updated_at            TIMESTAMP      NOT NULL          │
+│ PK  id                    VARCHAR(36)    NOT NULL          │ -- 参加者ID
+│ FK  session_id            VARCHAR(36)    NOT NULL          │ -- セッションID
+│ FK  applicant_id          VARCHAR(36)    NOT NULL          │ -- 応募者ID
+│     status                ENUM           NOT NULL          │ -- 参加状況
+│     joined_at             TIMESTAMP                        │ -- 参加時刻
+│     created_at            TIMESTAMP      NOT NULL          │ -- 作成日時
+│     updated_at            TIMESTAMP      NOT NULL          │ -- 更新日時
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -223,15 +218,15 @@ graph TB
 ┌─────────────────────────────────────────────────────────────┐
 │                   email_templates                          │
 ├─────────────────────────────────────────────────────────────┤
-│ PK  id                    VARCHAR(36)    NOT NULL          │
-│     name                  VARCHAR(100)   NOT NULL          │
-│     subject               VARCHAR(200)   NOT NULL          │
-│     body                  TEXT           NOT NULL          │
-│     stage                 ENUM           NOT NULL          │
-│     type                  ENUM           NOT NULL          │
-│     is_active             BOOLEAN        NOT NULL          │
-│     created_at            TIMESTAMP      NOT NULL          │
-│     updated_at            TIMESTAMP      NOT NULL          │
+│ PK  id                    VARCHAR(36)    NOT NULL          │ -- テンプレートID
+│     name                  VARCHAR(100)   NOT NULL          │ -- テンプレート名
+│     subject               VARCHAR(200)   NOT NULL          │ -- 件名
+│     body                  TEXT           NOT NULL          │ -- 本文
+│     stage                 ENUM           NOT NULL          │ -- 対象選考段階
+│     type                  ENUM           NOT NULL          │ -- メールタイプ
+│     is_active             BOOLEAN        NOT NULL          │ -- 有効フラグ
+│     created_at            TIMESTAMP      NOT NULL          │ -- 作成日時
+│     updated_at            TIMESTAMP      NOT NULL          │ -- 更新日時
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -247,17 +242,17 @@ graph TB
 ┌─────────────────────────────────────────────────────────────┐
 │                     email_logs                             │
 ├─────────────────────────────────────────────────────────────┤
-│ PK  id                    VARCHAR(36)    NOT NULL          │
-│ FK  template_id           VARCHAR(36)    NOT NULL          │
-│ FK  applicant_id          VARCHAR(36)    NOT NULL          │
-│     subject               VARCHAR(200)   NOT NULL          │
-│     body                  TEXT           NOT NULL          │
-│     status                ENUM           NOT NULL          │
-│     sent_at               TIMESTAMP      NOT NULL          │
-│     delivered_at          TIMESTAMP                        │
-│     error_message         TEXT                             │
-│     created_at            TIMESTAMP      NOT NULL          │
-│     updated_at            TIMESTAMP      NOT NULL          │
+│ PK  id                    VARCHAR(36)    NOT NULL          │ -- メールログID
+│ FK  template_id           VARCHAR(36)    NOT NULL          │ -- テンプレートID
+│ FK  applicant_id          VARCHAR(36)    NOT NULL          │ -- 応募者ID
+│     subject               VARCHAR(200)   NOT NULL          │ -- 送信件名
+│     body                  TEXT           NOT NULL          │ -- 送信本文
+│     status                ENUM           NOT NULL          │ -- 送信状況
+│     sent_at               TIMESTAMP      NOT NULL          │ -- 送信日時
+│     delivered_at          TIMESTAMP                        │ -- 配信日時
+│     error_message         TEXT                             │ -- エラーメッセージ
+│     created_at            TIMESTAMP      NOT NULL          │ -- 作成日時
+│     updated_at            TIMESTAMP      NOT NULL          │ -- 更新日時
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -274,26 +269,20 @@ graph TB
 ┌─────────────────────────────────────────────────────────────┐
 │                  evaluation_forms                          │
 ├─────────────────────────────────────────────────────────────┤
-│ PK  id                    VARCHAR(36)    NOT NULL          │
-│ FK  applicant_id          VARCHAR(36)    NOT NULL          │
-│     stage                 ENUM           NOT NULL          │
-│     evaluator_id          VARCHAR(36)    NOT NULL          │
-│     evaluator_name        VARCHAR(100)   NOT NULL          │
-│     evaluation_date       TIMESTAMP      NOT NULL          │
-│     criteria              JSON           NOT NULL          │
-│     overall_score         INT            NOT NULL          │
-│     comments              TEXT           NOT NULL          │
-│     result                ENUM           NOT NULL          │
-│     created_at            TIMESTAMP      NOT NULL          │
-│     updated_at            TIMESTAMP      NOT NULL          │
+│ PK  id                    VARCHAR(36)    NOT NULL          │ -- 評価フォームID
+│ FK  applicant_id          VARCHAR(36)    NOT NULL          │ -- 応募者ID
+│     stage                 ENUM           NOT NULL          │ -- 評価対象段階
+│     evaluator_id          VARCHAR(36)    NOT NULL          │ -- 評価者ID
+│     evaluator_name        VARCHAR(100)   NOT NULL          │ -- 評価者名
+│     evaluation_date       TIMESTAMP      NOT NULL          │ -- 評価日時
+│     criteria              JSON           NOT NULL          │ -- 評価項目
+│     overall_score         INT            NOT NULL          │ -- 総合評価点
+│     comments              TEXT           NOT NULL          │ -- コメント
+│     result                ENUM           NOT NULL          │ -- 評価結果
+│     created_at            TIMESTAMP      NOT NULL          │ -- 作成日時
+│     updated_at            TIMESTAMP      NOT NULL          │ -- 更新日時
 └─────────────────────────────────────────────────────────────┘
 ```
-
-**インデックス:**
-- `PRIMARY KEY (id)`
-- `INDEX idx_applicant_id (applicant_id)`
-- `INDEX idx_stage (stage)`
-- `INDEX idx_evaluation_date (evaluation_date)`
 
 ## 列挙型（ENUM）定義
 
@@ -317,12 +306,23 @@ ENUM('未着手', '完了', '提出待ち', '返信待ち')
 
 ### ContactStatus（連絡ステータス）
 ```sql
-ENUM('未', '済', '返信待ち', '○')
+ENUM('未', '済', '返信待ち')
 ```
 
 ### ParticipationStatus（参加ステータス）
 ```sql
 ENUM('参加', '不参加', '未定', '申込', '欠席')
+```
+
+### EventFormat（開催形式）
+```sql
+ENUM('対面', 'オンライン', 'ハイブリッド')
+```
+
+### EventType（イベントタイプ）
+```sql
+ENUM('会社説明会', '職場見学', 'CEOセミナー', '人事面接', '集団面接', 
+     '書類選考', '適性検査', '仕事体験', '最終選考', '内定面談')
 ```
 
 ## 外部キー制約
@@ -394,7 +394,10 @@ INSERT INTO applicants VALUES (
   'tanaka@example.com',
   '090-1234-5678',
   '東京都渋谷区...',
-  '東京大学工学部',
+  '北海道札幌市...',
+  '東京大学',
+  '工学部',
+  '機械工学科',
   '2024',
   'マイナビ',
   '男性',
@@ -414,8 +417,6 @@ INSERT INTO fixed_tasks VALUES (
   '書類確認',
   '応募書類の内容を確認する',
   '提出書類',
-  true,
-  30,
   1
 );
 ```
@@ -427,9 +428,7 @@ INSERT INTO task_instances VALUES (
   'app-001',
   'task-001',
   '未着手',
-  NULL,
   '2024-01-15 17:00:00',
-  NULL,
   NULL,
   NULL,
   NOW(),
@@ -442,13 +441,19 @@ INSERT INTO task_instances VALUES (
 ### 推奨インデックス戦略
 1. **検索頻度の高いカラム**: `email`, `current_stage`, `status`
 2. **結合条件**: `applicant_id`, `task_id`, `session_id`
-3. **日付範囲検索**: `start_date`, `due_date`, `sent_at`
+3. **日付範囲検索**: `due_date`, `sent_at`
 4. **複合インデックス**: `(applicant_id, status)`, `(stage, order)`
 
 ### パーティショニング戦略
 - **日付ベース**: `email_logs`, `selection_histories`
 - **段階ベース**: `task_instances`
 - **応募者ベース**: `evaluation_forms`
+
+---
+
+## 関連ドキュメント
+
+- [データベースリファクタリング計画](./database-refactoring-plan.md) - このスキーマの改善計画と実装詳細
 
 ---
 

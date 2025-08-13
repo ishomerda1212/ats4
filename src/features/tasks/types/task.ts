@@ -28,8 +28,6 @@ export interface FixedTask {
   title: string;
   description: string;
   type: TaskType;
-  isRequired: boolean;
-  estimatedDuration: number; // 分単位
   order: number; // 段階内での順序
 }
 
@@ -38,9 +36,7 @@ export interface TaskInstance extends BaseEntity {
   applicantId: string;
   taskId: string; // FixedTaskのID
   status: TaskStatus;
-  contactStatus?: ContactStatus; // 連絡系タスク用
   dueDate?: Date; // 任意の期限
-  startedAt?: Date;
   completedAt?: Date;
   notes?: string;
 }

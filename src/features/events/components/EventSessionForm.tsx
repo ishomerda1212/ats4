@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Save, X } from 'lucide-react';
 import { useEventSessionForm } from '../hooks/useEventSessionForm';
 import { EventSession } from '../types/event';
@@ -77,6 +78,46 @@ export function EventSessionForm({ eventId, session, mode, onCancel, onSuccess }
                   <FormLabel>会場 *</FormLabel>
                   <FormControl>
                     <Input placeholder="本社会議室A" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="format"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>開催形式 *</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="開催形式を選択してください" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="対面">対面</SelectItem>
+                      <SelectItem value="オンライン">オンライン</SelectItem>
+                      <SelectItem value="ハイブリッド">ハイブリッド</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="zoomUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>ZOOM URL</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="https://zoom.us/j/xxxxxxxxx" 
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

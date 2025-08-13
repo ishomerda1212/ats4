@@ -16,8 +16,6 @@ const taskSchema = z.object({
   title: z.string().min(1, 'タスク名を入力してください'),
   description: z.string().min(1, '説明を入力してください'),
   type: z.string().min(1, 'タスクタイプを選択してください'),
-  priority: z.string().min(1, '優先度を選択してください'),
-  assignee: z.string().optional(),
   dueDate: z.string().optional(),
 });
 
@@ -37,17 +35,13 @@ export function TaskForm({ selectionHistoryId, task, onCancel, onSuccess }: Task
     resolver: zodResolver(taskSchema),
     defaultValues: task ? {
       title: task.title,
-      description: task.description,
+      description: task.description || '',
       type: task.type,
-
-
       dueDate: task.dueDate ? new Date(task.dueDate).toISOString().slice(0, 16) : '', // datetime-local format
     } : {
       title: '',
       description: '',
       type: 'general',
-
-
       dueDate: '',
     },
   });

@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useTaskManagement } from '../hooks/useTaskManagement';
 import { Applicant } from '@/features/applicants/types/applicant';
-import { TaskStatus, ContactStatus, CONTACT_STATUSES, TaskInstance } from '../types/task';
+import { TaskStatus, TaskInstance } from '../types/task';
 import { formatDate } from '@/shared/utils/date';
 
 interface TaskSectionProps {
@@ -114,14 +114,6 @@ export function TaskSection({ applicant }: TaskSectionProps) {
     updateTaskStatus(taskId, status);
   };
 
-  const handleContactStatusChange = (taskId: string, contactStatus: ContactStatus) => {
-    updateTaskStatus(taskId, '返信待ち', contactStatus);
-  };
-
-  const isContactTask = (taskType: string) => {
-    return ['詳細連絡', '日程調整連絡', 'リマインド', '結果連絡'].includes(taskType);
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -165,50 +157,24 @@ export function TaskSection({ applicant }: TaskSectionProps) {
                       <label className="text-sm font-medium">ステータス</label>
                       <Select
                         value={task.status}
-                        onValueChange={(value: TaskStatus) => handleStatusChange(task.id, value)}
+                        onValueChange={(value) => handleStatusChange(task.id, value as TaskStatus)}
                       >
-                        <SelectTrigger className="w-32">
+                        <SelectTrigger className="w-24">
                           <SelectValue />
                         </SelectTrigger>
-                          <SelectContent>
-                           <SelectItem value="未着手">未着手</SelectItem>
-                           <SelectItem value="完了">完了</SelectItem>
-                           <SelectItem value="提出待ち">提出待ち</SelectItem>
-                           <SelectItem value="返信待ち">返信待ち</SelectItem>
-                         </SelectContent>
+                        <SelectContent>
+                          <SelectItem value="未着手">未着手</SelectItem>
+                          <SelectItem value="完了">完了</SelectItem>
+                          <SelectItem value="提出待ち">提出待ち</SelectItem>
+                          <SelectItem value="返信待ち">返信待ち</SelectItem>
+                        </SelectContent>
                       </Select>
                     </div>
-
-                    {isContactTask(task.type) && (
-                      <div>
-                        <label className="text-sm font-medium">連絡状況</label>
-                        <Select
-                          value={task.contactStatus || '未'}
-                          onValueChange={(value: ContactStatus) => handleContactStatusChange(task.id, value)}
-                        >
-                          <SelectTrigger className="w-24">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {CONTACT_STATUSES.map((status) => (
-                              <SelectItem key={status.value} value={status.value}>
-                                {status.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
 
                     <div className="flex items-center space-x-2">
                       <Badge className={getStatusColor(task.status)}>
                         {task.status}
                       </Badge>
-                      {task.contactStatus && (
-                        <Badge className="bg-purple-100 text-purple-800">
-                          {task.contactStatus}
-                        </Badge>
-                      )}
                     </div>
                   </div>
 
@@ -229,8 +195,12 @@ export function TaskSection({ applicant }: TaskSectionProps) {
                       
                     </div>
 
-                    <div className="text-muted-foreground">
-                      予想時間: {task.estimatedDuration}分
+                    <div className="text-xs text-muted-foreground">
+                      {task.dueDate && (
+                        <>
+                          期限: {formatDate(task.dueDate)}
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

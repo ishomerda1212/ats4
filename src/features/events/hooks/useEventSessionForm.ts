@@ -12,6 +12,8 @@ const eventSessionSchema = z.object({
   startDateTime: z.string().min(1, '開始日時を入力してください'),
   endDateTime: z.string().min(1, '終了日時を入力してください'),
   venue: z.string().min(1, '会場を入力してください'),
+  format: z.enum(['対面', 'オンライン', 'ハイブリッド']),
+  zoomUrl: z.string().optional(),
   notes: z.string().optional(),
 }).refine((data) => {
   const start = new Date(data.startDateTime);
@@ -20,6 +22,14 @@ const eventSessionSchema = z.object({
 }, {
   message: "終了日時は開始日時より後に設定してください",
   path: ["endDateTime"],
+}).refine((data) => {
+  if (data.format === 'オンライン' || data.format === 'ハイブリッド') {
+    return data.zoomUrl && data.zoomUrl.trim().length > 0;
+  }
+  return true;
+}, {
+  message: "オンラインまたはハイブリッド形式の場合はZOOM URLを入力してください",
+  path: ["zoomUrl"],
 });
 
 type EventSessionFormData = z.infer<typeof eventSessionSchema>;
@@ -39,10 +49,16 @@ export function useEventSessionForm(
       startDateTime: session.start.toISOString().slice(0, 16), // datetime-local format
       endDateTime: session.end.toISOString().slice(0, 16),
       venue: session.venue,
+      format: session.format,
+      zoomUrl: session.zoomUrl || '',
+      notes: session.notes || '',
     } : {
       startDateTime: '',
       endDateTime: '',
       venue: '',
+      format: '対面',
+      zoomUrl: '',
+      notes: '',
     },
   });
 
@@ -57,7 +73,9 @@ export function useEventSessionForm(
           start: new Date(data.startDateTime),
           end: new Date(data.endDateTime),
           venue: data.venue,
-          format: '対面',
+          format: data.format,
+          zoomUrl: data.zoomUrl,
+          notes: data.notes,
           participants: [],
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -74,6 +92,9 @@ export function useEventSessionForm(
           start: new Date(data.startDateTime),
           end: new Date(data.endDateTime),
           venue: data.venue,
+          format: data.format,
+          zoomUrl: data.zoomUrl,
+          notes: data.notes,
           updatedAt: new Date(),
         };
         setEventSessions(current => 

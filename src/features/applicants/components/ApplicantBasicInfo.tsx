@@ -81,7 +81,7 @@ export function ApplicantBasicInfo({ applicant }: ApplicantBasicInfoProps) {
               <MapPin className="h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="font-medium">住所</p>
-                <p className="text-sm text-muted-foreground">{applicant.address}</p>
+                <p className="text-sm text-muted-foreground">{applicant.currentAddress}</p>
               </div>
             </div>
           </div>

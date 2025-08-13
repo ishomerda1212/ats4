@@ -23,7 +23,7 @@ export interface SessionFormData {
   startDate: Date;
   endDate: Date;
   venue: string;
-  format?: '対面' | 'オンライン';
+  format?: '対面' | 'オンライン' | 'ハイブリッド';
   maxParticipants?: number;
   currentParticipants: number;
   recruiter?: string;

@@ -1,13 +1,36 @@
 import { useState } from 'react';
 import { TaskInstance, TaskStatus, FixedTask } from '@/features/tasks/types/task';
+import { EventSession } from '@/features/events/types/event';
 
 // FixedTaskとTaskInstanceを組み合わせた型
 type TaskWithFixedData = FixedTask & TaskInstance;
+
+// セッション作成用のデータ型
+interface SessionCreationData {
+  eventId: string;
+  name: string;
+  start: Date;
+  end: Date;
+  venue: string;
+  format: '対面' | 'オンライン' | 'ハイブリッド';
+  maxParticipants?: number;
+  recruiter?: string;
+}
+
+// セッション作成関数の型
+type CreateSessionFunction = (sessionData: SessionCreationData) => EventSession;
 
 export interface SessionFormData {
   selectedSessionId: string;
   sessionType: string;
   result: string;
+  // 新しいセッション作成用のフィールド
+  newSessionName: string;
+  newSessionStart: string;
+  newSessionEnd: string;
+  newSessionVenue: string;
+  newSessionFormat: string;
+  newSessionMaxParticipants: string;
 }
 
 export interface ResultFormData {
@@ -31,7 +54,13 @@ export const useStageAccordion = () => {
   const [sessionFormData, setSessionFormData] = useState<SessionFormData>({
     selectedSessionId: '',
     sessionType: '',
-    result: ''
+    result: '',
+    newSessionName: '',
+    newSessionStart: '',
+    newSessionEnd: '',
+    newSessionVenue: '',
+    newSessionFormat: '',
+    newSessionMaxParticipants: ''
   });
 
   // 書類選考の合否変更用の状態
@@ -93,15 +122,47 @@ export const useStageAccordion = () => {
   };
 
   // セッション情報を保存
-  const handleSaveSession = () => {
+  const handleSaveSession = (createNewSession?: CreateSessionFunction) => {
+    // 新しいセッションを作成する場合
+    if (sessionFormData.newSessionName && createNewSession) {
+      try {
+        const newSession = createNewSession({
+          eventId: `event-${editingStage}`, // 仮のイベントID
+          name: sessionFormData.newSessionName,
+          start: new Date(sessionFormData.newSessionStart),
+          end: new Date(sessionFormData.newSessionEnd),
+          venue: sessionFormData.newSessionVenue,
+          format: sessionFormData.newSessionFormat as '対面' | 'オンライン' | 'ハイブリッド',
+          maxParticipants: sessionFormData.newSessionMaxParticipants ? parseInt(sessionFormData.newSessionMaxParticipants) : undefined,
+          recruiter: sessionFormData.sessionType || undefined,
+        });
+        
+        // 新しく作成されたセッションを選択状態にする
+        setSessionFormData(prev => ({
+          ...prev,
+          selectedSessionId: newSession.id
+        }));
+        
+        console.log('新しいセッションを作成しました:', newSession);
+      } catch (error) {
+        console.error('セッション作成エラー:', error);
+      }
+    }
+    
     // ここでセッション情報を保存する処理を実装
-    // console.log('Saving session data for stage:', editingStage, sessionFormData);
+    console.log('Saving session data for stage:', editingStage, sessionFormData);
     
     // フォームをリセット
     setSessionFormData({
       selectedSessionId: '',
       sessionType: '',
-      result: ''
+      result: '',
+      newSessionName: '',
+      newSessionStart: '',
+      newSessionEnd: '',
+      newSessionVenue: '',
+      newSessionFormat: '',
+      newSessionMaxParticipants: ''
     });
     setIsSessionDialogOpen(false);
     setEditingStage('');

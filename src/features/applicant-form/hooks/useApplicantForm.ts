@@ -50,7 +50,7 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
           faculty: 'サンプル学部',
           department: 'サンプル学科',
           graduationYear: 2025,
-          address: 'サンプル県サンプル市',
+          currentAddress: 'サンプル県サンプル市',
           phone: '090-0000-0000',
           email: 'sample@example.com',
           currentStage: 'エントリー',
@@ -78,6 +78,9 @@ export const useApplicantForm = (applicantId: string, eventId: string) => {
             name: 'サンプルイベント',
             description: 'これはサンプルイベントです。実際のイベントデータが存在しない場合に表示されます。',
             stage: '会社説明会',
+            venue: 'サンプル会場',
+            maxParticipants: 50,
+            status: '予定',
             createdAt: new Date(),
             updatedAt: new Date()
           };

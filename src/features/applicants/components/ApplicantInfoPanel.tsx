@@ -71,7 +71,7 @@ export function ApplicantInfoPanel({ applicant, history = [] }: ApplicantInfoPan
 
             <div className="flex items-center space-x-3">
               <MapPin className="h-4 w-4 text-muted-foreground" />
-              <p className="text-sm">{applicant.address}</p>
+              <p className="text-sm">{applicant.currentAddress}</p>
             </div>
           </div>
         </CardContent>
@@ -108,8 +108,7 @@ export function ApplicantInfoPanel({ applicant, history = [] }: ApplicantInfoPan
                       <div className="flex-1">
                         <h4 className="font-medium text-sm">{item.stage}</h4>
                         <p className="text-xs text-muted-foreground">
-                          {formatDateTime(item.startDate)}
-                          {item.endDate && ` 〜 ${formatDateTime(item.endDate)}`}
+                          {formatDateTime(item.endDate || new Date())}
                         </p>
                       </div>
                     </div>

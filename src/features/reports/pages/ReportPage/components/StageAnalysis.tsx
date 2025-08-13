@@ -1,20 +1,27 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 import { 
-  BarChart3, 
   CheckCircle, 
   XCircle, 
   Clock, 
   UserMinus, 
-  UserX 
+  UserX,
+  History,
+  Activity
 } from 'lucide-react';
-import { type StageResult } from '../utils/reportCalculations';
+import { type StageResult, type CurrentStageResult } from '../utils/reportCalculations';
+import { CurrentStageAnalysis } from './CurrentStageAnalysis';
 
 interface StageAnalysisProps {
   stageResults: StageResult[];
+  currentStageResults: CurrentStageResult[];
 }
 
-export function StageAnalysis({ stageResults }: StageAnalysisProps) {
+export function StageAnalysis({ stageResults, currentStageResults }: StageAnalysisProps) {
+  const [viewMode, setViewMode] = useState<'historical' | 'current'>('historical');
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case '合格':
@@ -40,14 +47,39 @@ export function StageAnalysis({ stageResults }: StageAnalysisProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <BarChart3 className="h-5 w-5" />
-          <span>選考段階別集計</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="space-y-6">
+      {/* ビューモード切り替え */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Button
+            variant={viewMode === 'historical' ? 'default' : 'outline'}
+            onClick={() => setViewMode('historical')}
+            className="flex items-center space-x-2"
+          >
+            <History className="h-4 w-4" />
+            <span>蓄積データ</span>
+          </Button>
+          <Button
+            variant={viewMode === 'current' ? 'default' : 'outline'}
+            onClick={() => setViewMode('current')}
+            className="flex items-center space-x-2"
+          >
+            <Activity className="h-4 w-4" />
+            <span>リアルタイム</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* 蓄積データビュー */}
+      {viewMode === 'historical' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <History className="h-5 w-5" />
+              <span>選考段階別集計（蓄積データ）</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
@@ -116,5 +148,12 @@ export function StageAnalysis({ stageResults }: StageAnalysisProps) {
         </Table>
       </CardContent>
     </Card>
+      )}
+
+      {/* リアルタイムビュー */}
+      {viewMode === 'current' && (
+        <CurrentStageAnalysis currentStageResults={currentStageResults} />
+      )}
+    </div>
   );
 }

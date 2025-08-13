@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { User, Phone, Monitor, Users } from 'lucide-react';
+import { User, Phone, Monitor, Users, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { EventParticipant, ParticipationStatus, EventSession } from '../types/event';
 import { Applicant } from '@/features/applicants/types/applicant';
 
@@ -105,6 +107,14 @@ export function ParticipantList({ participants, applicants, session, onStatusCha
                         {participant.status}
                       </Badge>
                     )}
+                    
+                    {/* 参加者詳細への遷移ボタン */}
+                    <Link to={`/applicants/${applicant.id}?fromEvent=${session?.eventId}&fromSession=${session?.id}`}>
+                      <Button size="sm" variant="outline">
+                        <Eye className="h-3 w-3 mr-1" />
+                        詳細
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               );

@@ -1,34 +1,28 @@
 import { FixedTask } from '../../types/task';
 
-export const documentScreeningTemplates: FixedTask[] = [
+export const documentScreeningTasks: FixedTask[] = [
   {
-    id: 'document-detail-contact',
+    id: 'doc-screening-1',
     stage: '書類選考',
-    title: '詳細連絡',
-    description: '書類選考の詳細連絡',
-    type: '詳細連絡',
-    isRequired: true,
-    estimatedDuration: 15,
-    order: 1
+    title: '履歴書・職務経歴書確認',
+    description: '応募者の履歴書・職務経歴書の内容を確認し、基本要件との適合性を評価する',
+    type: 'document',
+    order: 1,
   },
   {
-    id: 'document-submit-documents',
+    id: 'doc-screening-2',
     stage: '書類選考',
-    title: '提出書類',
-    description: '書類選考の提出書類確認',
-    type: '提出書類',
-    isRequired: true,
-    estimatedDuration: 30,
-    order: 2
+    title: '志望動機確認',
+    description: '応募者の志望動機の妥当性と企業への理解度を評価する',
+    type: 'document',
+    order: 2,
   },
   {
-    id: 'document-result-contact',
+    id: 'doc-screening-3',
     stage: '書類選考',
-    title: '結果連絡',
-    description: '書類選考の結果連絡',
-    type: '結果連絡',
-    isRequired: true,
-    estimatedDuration: 15,
-    order: 3
-  }
+    title: '書類選考結果通知',
+    description: '書類選考の結果を応募者に通知する',
+    type: 'email',
+    order: 3,
+  },
 ];

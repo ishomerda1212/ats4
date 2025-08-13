@@ -27,7 +27,7 @@ export function StageCard({ item, sessionInfo }: StageCardProps) {
               if (sessionInfo) {
                 return formatDateTime(sessionInfo.session.start);
               }
-              return item.startDate ? formatDateTime(item.startDate) : '未設定';
+              return item.createdAt ? formatDateTime(item.createdAt) : '未設定';
             })()}
           </p>
         </div>

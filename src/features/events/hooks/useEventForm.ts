@@ -14,6 +14,9 @@ const eventSchema = z.object({
   name: z.string().min(1, 'イベント名を入力してください'),
   stage: z.string().min(1, '選考段階を選択してください'),
   description: z.string().min(1, '説明を入力してください'),
+  venue: z.string().min(1, '開催場所を入力してください'),
+  maxParticipants: z.number().min(1, '最大参加者数を入力してください'),
+  status: z.string().min(1, 'ステータスを選択してください'),
 });
 
 type EventFormData = z.infer<typeof eventSchema>;
@@ -29,10 +32,16 @@ export function useEventForm(event?: Event, mode: 'create' | 'edit' = 'create') 
       name: event.name,
       stage: event.stage,
       description: event.description,
+      venue: event.venue,
+      maxParticipants: event.maxParticipants,
+      status: event.status,
     } : {
       name: '',
       stage: '',
       description: '',
+      venue: '',
+      maxParticipants: 50,
+      status: '予定',
     },
   });
 
@@ -45,6 +54,9 @@ export function useEventForm(event?: Event, mode: 'create' | 'edit' = 'create') 
           name: data.name,
           stage: data.stage as SelectionStage,
           description: data.description,
+          venue: data.venue,
+          maxParticipants: data.maxParticipants,
+          status: data.status as '予定' | '開催中' | '終了' | 'キャンセル',
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -62,6 +74,9 @@ export function useEventForm(event?: Event, mode: 'create' | 'edit' = 'create') 
           name: data.name,
           stage: data.stage as SelectionStage,
           description: data.description,
+          venue: data.venue,
+          maxParticipants: data.maxParticipants,
+          status: data.status as '予定' | '開催中' | '終了' | 'キャンセル',
           updatedAt: new Date(),
         };
         setEvents(current => 

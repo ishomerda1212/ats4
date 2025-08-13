@@ -6,6 +6,9 @@ export const mockEvents: Event[] = [
     name: '会社説明会',
     description: '弊社の事業内容、働く環境、キャリアパスについて詳しくご説明します。',
     stage: '会社説明会',
+    venue: '本社オフィス',
+    maxParticipants: 50,
+    status: '予定',
     createdAt: new Date('2024-01-10T09:00:00Z'),
     updatedAt: new Date('2024-01-10T09:00:00Z')
   },
@@ -14,6 +17,9 @@ export const mockEvents: Event[] = [
     name: '職場見学会',
     description: '実際の職場を見学し、社員との交流を通じて職場の雰囲気を体感していただけます。',
     stage: '職場見学',
+    venue: '開発フロア',
+    maxParticipants: 20,
+    status: '予定',
     createdAt: new Date('2024-01-12T10:00:00Z'),
     updatedAt: new Date('2024-01-12T10:00:00Z')
   },
@@ -22,6 +28,9 @@ export const mockEvents: Event[] = [
     name: 'CEOセミナー',
     description: '代表取締役による経営方針説明と質疑応答セッションです。',
     stage: 'CEOセミナー',
+    venue: '大会議室',
+    maxParticipants: 30,
+    status: '予定',
     createdAt: new Date('2024-01-15T11:00:00Z'),
     updatedAt: new Date('2024-01-15T11:00:00Z')
   },
@@ -30,6 +39,9 @@ export const mockEvents: Event[] = [
     name: '人事面接',
     description: '人事面接を実施します。志望動機やキャリアプランについて詳しく話し合います。',
     stage: '人事面接',
+    venue: '面接室',
+    maxParticipants: 10,
+    status: '予定',
     createdAt: new Date('2024-01-15T09:00:00Z'),
     updatedAt: new Date('2024-01-15T09:00:00Z')
   },
@@ -38,6 +50,9 @@ export const mockEvents: Event[] = [
     name: '集団面接',
     description: '複数の応募者による集団面接です。',
     stage: '集団面接',
+    venue: '大会議室',
+    maxParticipants: 20,
+    status: '予定',
     createdAt: new Date('2024-01-20T09:00:00Z'),
     updatedAt: new Date('2024-01-20T09:00:00Z')
   },
@@ -46,6 +61,9 @@ export const mockEvents: Event[] = [
     name: '書類選考',
     description: '書類選考の詳細説明と提出書類の確認を行います。',
     stage: '書類選考',
+    venue: '人事部',
+    maxParticipants: 50,
+    status: '予定',
     createdAt: new Date('2024-01-08T09:00:00Z'),
     updatedAt: new Date('2024-01-08T09:00:00Z')
   },
@@ -54,6 +72,9 @@ export const mockEvents: Event[] = [
     name: '適性検査',
     description: '適性検査の実施と結果確認を行います。',
     stage: '適性検査',
+    venue: '会議室',
+    maxParticipants: 30,
+    status: '予定',
     createdAt: new Date('2024-01-09T09:00:00Z'),
     updatedAt: new Date('2024-01-09T09:00:00Z')
   },
@@ -62,6 +83,9 @@ export const mockEvents: Event[] = [
     name: '仕事体験',
     description: '実際の業務を体験していただき、職場の雰囲気を体感していただけます。',
     stage: '仕事体験',
+    venue: '開発フロア',
+    maxParticipants: 10,
+    status: '予定',
     createdAt: new Date('2024-01-14T09:00:00Z'),
     updatedAt: new Date('2024-01-14T09:00:00Z')
   },
@@ -70,6 +94,9 @@ export const mockEvents: Event[] = [
     name: '最終選考',
     description: '最終選考の面接と総合評価を行います。',
     stage: '最終選考',
+    venue: '大会議室',
+    maxParticipants: 5,
+    status: '予定',
     createdAt: new Date('2024-01-22T09:00:00Z'),
     updatedAt: new Date('2024-01-22T09:00:00Z')
   },
@@ -78,6 +105,9 @@ export const mockEvents: Event[] = [
     name: '内定面談',
     description: '内定通知と入社手続きの案内を行います。',
     stage: '内定面談',
+    venue: '人事部',
+    maxParticipants: 10,
+    status: '予定',
     createdAt: new Date('2024-01-25T09:00:00Z'),
     updatedAt: new Date('2024-01-25T09:00:00Z')
   }
@@ -105,6 +135,8 @@ export const mockEventSessions: EventSession[] = [
     end: new Date(new Date().setHours(12, 0, 0, 0)),
     venue: '本社オフィスB',
     format: 'オンライン',
+    zoomUrl: 'https://zoom.us/j/1234567890',
+    notes: '資料配布あり、動きやすい服装でお越しください',
     participants: [],
     createdAt: new Date('2024-01-10T09:00:00Z'),
     updatedAt: new Date('2024-01-10T09:00:00Z')
@@ -158,6 +190,8 @@ export const mockEventSessions: EventSession[] = [
     end: new Date(new Date().setHours(15, 0, 0, 0)),
     venue: '面接室B',
     format: 'オンライン',
+    zoomUrl: 'https://zoom.us/j/9876543210',
+    notes: '面接前に身分証明書の準備をお願いします',
     maxParticipants: 1, // 人事面接なので1名まで
     participants: [],
     recruiter: '佐藤課長',
@@ -201,6 +235,8 @@ export const mockEventSessions: EventSession[] = [
     end: new Date('2024-03-18T16:00:00Z'),
     venue: '会議室C',
     format: 'オンライン',
+    zoomUrl: 'https://zoom.us/j/5556667777',
+    notes: 'グループディスカッションを含む面接です',
     maxParticipants: 8, // 集団面接なので8名まで
     participants: [],
     recruiter: '人事部一同',
@@ -245,6 +281,8 @@ export const mockEventSessions: EventSession[] = [
     end: new Date('2024-02-07T16:00:00Z'),
     venue: 'オンライン',
     format: 'オンライン',
+    zoomUrl: 'https://zoom.us/j/1112223333',
+    notes: '適性検査は事前に送付されたURLからアクセスしてください',
     maxParticipants: 15,
     participants: [],
     recruiter: '人事部',
