@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from '@/shared/components/layout/Layout';
+import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
 import { ApplicantListPage } from '@/features/applicants/pages/ApplicantListPage';
 import { ApplicantDetailPage } from '@/features/applicants/pages/ApplicantDetailPage';
 import { ApplicantCreatePage } from '@/features/applicants/pages/ApplicantCreatePage';
@@ -23,7 +24,8 @@ export function Router() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="/applicants" replace />} />
+          <Route index element={<DashboardPage />} />
+          <Route path="dashboard" element={<DashboardPage />} />
           <Route path="applicants" element={<ApplicantListPage />} />
           <Route path="applicants/create" element={<ApplicantCreatePage />} />
           <Route path="applicants/:id" element={<ApplicantDetailPage />} />

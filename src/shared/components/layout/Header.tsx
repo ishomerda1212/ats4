@@ -1,4 +1,4 @@
-import { Building2, Users, Calendar, FileText, Clock } from 'lucide-react';
+import { Building2, Users, Calendar, FileText, Clock, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -18,6 +18,16 @@ export function Header() {
             </Link>
             
             <nav className="flex space-x-4">
+              <Link to="/dashboard">
+                <Button 
+                  variant={isActive('/dashboard') || isActive('/') ? 'default' : 'ghost'}
+                  className="flex items-center space-x-2"
+                >
+                  <Home className="h-4 w-4" />
+                  <span>ダッシュボード</span>
+                </Button>
+              </Link>
+              
               <Link to="/applicants">
                 <Button 
                   variant={isActive('/applicants') ? 'default' : 'ghost'}
