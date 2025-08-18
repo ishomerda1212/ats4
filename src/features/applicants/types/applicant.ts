@@ -91,19 +91,15 @@ export interface Applicant extends BaseEntity {
   department?: string; // 学科・コース
   graduationYear: number; // 卒業年度
   currentAddress: string; // 現住所
-  hometownAddress?: string; // 帰省先住所
+  birthplace?: string; // 出身地
   phone: string; // 携帯電話
   email: string; // メール
   currentStage: SelectionStage; // 現在の選考段階
   
   // 詳細情報
-  motivation?: string; // 志望動機
-  jobSearchAxis?: string; // 就活の軸
+  experience?: string; // 学業・バイト・サークル
   otherCompanyStatus?: string; // 他社状況
-  futureVision?: string; // 将来像
-  strengths?: string; // 長所
-  weaknesses?: string; // 短所
-  experience?: string; // 経験・活動歴（趣味・サークル・アルバイト）
+  appearance?: string; // 見た目
   
   // 選考履歴
   history?: SelectionHistory[];

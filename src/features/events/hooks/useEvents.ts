@@ -1,13 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Event, EventSession, EventParticipant, ParticipationStatus } from '../types/event';
-import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
-import { mockEvents, mockEventSessions, mockEventParticipants } from '@/shared/data/mockEventData';
+import { supabase } from '@/lib/supabase';
 
 export function useEvents() {
-  const [events, setEvents] = useLocalStorage<Event[]>('events', mockEvents);
-  const [eventSessions, setEventSessions] = useLocalStorage<EventSession[]>('eventSessions', mockEventSessions);
-  const [eventParticipants, setEventParticipants] = useLocalStorage<EventParticipant[]>('eventParticipants', mockEventParticipants);
-  const [loading] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [eventSessions, setEventSessions] = useState<EventSession[]>([]);
+  const [eventParticipants, setEventParticipants] = useState<EventParticipant[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // データベースからイベントデータを取得
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Failed to fetch events:', error);
+        } else if (data) {
+          setEvents(data as Event[]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch events:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   // LocalStorageから読み込んだデータのDateオブジェクトを復元
   const normalizeSessions = (sessions: EventSession[]): EventSession[] => {

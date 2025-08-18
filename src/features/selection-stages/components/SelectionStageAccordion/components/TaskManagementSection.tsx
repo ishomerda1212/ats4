@@ -28,36 +28,39 @@ export function TaskManagementSection({
         タスク
       </h4>
       {stageTasks.map((task) => (
-        <div key={task.id} className="flex items-center justify-between p-3 border rounded-lg">
-          <div className="flex items-center space-x-3">
-            {getTaskStatusIcon(task.status)}
-            <div className="flex-1">
-              <h5 className="font-medium text-sm">{task.title}</h5>
-              <p className="text-xs text-muted-foreground">{task.description}</p>
-              <p className="text-xs text-muted-foreground">ステータス: {task.status}</p>
+        <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg bg-white hover:bg-gray-50 transition-colors">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-2">
+              <h5 className="font-medium text-sm text-gray-900 truncate">{task.title}</h5>
+              <div className="flex items-center space-x-2 ml-4">
+                <Badge className={`${getTaskStatusColor(task.status)} text-xs`}>
+                  {task.status}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEditTask(task)}
+                  className="h-8 w-8 p-0 hover:bg-gray-100"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <p className="text-xs text-gray-600 mb-1">{task.description}</p>
+            <div className="flex items-center space-x-4 text-xs text-gray-500">
               {task.dueDate && (
-                <p className="text-xs text-muted-foreground">
-                  期限: {formatDate(task.dueDate)}
-                </p>
+                <span className="flex items-center">
+                  <span className="mr-1">期限:</span>
+                  <span className="font-medium">{formatDate(task.dueDate)}</span>
+                </span>
               )}
               {task.notes && (
-                <p className="text-xs text-muted-foreground">
-                  メモ: {task.notes}
-                </p>
+                <span className="flex items-center">
+                  <span className="mr-1">メモ:</span>
+                  <span className="truncate max-w-32">{task.notes}</span>
+                </span>
               )}
             </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Badge className={getTaskStatusColor(task.status)}>
-              {task.status}
-            </Badge>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onEditTask(task)}
-            >
-              <Edit className="h-3 w-3" />
-            </Button>
           </div>
         </div>
       ))}

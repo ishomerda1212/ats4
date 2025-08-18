@@ -1,22 +1,71 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Applicant, SelectionStage } from '../types/applicant';
-import { mockApplicants, mockSelectionHistory } from '@/shared/data/mockData';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
+import { supabase } from '@/lib/supabase';
 
 export function useApplicants() {
-  const [applicants, setApplicants] = useLocalStorage<Applicant[]>('applicants', mockApplicants);
-  const [selectionHistory] = useLocalStorage('selectionHistory', mockSelectionHistory);
-  const [loading] = useState(false);
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [selectionHistory, setSelectionHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStage, setSelectedStage] = useState<SelectionStage | 'all'>('all');
 
-  // 応募者データに履歴を結合
+  // データベースから応募者データを取得
+  const fetchApplicants = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('applicants')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Failed to fetch applicants:', error);
+      } else if (data) {
+        // データベースのフィールド名をTypeScriptの型定義に合わせて変換
+        const transformedData = data.map(item => ({
+          id: item.id,
+          source: item.source,
+          name: item.name,
+          nameKana: item.name_kana, // スネークケースからキャメルケースに変換
+          gender: item.gender,
+          schoolName: item.school_name, // スネークケースからキャメルケースに変換
+          faculty: item.faculty,
+          department: item.department,
+          graduationYear: item.graduation_year, // スネークケースからキャメルケースに変換
+          currentAddress: item.current_address, // スネークケースからキャメルケースに変換
+          birthplace: item.birthplace,
+          phone: item.phone,
+          email: item.email,
+          currentStage: item.current_stage, // スネークケースからキャメルケースに変換
+          experience: item.experience,
+          otherCompanyStatus: item.other_company_status, // スネークケースからキャメルケースに変換
+          appearance: item.appearance,
+          createdAt: item.created_at, // スネークケースからキャメルケースに変換
+          updatedAt: item.updated_at, // スネークケースからキャメルケースに変換
+        }));
+        
+        console.log('📊 Transformed applicants data:', transformedData);
+        setApplicants(transformedData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch applicants:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchApplicants();
+  }, [fetchApplicants]);
+
+  // 応募者データ（履歴は後で実装）
   const applicantsWithHistory = useMemo(() => {
     return applicants.map(applicant => ({
       ...applicant,
-      history: selectionHistory.filter(history => history.applicantId === applicant.id)
+      history: [] // 履歴は後で実装
     }));
-  }, [applicants, selectionHistory]);
+  }, [applicants]);
 
   const filteredApplicants = applicantsWithHistory.filter((applicant) => {
     const matchesSearch = applicant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -61,6 +110,7 @@ export function useApplicants() {
     getStageCount,
     updateApplicant,
     addApplicant,
-    selectionHistory
+    selectionHistory,
+    refresh: fetchApplicants
   };
 }

@@ -1,22 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 import { Event, EventSession, EventParticipant } from '@/features/events/types/event';
 import { Applicant } from '@/features/applicants/types/applicant';
 import { ApplicantEventResponse, SessionResponse, EventFormData, SessionFormData } from '../types/applicantForm';
 import { generateId } from '@/shared/utils/date';
-import { mockEvents, mockEventSessions, mockEventParticipants } from '@/shared/data/mockEventData';
-import { mockApplicants } from '@/shared/data/mockData';
-import { mockApplicantResponses } from '@/shared/data/mockApplicantResponseData';
+import { supabase } from '@/lib/supabase';
 
 export const useApplicantForm = (applicantId: string, eventId: string) => {
-  // デバッグ情報をコンソールに出力
-  // console.log('useApplicantForm - Parameters:', { applicantId, eventId });
-  
-  const [events] = useLocalStorage<Event[]>('events', mockEvents);
-  const [eventSessions] = useLocalStorage<EventSession[]>('eventSessions', mockEventSessions);
-  const [eventParticipants, setEventParticipants] = useLocalStorage<EventParticipant[]>('eventParticipants', mockEventParticipants);
-  const [applicants] = useLocalStorage<Applicant[]>('applicants', mockApplicants);
-  const [applicantResponses, setApplicantResponses] = useLocalStorage<ApplicantEventResponse[]>('applicantResponses', mockApplicantResponses);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [eventSessions, setEventSessions] = useState<EventSession[]>([]);
+  const [eventParticipants, setEventParticipants] = useState<EventParticipant[]>([]);
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [applicantResponses, setApplicantResponses] = useState<ApplicantEventResponse[]>([]);
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

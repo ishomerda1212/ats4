@@ -100,42 +100,7 @@ export function checkEventSessionData(eventId: string, sessionId: string) {
  * モックデータを強制的にローカルストレージに設定
  */
 export function forceLoadMockData() {
-  console.log('モックデータの強制読み込みを開始します...');
-  
-  // モックデータをインポート
-  import('@/shared/data/mockEventData').then(({ mockEvents, mockEventSessions, mockEventParticipants }) => {
-    localStorage.setItem('events', JSON.stringify(mockEvents));
-    localStorage.setItem('eventSessions', JSON.stringify(mockEventSessions));
-    localStorage.setItem('eventParticipants', JSON.stringify(mockEventParticipants));
-    console.log('✅ イベント関連モックデータを強制読み込みしました。');
-    console.log('イベント数:', mockEvents.length);
-    console.log('セッション数:', mockEventSessions.length);
-    console.log('参加者数:', mockEventParticipants.length);
-    
-    // 読み込み後の確認
-    console.log('読み込み後の確認:');
-    console.log('events in localStorage:', localStorage.getItem('events') ? 'あり' : 'なし');
-    console.log('eventSessions in localStorage:', localStorage.getItem('eventSessions') ? 'あり' : 'なし');
-    console.log('eventParticipants in localStorage:', localStorage.getItem('eventParticipants') ? 'あり' : 'なし');
-  }).catch(error => {
-    console.error('❌ イベントデータの読み込みに失敗:', error);
-  });
-
-  import('@/shared/data/mockData').then(({ mockApplicants }) => {
-    localStorage.setItem('applicants', JSON.stringify(mockApplicants));
-    console.log('✅ 応募者モックデータを強制読み込みしました。');
-    console.log('応募者数:', mockApplicants.length);
-  }).catch(error => {
-    console.error('❌ 応募者データの読み込みに失敗:', error);
-  });
-
-  import('@/shared/data/mockApplicantResponseData').then(({ mockApplicantResponses }) => {
-    localStorage.setItem('applicantResponses', JSON.stringify(mockApplicantResponses));
-    console.log('✅ 応募者回答モックデータを強制読み込みしました。');
-    console.log('回答数:', mockApplicantResponses.length);
-  }).catch(error => {
-    console.error('❌ 応募者回答データの読み込みに失敗:', error);
-  });
+  console.log('モックデータの強制読み込みは無効化されました。データベースから直接データを取得します。');
 }
 
 /**

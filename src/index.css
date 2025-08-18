@@ -96,4 +96,24 @@
   button {
     @apply text-foreground;
   }
+  
+  /* プレイスホルダーテキストのスタイル */
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-muted-foreground/40;
+    font-style: italic;
+    font-weight: 300;
+  }
+  
+  /* 入力済みテキストとの区別を明確にする */
+  input:not(:placeholder-shown),
+  textarea:not(:placeholder-shown) {
+    @apply text-foreground font-normal;
+  }
+  
+  /* フォーカス時のプレイスホルダー */
+  input:focus::placeholder,
+  textarea:focus::placeholder {
+    @apply text-muted-foreground/30;
+  }
 }

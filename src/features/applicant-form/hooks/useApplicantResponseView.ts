@@ -1,17 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 import { Event, EventSession } from '@/features/events/types/event';
 import { Applicant } from '@/features/applicants/types/applicant';
 import { ApplicantEventResponse, EventFormData, SessionFormData } from '../types/applicantForm';
-import { mockEvents, mockEventSessions } from '@/shared/data/mockEventData';
-import { mockApplicants } from '@/shared/data/mockData';
-import { mockApplicantResponses } from '@/shared/data/mockApplicantResponseData';
+import { supabase } from '@/lib/supabase';
 
 export const useApplicantResponseView = (applicantId: string, eventId: string) => {
-  const [events] = useLocalStorage<Event[]>('events', mockEvents);
-  const [eventSessions] = useLocalStorage<EventSession[]>('eventSessions', mockEventSessions);
-  const [applicants] = useLocalStorage<Applicant[]>('applicants', mockApplicants);
-  const [applicantResponses] = useLocalStorage<ApplicantEventResponse[]>('applicantResponses', mockApplicantResponses);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [eventSessions, setEventSessions] = useState<EventSession[]>([]);
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [applicantResponses, setApplicantResponses] = useState<ApplicantEventResponse[]>([]);
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

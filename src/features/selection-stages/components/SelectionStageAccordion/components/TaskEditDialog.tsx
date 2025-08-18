@@ -5,13 +5,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Save } from 'lucide-react';
-import { TaskStatus } from '@/features/tasks/types/task';
+import { TaskStatus, TaskType } from '@/features/tasks/types/task';
 import { getTaskStatusIcon } from '../utils/stageHelpers';
 
 interface TaskEditDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   taskStatus: TaskStatus;
+  taskType?: TaskType; // タスクタイプを追加
   dueDate: string;
   notes: string;
   onTaskStatusChange: (status: TaskStatus) => void;
@@ -24,6 +25,7 @@ export function TaskEditDialog({
   isOpen,
   onOpenChange,
   taskStatus,
+  taskType,
   dueDate,
   notes,
   onTaskStatusChange,
@@ -31,6 +33,14 @@ export function TaskEditDialog({
   onNotesChange,
   onSave
 }: TaskEditDialogProps) {
+  // アプローチタスクかどうかを判定
+  const isApproachTask = taskType && ['アプローチ1', 'アプローチ2', 'アプローチ3', 'アプローチ4', 'アプローチ5'].includes(taskType);
+  
+  // アプローチタスクの場合は「未着手」と「完了」のみ、それ以外はすべてのステータスを表示
+  const availableStatuses: TaskStatus[] = isApproachTask 
+    ? ['未着手', '完了']
+    : ['未着手', '返信待ち', '提出待ち', '完了'];
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent aria-describedby="task-dialog-description">
@@ -51,30 +61,14 @@ export function TaskEditDialog({
                 <SelectValue placeholder="ステータスを選択してください" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="未着手">
-                  <div className="flex items-center space-x-2">
-                    {getTaskStatusIcon('未着手')}
-                    <span>未着手</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="返信待ち">
-                  <div className="flex items-center space-x-2">
-                    {getTaskStatusIcon('返信待ち')}
-                    <span>返信待ち</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="提出待ち">
-                  <div className="flex items-center space-x-2">
-                    {getTaskStatusIcon('提出待ち')}
-                    <span>提出待ち</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="完了">
-                  <div className="flex items-center space-x-2">
-                    {getTaskStatusIcon('完了')}
-                    <span>完了</span>
-                  </div>
-                </SelectItem>
+                {availableStatuses.map((status) => (
+                  <SelectItem key={status} value={status}>
+                    <div className="flex items-center space-x-2">
+                      {getTaskStatusIcon(status)}
+                      <span>{status}</span>
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

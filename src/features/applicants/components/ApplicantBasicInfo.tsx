@@ -80,10 +80,20 @@ export function ApplicantBasicInfo({ applicant }: ApplicantBasicInfoProps) {
             <div className="flex items-center space-x-3">
               <MapPin className="h-5 w-5 text-muted-foreground" />
               <div>
-                <p className="font-medium">住所</p>
+                <p className="font-medium">現住所</p>
                 <p className="text-sm text-muted-foreground">{applicant.currentAddress}</p>
               </div>
             </div>
+
+            {applicant.birthplace && (
+              <div className="flex items-center space-x-3">
+                <MapPin className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <p className="font-medium">出身地</p>
+                  <p className="text-sm text-muted-foreground">{applicant.birthplace}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -91,96 +101,42 @@ export function ApplicantBasicInfo({ applicant }: ApplicantBasicInfoProps) {
         <div className="pt-6 border-t">
           <h3 className="text-lg font-semibold mb-4">詳細情報</h3>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* 志望動機・就活の軸・他社状況・将来像 */}
-            <div className="space-y-4">
-              {applicant.motivation && (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Target className="h-4 w-4 text-blue-600" />
-                    <h4 className="font-medium text-sm">志望動機</h4>
-                  </div>
-                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
-                    {applicant.motivation}
-                  </p>
+          <div className="space-y-4">
+            {applicant.experience && (
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Briefcase className="h-4 w-4 text-blue-600" />
+                  <h4 className="font-medium text-sm">学業・バイト・サークル</h4>
                 </div>
-              )}
+                <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
+                  {applicant.experience}
+                </p>
+              </div>
+            )}
 
-              {applicant.jobSearchAxis && (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Award className="h-4 w-4 text-green-600" />
-                    <h4 className="font-medium text-sm">就活の軸</h4>
-                  </div>
-                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
-                    {applicant.jobSearchAxis}
-                  </p>
+            {applicant.otherCompanyStatus && (
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Briefcase className="h-4 w-4 text-orange-600" />
+                  <h4 className="font-medium text-sm">他社状況</h4>
                 </div>
-              )}
+                <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
+                  {applicant.otherCompanyStatus}
+                </p>
+              </div>
+            )}
 
-              {applicant.otherCompanyStatus && (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Briefcase className="h-4 w-4 text-orange-600" />
-                    <h4 className="font-medium text-sm">他社状況</h4>
-                  </div>
-                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
-                    {applicant.otherCompanyStatus}
-                  </p>
+            {applicant.appearance && (
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <User className="h-4 w-4 text-green-600" />
+                  <h4 className="font-medium text-sm">見た目</h4>
                 </div>
-              )}
-
-              {applicant.futureVision && (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Target className="h-4 w-4 text-purple-600" />
-                    <h4 className="font-medium text-sm">将来像</h4>
-                  </div>
-                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
-                    {applicant.futureVision}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* 長所・短所・経験・活動歴 */}
-            <div className="space-y-4">
-              {applicant.strengths && (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Heart className="h-4 w-4 text-red-600" />
-                    <h4 className="font-medium text-sm">長所</h4>
-                  </div>
-                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
-                    {applicant.strengths}
-                  </p>
-                </div>
-              )}
-
-              {applicant.weaknesses && (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <User className="h-4 w-4 text-yellow-600" />
-                    <h4 className="font-medium text-sm">短所</h4>
-                  </div>
-                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
-                    {applicant.weaknesses}
-                  </p>
-                </div>
-              )}
-
-              {applicant.experience && (
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Briefcase className="h-4 w-4 text-indigo-600" />
-                    <h4 className="font-medium text-sm">経験・活動歴</h4>
-                  </div>
-                  <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
-                    {applicant.experience}
-                  </p>
-                </div>
-              )}
-            </div>
+                <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
+                  {applicant.appearance}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* 登録日と最終更新日 */}

@@ -4,7 +4,7 @@ import { ApplicantForm } from '../components/ApplicantForm';
 
 export function ApplicantEditPage() {
   const { id } = useParams<{ id: string }>();
-  const { applicants, loading } = useApplicants();
+  const { applicants, loading, refresh } = useApplicants();
 
   const applicant = applicants.find(a => a.id === id);
 
@@ -32,7 +32,7 @@ export function ApplicantEditPage() {
         <p className="text-muted-foreground mt-1">{applicant.name}さんの情報を編集します</p>
       </div>
 
-      <ApplicantForm applicant={applicant} mode="edit" />
+      <ApplicantForm applicant={applicant} mode="edit" onRefresh={refresh} />
     </div>
   );
 }

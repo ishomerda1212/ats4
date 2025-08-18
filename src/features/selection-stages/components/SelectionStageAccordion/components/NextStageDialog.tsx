@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { getNextStage } from '../utils/stageHelpers';
 import { Applicant } from '@/features/applicants/types/applicant';
+import { SELECTION_STAGES } from '@/shared/utils/constants';
 
 interface NextStageDialogProps {
   isOpen: boolean;
@@ -17,6 +18,9 @@ export function NextStageDialog({
   onAdvanceToStage
 }: NextStageDialogProps) {
   const nextStage = getNextStage(applicant.currentStage);
+  
+  // 現在の段階を除外したすべての選考段階を取得
+  const availableStages = SELECTION_STAGES.filter(stage => stage !== applicant.currentStage);
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -31,17 +35,38 @@ export function NextStageDialog({
           <p className="text-sm text-muted-foreground">
             応募者を次の段階に進めます。どの段階に進めますか？
           </p>
-          <div className="space-y-2">
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {/* 推奨の次の段階を最初に表示 */}
             {nextStage && (
-              <Button
-                key={nextStage}
-                variant="outline"
-                className="w-full justify-start"
-                onClick={() => onAdvanceToStage(nextStage)}
-              >
-                {nextStage}
-              </Button>
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">推奨の次の段階</p>
+                <Button
+                  key={nextStage}
+                  variant="default"
+                  className="w-full justify-start"
+                  onClick={() => onAdvanceToStage(nextStage)}
+                >
+                  {nextStage}
+                </Button>
+              </div>
             )}
+            
+            {/* その他の段階を表示 */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">その他の段階</p>
+              {availableStages
+                .filter(stage => !nextStage || stage !== nextStage)
+                .map((stage) => (
+                  <Button
+                    key={stage}
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => onAdvanceToStage(stage)}
+                  >
+                    {stage}
+                  </Button>
+                ))}
+            </div>
           </div>
         </div>
       </DialogContent>

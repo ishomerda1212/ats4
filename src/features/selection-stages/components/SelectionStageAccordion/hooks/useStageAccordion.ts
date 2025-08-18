@@ -94,11 +94,16 @@ export const useStageAccordion = () => {
   };
 
   // タスクを保存
-  const handleSaveTask = (setTaskDueDate: (taskId: string, date: Date) => void) => {
+  const handleSaveTask = (
+    setTaskDueDate: (taskId: string, date: Date) => void,
+    updateTaskStatus?: (taskId: string, status: TaskStatus) => void
+  ) => {
     if (!editingTask) return;
 
-    // タスクステータスの更新処理（実装予定）
-    // console.log('Task status updated:', taskStatus);
+    // タスクステータスの更新処理
+    if (updateTaskStatus && editingTask.status !== taskStatus) {
+      updateTaskStatus(editingTask.id, taskStatus);
+    }
     
     if (dueDate) {
       setTaskDueDate(editingTask.id, new Date(dueDate));

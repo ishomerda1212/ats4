@@ -1,211 +1,152 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { TaskInstance, FixedTask, TaskStatus } from '../types/task';
 import { getFixedTasksByStage } from '../data/taskTemplates';
 import { generateId } from '@/shared/utils/date';
 import { Applicant, SelectionStage } from '@/features/applicants/types/applicant';
+import { supabase } from '@/lib/supabase';
 
 // FixedTaskとTaskInstanceを組み合わせた型
 type TaskWithFixedData = FixedTask & TaskInstance;
 
-// モックデータ（実際の実装ではAPIやストレージを使用）
-const mockTaskInstances: TaskInstance[] = [
-  {
-    id: 'task-1',
-    applicantId: 'applicant-1',
-    taskId: 'fixed-task-1',
-    status: '完了',
-    dueDate: new Date('2024-01-20'),
-    completedAt: new Date('2024-01-18'),
-    notes: '完了しました',
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-18'),
-  },
-  {
-    id: 'task-2',
-    applicantId: 'applicant-1',
-    taskId: 'fixed-task-2',
-    status: '未着手',
-    dueDate: new Date('2024-01-25'),
-    notes: '未着手です',
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-21'),
-  },
-  {
-    id: 'task-3',
-    applicantId: 'applicant-2',
-    taskId: 'fixed-task-1',
-    status: '完了',
-    dueDate: new Date('2024-01-22'),
-    completedAt: new Date('2024-01-20'),
-    notes: '完了しました',
-    createdAt: new Date('2024-01-16'),
-    updatedAt: new Date('2024-01-20'),
-  },
-  {
-    id: 'task-4',
-    applicantId: 'applicant-2',
-    taskId: 'fixed-task-3',
-    status: '完了',
-    dueDate: new Date('2024-01-28'),
-    completedAt: new Date('2024-01-25'),
-    notes: '完了しました',
-    createdAt: new Date('2024-01-16'),
-    updatedAt: new Date('2024-01-25'),
-  },
-  {
-    id: 'task-5',
-    applicantId: 'applicant-3',
-    taskId: 'fixed-task-1',
-    status: '完了',
-    dueDate: new Date('2024-01-24'),
-    completedAt: new Date('2024-01-22'),
-    notes: '完了しました',
-    createdAt: new Date('2024-01-17'),
-    updatedAt: new Date('2024-01-22'),
-  },
-  {
-    id: 'task-6',
-    applicantId: 'applicant-3',
-    taskId: 'fixed-task-2',
-    status: '完了',
-    dueDate: new Date('2024-01-30'),
-    completedAt: new Date('2024-01-28'),
-    notes: '完了しました',
-    createdAt: new Date('2024-01-17'),
-    updatedAt: new Date('2024-01-28'),
-  },
-  {
-    id: 'task-7',
-    applicantId: 'applicant-4',
-    taskId: 'fixed-task-1',
-    status: '完了',
-    dueDate: new Date('2024-01-26'),
-    completedAt: new Date('2024-01-24'),
-    notes: '完了しました',
-    createdAt: new Date('2024-01-18'),
-    updatedAt: new Date('2024-01-24'),
-  },
-  {
-    id: 'task-8',
-    applicantId: 'applicant-4',
-    taskId: 'fixed-task-3',
-    status: '完了',
-    dueDate: new Date('2024-01-30'),
-    completedAt: new Date('2024-01-28'),
-    notes: '完了しました',
-    createdAt: new Date('2024-01-18'),
-    updatedAt: new Date('2024-01-28'),
-  },
-  {
-    id: 'task-9',
-    applicantId: 'applicant-5',
-    taskId: 'fixed-task-1',
-    status: '完了',
-    dueDate: new Date('2024-01-28'),
-    completedAt: new Date('2024-01-26'),
-    notes: '完了しました',
-    createdAt: new Date('2024-01-19'),
-    updatedAt: new Date('2024-01-26'),
-  },
-  {
-    id: 'task-10',
-    applicantId: 'applicant-5',
-    taskId: 'fixed-task-2',
-    status: '未着手',
-    dueDate: new Date('2024-02-02'),
-    notes: '未着手です',
-    createdAt: new Date('2024-01-19'),
-    updatedAt: new Date('2024-01-19'),
-  },
-];
-
 export const useTaskManagement = () => {
-  const [taskInstances, setTaskInstances] = useState<TaskInstance[]>(mockTaskInstances);
+  const [taskInstances, setTaskInstances] = useState<TaskInstance[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // 応募者のタスクを取得
-  const getApplicantTasks = useCallback((applicant: Applicant): TaskWithFixedData[] => {
-    const currentStage = applicant.currentStage;
-    const fixedTasks = getFixedTasksByStage(currentStage);
-    
-    return fixedTasks.map((fixedTask: FixedTask) => {
-      const instance = taskInstances.find(
-        ti => ti.applicantId === applicant.id && ti.taskId === fixedTask.id
-      );
-      
-      if (instance) {
-        return { ...fixedTask, ...instance };
-      } else {
-        // 新しいタスクインスタンスを作成
-        const newInstance: TaskInstance = {
-          id: generateId(),
-          applicantId: applicant.id,
-          taskId: fixedTask.id,
-          status: '未着手',
-          dueDate: new Date(),
-          notes: '',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        
-        // 日程調整連絡とリマインドの場合は返信待ちステータスを設定
-        if (['日程調整連絡', 'リマインド'].includes(fixedTask.type)) {
-          newInstance.status = '返信待ち';
+  // データベースからタスクインスタンスを取得
+  useEffect(() => {
+    const fetchTaskInstances = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('task_instances')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Failed to fetch task instances:', error);
+        } else if (data) {
+          // データベースのフィールド名をTypeScriptの型定義に合わせて変換
+          const transformedData = data.map(item => ({
+            id: item.id,
+            applicantId: item.applicant_id,
+            taskId: item.task_id,
+            status: item.status,
+            dueDate: item.due_date ? new Date(item.due_date) : undefined,
+            completedAt: item.completed_at ? new Date(item.completed_at) : undefined,
+            notes: item.notes,
+            createdAt: new Date(item.created_at),
+            updatedAt: new Date(item.updated_at),
+          }));
+          
+          console.log('📊 Transformed task instances:', transformedData);
+          setTaskInstances(transformedData);
         }
-        
-        // 提出書類タスクの場合は初期ステータスを設定
-        if (fixedTask.type === '提出書類') {
-          newInstance.status = '提出待ち';
-        }
-        
-        setTaskInstances(prev => [...prev, newInstance]);
-        return { ...fixedTask, ...newInstance };
+      } catch (error) {
+        console.error('Failed to fetch task instances:', error);
+      } finally {
+        setLoading(false);
       }
-    }).sort((a: TaskWithFixedData, b: TaskWithFixedData) => a.order - b.order);
-  }, [taskInstances]);
+    };
+
+    fetchTaskInstances();
+  }, []);
 
   // 応募者の特定段階のタスクを取得
-  const getApplicantTasksByStage = useCallback((applicant: Applicant, stage: string): TaskWithFixedData[] => {
-    const fixedTasks = getFixedTasksByStage(stage as SelectionStage);
+  const getApplicantTasksByStage = useCallback(async (applicant: Applicant, stage: string): Promise<TaskWithFixedData[]> => {
+    // データベースからタスクインスタンスを取得
+    const { data: dbTaskInstances, error } = await supabase
+      .from('task_instances')
+      .select('*')
+      .eq('applicant_id', applicant.id);
+      
+    if (error) {
+      console.error('Failed to fetch task instances:', error);
+      return [];
+    }
     
-    return fixedTasks.map((fixedTask: FixedTask) => {
-      const instance = taskInstances.find(
-        ti => ti.applicantId === applicant.id && ti.taskId === fixedTask.id
+    // データベースのフィールド名をTypeScriptの型定義に合わせて変換
+    const transformedInstances = dbTaskInstances?.map(item => ({
+      id: item.id,
+      applicantId: item.applicant_id,
+      taskId: item.task_id,
+      status: item.status,
+      dueDate: item.due_date ? new Date(item.due_date) : undefined,
+      completedAt: item.completed_at ? new Date(item.completed_at) : undefined,
+      notes: item.notes,
+      createdAt: new Date(item.created_at),
+      updatedAt: new Date(item.updated_at),
+    })) || [];
+    
+    // データベースからfixed_tasksも取得して、正しいマッチングを行う
+    const { data: dbFixedTasks, error: fixedTasksError } = await supabase
+      .from('fixed_tasks')
+      .select('*')
+      .eq('stage', stage)
+      .order('order_num', { ascending: true });
+      
+    if (fixedTasksError) {
+      console.error('Failed to fetch fixed tasks from database:', fixedTasksError);
+      return [];
+    }
+    
+    return dbFixedTasks.map((dbFixedTask) => {
+      const instance = transformedInstances.find(
+        ti => ti.taskId === dbFixedTask.id
       );
       
       if (instance) {
-        return { ...fixedTask, ...instance };
+        return { 
+          stage: dbFixedTask.stage,
+          title: dbFixedTask.title,
+          description: dbFixedTask.description,
+          type: dbFixedTask.type,
+          order: dbFixedTask.order_num,
+          ...instance 
+        };
       } else {
-        // 新しいタスクインスタンスを作成
+        // 新しいタスクインスタンスを作成（データベースには保存しない）
         const newInstance: TaskInstance = {
           id: generateId(),
           applicantId: applicant.id,
-          taskId: fixedTask.id,
+          taskId: dbFixedTask.id,
           status: '未着手',
-          dueDate: new Date(),
+          dueDate: undefined, // 期限なし
           notes: '',
           createdAt: new Date(),
           updatedAt: new Date(),
         };
         
         // 日程調整連絡とリマインドの場合は返信待ちステータスを設定
-        if (['日程調整連絡', 'リマインド'].includes(fixedTask.type)) {
+        if (['日程調整連絡', 'リマインド'].includes(dbFixedTask.type)) {
           newInstance.status = '返信待ち';
         }
         
         // 提出書類タスクの場合は初期ステータスを設定
-        if (fixedTask.type === '提出書類') {
+        if (dbFixedTask.type === '提出書類') {
           newInstance.status = '提出待ち';
         }
         
-        setTaskInstances(prev => [...prev, newInstance]);
-        return { ...fixedTask, ...newInstance };
+        return { 
+          stage: dbFixedTask.stage,
+          title: dbFixedTask.title,
+          description: dbFixedTask.description,
+          type: dbFixedTask.type,
+          order: dbFixedTask.order_num,
+          ...newInstance 
+        };
       }
     }).sort((a: TaskWithFixedData, b: TaskWithFixedData) => a.order - b.order);
-  }, [taskInstances]);
+  }, []);
+
+  // 応募者のタスクを取得
+  const getApplicantTasks = useCallback(async (applicant: Applicant): Promise<TaskWithFixedData[]> => {
+    const currentStage = applicant.currentStage;
+    return await getApplicantTasksByStage(applicant, currentStage);
+  }, [getApplicantTasksByStage]);
 
   // 次のタスクを取得（現在の段階のみ）
-  const getNextTask = useCallback((applicant: Applicant): TaskWithFixedData | null => {
-    const tasks = getApplicantTasks(applicant);
+  const getNextTask = useCallback(async (applicant: Applicant): Promise<TaskWithFixedData | null> => {
+    const tasks = await getApplicantTasks(applicant);
     return tasks.find(task => task.status === '未着手') || 
            tasks.find(task => task.status === '返信待ち') || 
            tasks.find(task => task.status === '提出待ち') || 
@@ -213,11 +154,11 @@ export const useTaskManagement = () => {
   }, [getApplicantTasks]);
 
   // 次のタスクを取得（全段階）
-  const getNextTaskAllStages = useCallback((applicant: Applicant): TaskWithFixedData | null => {
+  const getNextTaskAllStages = useCallback(async (applicant: Applicant): Promise<TaskWithFixedData | null> => {
     const allStages = ['エントリー', '書類選考', '会社説明会', '適性検査体験', '職場見学', '仕事体験', '人事面接', '集団面接', 'CEOセミナー', '人事面接', '最終選考', '内定面談', '不採用'];
     
     for (const stage of allStages) {
-      const tasks = getApplicantTasksByStage(applicant, stage);
+      const tasks = await getApplicantTasksByStage(applicant, stage);
       const nextTask = tasks.find(task => task.status === '未着手') || 
                       tasks.find(task => task.status === '返信待ち') ||
                       tasks.find(task => task.status === '提出待ち');
@@ -230,34 +171,90 @@ export const useTaskManagement = () => {
   }, [getApplicantTasksByStage]);
 
   // タスクステータスを更新
-  const updateTaskStatus = useCallback((
+  const updateTaskStatus = useCallback(async (
     taskInstanceId: string, 
     status: TaskStatus
   ) => {
-    setTaskInstances(prev => prev.map(task => {
-      if (task.id === taskInstanceId) {
-        const updates: Partial<TaskInstance> = {
-          status,
-          updatedAt: new Date()
-        };
-        
-        if (status === '完了' && !task.completedAt) {
-          updates.completedAt = new Date();
-        }
-        
-        return { ...task, ...updates };
+    try {
+      console.log('🔄 Updating task status:', { taskInstanceId, status });
+      
+      // データベースにタスクステータスを更新
+      const updateData: any = {
+        status,
+        updated_at: new Date().toISOString()
+      };
+      
+      if (status === '完了') {
+        updateData.completed_at = new Date().toISOString();
       }
-      return task;
-    }));
+      
+      const { error } = await supabase
+        .from('task_instances')
+        .update(updateData)
+        .eq('id', taskInstanceId);
+        
+      if (error) {
+        console.error('❌ Failed to update task status:', error);
+        throw error;
+      }
+      
+      console.log('✅ Task status updated successfully');
+      
+      // ローカル状態も更新
+      setTaskInstances(prev => prev.map(task => {
+        if (task.id === taskInstanceId) {
+          const updates: Partial<TaskInstance> = {
+            status,
+            updatedAt: new Date()
+          };
+          
+          if (status === '完了' && !task.completedAt) {
+            updates.completedAt = new Date();
+          }
+          
+          return { ...task, ...updates };
+        }
+        return task;
+      }));
+      
+    } catch (error) {
+      console.error('❌ Error updating task status:', error);
+      throw error;
+    }
   }, []);
 
   // タスクに期限を設定
-  const setTaskDueDate = useCallback((taskInstanceId: string, dueDate: Date) => {
-    setTaskInstances(prev => prev.map(task => 
-      task.id === taskInstanceId 
-        ? { ...task, dueDate, updatedAt: new Date() }
-        : task
-    ));
+  const setTaskDueDate = useCallback(async (taskInstanceId: string, dueDate: Date) => {
+    try {
+      console.log('🔄 Setting task due date:', { taskInstanceId, dueDate });
+      
+      // データベースにタスク期限を更新
+      const { error } = await supabase
+        .from('task_instances')
+        .update({
+          due_date: dueDate.toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', taskInstanceId);
+        
+      if (error) {
+        console.error('❌ Failed to update task due date:', error);
+        throw error;
+      }
+      
+      console.log('✅ Task due date updated successfully');
+      
+      // ローカル状態も更新
+      setTaskInstances(prev => prev.map(task => 
+        task.id === taskInstanceId 
+          ? { ...task, dueDate, updatedAt: new Date() }
+          : task
+      ));
+      
+    } catch (error) {
+      console.error('❌ Error updating task due date:', error);
+      throw error;
+    }
   }, []);
 
 
@@ -306,6 +303,7 @@ export const useTaskManagement = () => {
 
   return {
     taskInstances,
+    loading,
     getApplicantTasks,
     getApplicantTasksByStage,
     getNextTask,

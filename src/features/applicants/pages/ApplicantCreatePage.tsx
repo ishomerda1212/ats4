@@ -1,6 +1,9 @@
 import { ApplicantForm } from '../components/ApplicantForm';
+import { useApplicants } from '../hooks/useApplicants';
 
 export function ApplicantCreatePage() {
+  const { refresh } = useApplicants();
+
   return (
     <div className="space-y-6">
       <div>
@@ -8,7 +11,7 @@ export function ApplicantCreatePage() {
         <p className="text-muted-foreground mt-1">新しい応募者の情報を登録します</p>
       </div>
 
-      <ApplicantForm mode="create" />
+      <ApplicantForm mode="create" onRefresh={refresh} />
     </div>
   );
 }
