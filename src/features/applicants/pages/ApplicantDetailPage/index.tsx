@@ -11,8 +11,10 @@ import { usePDFStorage } from './hooks/usePDFStorage';
 export function ApplicantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
-  const { applicant, history, stageDetails, loading } = useApplicantDetail(id!);
+  const { applicant, history, stageDetails, loading, refresh, nextTask } = useApplicantDetail(id!);
   const [activeTab, setActiveTab] = useState('selection-history');
+  
+  console.log('🔍 ApplicantDetailPage - nextTask:', nextTask);
   
   // URLパラメータから前のページの情報を取得
   const fromEvent = searchParams.get('fromEvent');
@@ -20,7 +22,7 @@ export function ApplicantDetailPage() {
   
   // フックを使用して状態管理を分離
   const evaluationFormsHook = useEvaluationForms(id!);
-  const pdfStorageHook = usePDFStorage();
+  const pdfStorageHook = usePDFStorage(id!);
 
   if (loading) {
     return (
@@ -70,7 +72,7 @@ export function ApplicantDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 左側：応募者基本情報（3分の1） */}
         <div className="lg:col-span-1">
-          <ApplicantBasicInfo applicant={applicant} />
+          <ApplicantBasicInfo applicant={applicant} nextTask={nextTask} />
         </div>
         
         {/* 右側：タブコンテンツ（3分の2） */}
@@ -81,7 +83,8 @@ export function ApplicantDetailPage() {
             stageDetails={stageDetails}
             activeTab={activeTab}
             onTabChange={setActiveTab}
-            // 評定表関連のprops
+            refresh={refresh}
+            // 評定表関連
             evaluationForms={evaluationFormsHook.evaluationForms}
             formData={evaluationFormsHook.formData}
             showEvaluationForm={evaluationFormsHook.showEvaluationForm}
@@ -96,12 +99,21 @@ export function ApplicantDetailPage() {
             onDeleteForm={evaluationFormsHook.handleDeleteForm}
             onSaveEdit={evaluationFormsHook.handleSaveEdit}
             onCancelEdit={evaluationFormsHook.handleCancelEdit}
-            // PDF関連のprops
+            // PDF管理関連
             pdfFormData={pdfStorageHook.pdfFormData}
             showPdfForm={pdfStorageHook.showPdfForm}
             onShowPdfForm={pdfStorageHook.setShowPdfForm}
             onPdfFormDataChange={pdfStorageHook.handlePdfFormDataChange}
             onSavePdf={pdfStorageHook.handleSavePdf}
+            pdfDocuments={pdfStorageHook.pdfDocuments}
+            loading={pdfStorageHook.loading}
+            onDeletePdf={pdfStorageHook.handleDeletePdf}
+            onPreviewPdf={pdfStorageHook.handlePreviewPdf}
+            onDownloadPdf={pdfStorageHook.handleDownloadPdf}
+            showPdfPreview={pdfStorageHook.showPdfPreview}
+            previewPdfUrl={pdfStorageHook.previewPdfUrl}
+            previewPdfName={pdfStorageHook.previewPdfName}
+            onClosePdfPreview={pdfStorageHook.closePdfPreview}
           />
         </div>
       </div>

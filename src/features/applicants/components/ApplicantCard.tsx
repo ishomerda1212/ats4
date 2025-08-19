@@ -1,54 +1,141 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Mail, Phone, School, User, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Calendar, Mail, Phone, School, User, CheckSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Applicant } from '../types/applicant';
 import { StatusBadge } from '@/shared/components/common/StatusBadge';
 import { formatDate } from '@/shared/utils/date';
-import { useTaskManagement } from '@/features/tasks/hooks/useTaskManagement';
 import { TaskStatus } from '@/features/tasks/types/task';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+
+// 次のタスク用の拡張されたTaskInstance型
+interface ExtendedTaskInstance {
+  id: string;
+  applicantId: string;
+  taskId: string;
+  status: TaskStatus;
+  dueDate?: Date;
+  completedAt?: Date;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  title: string;
+  description: string;
+  type: string;
+}
 
 interface ApplicantCardProps {
   applicant: Applicant;
 }
 
 export function ApplicantCard({ applicant }: ApplicantCardProps) {
-  const { getNextTaskAllStages, getDaysUntilDue, getDueStatus } = useTaskManagement();
-  const nextTask = getNextTaskAllStages(applicant);
+  const [nextTask, setNextTask] = useState<ExtendedTaskInstance | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const getStatusIcon = (status: TaskStatus) => {
-    switch (status) {
-      case '完了':
-        return <CheckCircle className="h-3 w-3 text-green-600" />;
+  // 次のタスクを取得する関数
+  const fetchNextTask = async () => {
+    try {
+      setLoading(true);
+      
+      // 応募者の現在の選考段階を取得
+      const { data: applicantData } = await supabase
+        .from('applicants')
+        .select('current_stage')
+        .eq('id', applicant.id)
+        .single();
 
-      case '未着手':
-        return <AlertCircle className="h-3 w-3 text-gray-400" />;
-      default:
-        return <Clock className="h-3 w-3 text-gray-400" />;
+      if (!applicantData?.current_stage) {
+        setNextTask(null);
+        return;
+      }
+
+      // 現在の選考段階のステータスを確認
+      const { data: currentStageHistory } = await supabase
+        .from('selection_histories')
+        .select('status')
+        .eq('applicant_id', applicant.id)
+        .eq('stage', applicantData.current_stage)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      // 現在の選考段階が「完了」の場合は次のタスクを表示しない
+      if (currentStageHistory?.status === '完了') {
+        setNextTask(null);
+        return;
+      }
+
+      // 現在の選考段階のfixed_tasksを取得
+      const { data: fixedTasks } = await supabase
+        .from('fixed_tasks')
+        .select('id')
+        .eq('stage', applicantData.current_stage)
+        .order('order_num', { ascending: true });
+
+      if (!fixedTasks || fixedTasks.length === 0) {
+        setNextTask(null);
+        return;
+      }
+
+      // 現在の選考段階のタスクインスタンスを取得（完了していないもの）
+      const fixedTaskIds = fixedTasks.map(task => task.id);
+      const { data: tasks } = await supabase
+        .from('task_instances')
+        .select(`
+          *,
+          fixed_tasks (
+            title,
+            description,
+            type
+          )
+        `)
+        .eq('applicant_id', applicant.id)
+        .in('task_id', fixedTaskIds)
+        .neq('status', '完了')
+        .order('created_at', { ascending: true });
+
+      if (tasks && tasks.length > 0) {
+        // 最初の未完了タスクを次のタスクとして設定
+        const nextTaskData = tasks[0];
+        const nextTaskObj = {
+          id: nextTaskData.id,
+          applicantId: nextTaskData.applicant_id,
+          taskId: nextTaskData.task_id,
+          status: nextTaskData.status,
+          dueDate: nextTaskData.due_date ? new Date(nextTaskData.due_date) : undefined,
+          completedAt: nextTaskData.completed_at ? new Date(nextTaskData.completed_at) : undefined,
+          notes: nextTaskData.notes,
+          createdAt: new Date(nextTaskData.created_at),
+          updatedAt: new Date(nextTaskData.updated_at),
+          title: nextTaskData.fixed_tasks?.title || '',
+          description: nextTaskData.fixed_tasks?.description || '',
+          type: nextTaskData.fixed_tasks?.type || 'general'
+        };
+        
+        setNextTask(nextTaskObj);
+      } else {
+        setNextTask(null);
+      }
+    } catch (error) {
+      console.error('Failed to fetch next task:', error);
+      setNextTask(null);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchNextTask();
+  }, [applicant.id]);
 
   const getStatusColor = (status: TaskStatus) => {
     switch (status) {
       case '完了':
         return 'bg-green-100 text-green-800';
-
       case '未着手':
         return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getDueStatusColor = (dueStatus?: string) => {
-    switch (dueStatus) {
-      case 'overdue':
-        return 'bg-red-100 text-red-800';
-      case 'urgent':
-        return 'bg-orange-100 text-orange-800';
-      case 'upcoming':
-        return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -95,37 +182,22 @@ export function ApplicantCard({ applicant }: ApplicantCardProps) {
         {/* 次のタスク表示 */}
         {nextTask && (
           <div className="border-t pt-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                {getStatusIcon(nextTask.status)}
-                <span className="text-sm font-medium">次のタスク:</span>
-                <span className="text-sm">{nextTask.title}</span>
+            <div className="flex items-center space-x-2 mb-2">
+              <CheckSquare className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium">次のタスク</span>
+            </div>
+            <div className="bg-blue-50 p-3 rounded-md border border-blue-200">
+              <div className="flex items-center justify-between mb-2">
+                <h5 className="font-medium text-sm text-blue-900">{nextTask.title}</h5>
                 <Badge className={`text-xs ${getStatusColor(nextTask.status)}`}>
                   {nextTask.status}
                 </Badge>
               </div>
+              <p className="text-xs text-blue-700 mb-2">{nextTask.description}</p>
               {nextTask.dueDate && (
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">
-                    {formatDate(nextTask.dueDate)}
-                  </span>
-                  {(() => {
-                    const daysUntilDue = getDaysUntilDue(nextTask.dueDate);
-                    const dueStatus = getDueStatus(nextTask.dueDate, nextTask.status);
-                    if (dueStatus && dueStatus !== 'normal') {
-                      return (
-                        <Badge className={`text-xs ${getDueStatusColor(dueStatus)}`}>
-                          {dueStatus === 'overdue' 
-                            ? `期限切れ (${Math.abs(daysUntilDue)}日前)`
-                            : `あと${daysUntilDue}日`
-                          }
-                        </Badge>
-                      );
-                    }
-                    return null;
-                  })()}
-                </div>
+                <p className="text-xs text-blue-600">
+                  期限: {formatDate(nextTask.dueDate)}
+                </p>
               )}
             </div>
           </div>
@@ -138,7 +210,9 @@ export function ApplicantCard({ applicant }: ApplicantCardProps) {
           </div>
           
           <Link to={`/applicants/${applicant.id}`}>
-            <Button size="sm">詳細を見る</Button>
+            <Button variant="outline" size="sm">
+              詳細を見る
+            </Button>
           </Link>
         </div>
       </CardContent>

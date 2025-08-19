@@ -18,6 +18,7 @@ interface ApplicantDetailTabsProps {
   stageDetails: Record<string, unknown>;
   activeTab: string;
   onTabChange: (value: string) => void;
+  refresh?: () => void;
   // 評定表関連
   evaluationForms: EvaluationForm[];
   formData: EvaluationFormData;
@@ -39,6 +40,15 @@ interface ApplicantDetailTabsProps {
   onShowPdfForm: (show: boolean) => void;
   onPdfFormDataChange: (field: string, value: string | File | null) => void;
   onSavePdf: () => void;
+  pdfDocuments: any[]; // Added for PDFStorageTab
+  loading: boolean; // Added for PDFStorageTab
+  onDeletePdf: (documentId: string, filePath: string) => void; // Added for PDFStorageTab
+  onPreviewPdf: (document: any) => void; // Added for PDFStorageTab
+  onDownloadPdf: (document: any) => void; // Added for PDFStorageTab
+  showPdfPreview: boolean; // Added for PDFStorageTab
+  previewPdfUrl: string; // Added for PDFStorageTab
+  previewPdfName: string; // Added for PDFStorageTab
+  onClosePdfPreview: () => void; // Added for PDFStorageTab
 }
 
 export function ApplicantDetailTabs({
@@ -47,6 +57,7 @@ export function ApplicantDetailTabs({
   stageDetails,
   activeTab,
   onTabChange,
+  refresh,
   evaluationForms,
   formData,
   showEvaluationForm,
@@ -65,7 +76,16 @@ export function ApplicantDetailTabs({
   showPdfForm,
   onShowPdfForm,
   onPdfFormDataChange,
-  onSavePdf
+  onSavePdf,
+  pdfDocuments, // Added for PDFStorageTab
+  loading, // Added for PDFStorageTab
+  onDeletePdf, // Added for PDFStorageTab
+  onPreviewPdf, // Added for PDFStorageTab
+  onDownloadPdf, // Added for PDFStorageTab
+  showPdfPreview, // Added for PDFStorageTab
+  previewPdfUrl, // Added for PDFStorageTab
+  previewPdfName, // Added for PDFStorageTab
+  onClosePdfPreview // Added for PDFStorageTab
 }: ApplicantDetailTabsProps) {
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
@@ -94,6 +114,7 @@ export function ApplicantDetailTabs({
           applicant={applicant} 
           history={history}
           stageDetails={stageDetails}
+          refresh={refresh}
         />
       </TabsContent>
 
@@ -125,6 +146,15 @@ export function ApplicantDetailTabs({
           onShowPdfForm={onShowPdfForm}
           onPdfFormDataChange={onPdfFormDataChange}
           onSavePdf={onSavePdf}
+          pdfDocuments={pdfDocuments}
+          loading={loading}
+          onDeletePdf={onDeletePdf}
+          onPreviewPdf={onPreviewPdf}
+          onDownloadPdf={onDownloadPdf}
+          showPdfPreview={showPdfPreview}
+          previewPdfUrl={previewPdfUrl}
+          previewPdfName={previewPdfName}
+          onClosePdfPreview={onClosePdfPreview}
         />
       </TabsContent>
 

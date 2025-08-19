@@ -18,6 +18,7 @@ import { NextStageDialog } from './components/NextStageDialog';
 import { useState, useEffect } from 'react';
 import { FixedTask, TaskInstance, TaskStatus } from '@/features/tasks/types/task';
 import { supabase } from '@/lib/supabase';
+import { STAGES_WITH_SESSION } from '@/shared/utils/constants';
 
 // FixedTaskとTaskInstanceを組み合わせた型
 type TaskWithFixedData = FixedTask & TaskInstance;
@@ -26,12 +27,14 @@ interface SelectionStageAccordionProps {
   applicant: Applicant;
   history: SelectionHistory[];
   stageDetails?: Record<string, unknown>;
+  onRefresh?: () => void;
 }
 
 export function SelectionStageAccordion({ 
   applicant, 
   history, 
-  stageDetails = {}
+  stageDetails = {},
+  onRefresh
 }: SelectionStageAccordionProps) {
   const [stageTasksMap, setStageTasksMap] = useState<Record<string, TaskWithFixedData[]>>({});
   const [loading, setLoading] = useState(false);
@@ -75,7 +78,7 @@ export function SelectionStageAccordion({
     handleOpenResultDialog,
     handleSaveResult,
     handleResultFormChange
-  } = useStageAccordion();
+  } = useStageAccordion(applicant, onRefresh);
 
   const {
     getStageSessionInfoForStage,
@@ -210,12 +213,14 @@ export function SelectionStageAccordion({
                   <AccordionContent>
                     <div className="space-y-4 pt-4">
                       {/* セッション情報 */}
-                      <SessionBookingForm
-                        stage={item.stage}
-                        sessionInfo={sessionInfo}
-                        onOpenSessionDialog={handleOpenSessionDialog}
-                        applicantId={applicant.id}
-                      />
+                      {STAGES_WITH_SESSION.includes(item.stage as any) && (
+                        <SessionBookingForm
+                          stage={item.stage}
+                          sessionInfo={sessionInfo}
+                          onOpenSessionDialog={handleOpenSessionDialog}
+                          applicantId={applicant.id}
+                        />
+                      )}
 
                       {/* 書類選考の合否変更機能 */}
                       {item.stage === '書類選考' && (

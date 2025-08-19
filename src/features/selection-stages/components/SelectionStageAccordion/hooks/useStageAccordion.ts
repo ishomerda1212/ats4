@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { TaskInstance, TaskStatus, FixedTask } from '@/features/tasks/types/task';
 import { EventSession } from '@/features/events/types/event';
+import { Applicant } from '@/features/applicants/types/applicant';
+import { supabase } from '@/lib/supabase';
 
 // FixedTaskとTaskInstanceを組み合わせた型
 type TaskWithFixedData = FixedTask & TaskInstance;
@@ -37,7 +39,7 @@ export interface ResultFormData {
   result: string;
 }
 
-export const useStageAccordion = () => {
+export const useStageAccordion = (applicant: Applicant, onRefresh?: () => void) => {
   // タスク編集関連の状態
   const [editingTask, setEditingTask] = useState<TaskWithFixedData | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -76,12 +78,96 @@ export const useStageAccordion = () => {
   };
 
   // 選択した段階に進める
-  const advanceToSelectedStage = (selectedStage: string) => {
-    // ここで選考段階を進める処理を実装
-    // console.log('Advancing to stage:', selectedStage);
-    // 未使用変数エラー回避のための参照
-    void selectedStage;
-    setIsNextStageDialogOpen(false);
+  const advanceToSelectedStage = async (selectedStage: string) => {
+    try {
+      // 1. 前の段階（現在進行中の段階）を完了にする
+      const { error: updatePreviousError } = await supabase
+        .from('selection_histories')
+        .update({
+          status: '完了',
+          updated_at: new Date().toISOString()
+        })
+        .eq('applicant_id', applicant.id)
+        .eq('status', '進行中');
+        
+      if (updatePreviousError) {
+        console.error('Failed to update previous stage status:', updatePreviousError);
+        return;
+      }
+      
+      // 2. 選考履歴に新しい段階を追加
+      const { error } = await supabase
+        .from('selection_histories')
+        .insert([{
+          applicant_id: applicant.id,
+          stage: selectedStage,
+          status: '進行中',
+          notes: '次の段階に進めました',
+        }]);
+        
+      if (error) {
+        console.error('Failed to create selection history:', error);
+        return;
+      }
+      
+      // 3. 応募者の現在の段階を更新
+      const { error: updateError } = await supabase
+        .from('applicants')
+        .update({
+          current_stage: selectedStage,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', applicant.id);
+        
+      if (updateError) {
+        console.error('Failed to update applicant current stage:', updateError);
+        return;
+      }
+
+      // 4. 新しい段階のタスクを自動生成
+      const { data: fixedTasks, error: fixedTasksError } = await supabase
+        .from('fixed_tasks')
+        .select('id')
+        .eq('stage', selectedStage)
+        .order('order_num', { ascending: true });
+
+      if (fixedTasksError) {
+        console.error('Failed to fetch fixed tasks:', fixedTasksError);
+        return;
+      }
+
+      if (fixedTasks && fixedTasks.length > 0) {
+        // タスクインスタンスを作成
+        const taskInstances = fixedTasks.map(task => ({
+          applicant_id: applicant.id,
+          task_id: task.id,
+          status: '未着手',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }));
+
+        const { error: taskInstancesError } = await supabase
+          .from('task_instances')
+          .insert(taskInstances);
+
+        if (taskInstancesError) {
+          console.error('Failed to create task instances:', taskInstancesError);
+          return;
+        }
+
+        console.log(`Created ${taskInstances.length} task instances for stage: ${selectedStage}`);
+      }
+      
+      console.log('Successfully advanced to stage:', selectedStage);
+      setIsNextStageDialogOpen(false);
+      
+      // 親コンポーネントに更新を通知
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      console.error('Error advancing to stage:', error);
+    }
   };
 
   // タスク編集を開始

@@ -5,18 +5,21 @@ interface SelectionHistoryTabProps {
   applicant: Applicant;
   history: SelectionHistory[];
   stageDetails: Record<string, unknown>;
+  refresh?: () => void;
 }
 
 export function SelectionHistoryTab({ 
   applicant, 
   history, 
-  stageDetails 
+  stageDetails,
+  refresh
 }: SelectionHistoryTabProps) {
   return (
     <SelectionStageAccordion 
       applicant={applicant} 
       history={history}
       stageDetails={stageDetails}
+      onRefresh={refresh}
     />
   );
 }
