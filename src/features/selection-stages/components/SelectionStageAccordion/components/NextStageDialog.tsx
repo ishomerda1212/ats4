@@ -1,7 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Applicant } from '@/features/applicants/types/applicant';
-import { getNextStage } from '../utils/stageHelpers';
 import { SELECTION_STAGES } from '@/shared/utils/constants';
 
 interface NextStageDialogProps {
@@ -17,16 +16,8 @@ export function NextStageDialog({
   applicant,
   onAdvanceToStage
 }: NextStageDialogProps) {
-  const recommendedNextStage = getNextStage(applicant.currentStage);
-  
   // 現在の段階以外のすべての段階を取得
   const availableStages = SELECTION_STAGES.filter(stage => stage !== applicant.currentStage);
-  
-  // 推奨段階を最初に配置し、残りをアルファベット順にソート
-  const sortedStages = [
-    ...(recommendedNextStage ? [recommendedNextStage] : []),
-    ...availableStages.filter(stage => stage !== recommendedNextStage).sort()
-  ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -40,31 +31,18 @@ export function NextStageDialog({
           </p>
           
           <div className="grid grid-cols-2 gap-3">
-            {sortedStages.map((stage) => {
-              const isRecommended = stage === recommendedNextStage;
-              
-              return (
-                <Button
-                  key={stage}
-                  variant={isRecommended ? "default" : "outline"}
-                  className={`h-auto p-4 text-left justify-start ${
-                    isRecommended 
-                      ? "bg-blue-600 text-white hover:bg-blue-700" 
-                      : "hover:bg-gray-50"
-                  }`}
-                  onClick={() => onAdvanceToStage(stage)}
-                >
-                  <div className="flex flex-col items-start">
-                    <span className="font-medium">{stage}</span>
-                    {isRecommended && (
-                      <span className="text-xs opacity-90 mt-1">
-                        推奨の次の段階
-                      </span>
-                    )}
-                  </div>
-                </Button>
-              );
-            })}
+            {availableStages.map((stage) => (
+              <Button
+                key={stage}
+                variant="outline"
+                className="h-auto p-4 text-left justify-start hover:bg-gray-50"
+                onClick={() => onAdvanceToStage(stage)}
+              >
+                <div className="flex flex-col items-start">
+                  <span className="font-medium">{stage}</span>
+                </div>
+              </Button>
+            ))}
           </div>
         </div>
       </DialogContent>

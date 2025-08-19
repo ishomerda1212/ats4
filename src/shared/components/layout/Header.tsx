@@ -20,7 +20,7 @@ export function Header() {
             <nav className="flex space-x-4">
               <Link to="/dashboard">
                 <Button 
-                  variant={isActive('/dashboard') || isActive('/') ? 'default' : 'ghost'}
+                  variant={isActive('/dashboard') ? 'default' : 'ghost'}
                   className="flex items-center space-x-2"
                 >
                   <Home className="h-4 w-4" />
@@ -35,6 +35,16 @@ export function Header() {
                 >
                   <Users className="h-4 w-4" />
                   <span>応募者管理</span>
+                </Button>
+              </Link>
+              
+              <Link to="/tasks">
+                <Button 
+                  variant={isActive('/tasks') ? 'default' : 'ghost'}
+                  className="flex items-center space-x-2"
+                >
+                  <Clock className="h-4 w-4" />
+                  <span>タスク管理</span>
                 </Button>
               </Link>
               
@@ -57,17 +67,6 @@ export function Header() {
                   <span>レポート</span>
                 </Button>
               </Link>
-              
-              <Link to="/tasks">
-                <Button 
-                  variant={isActive('/tasks') ? 'default' : 'ghost'}
-                  className="flex items-center space-x-2"
-                >
-                  <Clock className="h-4 w-4" />
-                  <span>タスク管理</span>
-                </Button>
-              </Link>
-              
             </nav>
           </div>
         </div>

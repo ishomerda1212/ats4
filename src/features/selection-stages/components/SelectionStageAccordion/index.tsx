@@ -173,17 +173,15 @@ export function SelectionStageAccordion({
             <Clock className="h-5 w-5" />
             <span>選考履歴</span>
           </CardTitle>
-          {getNextStage(applicant.currentStage) && (
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={openNextStageDialog}
-              className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              次の段階に進める
-            </Button>
-          )}
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={openNextStageDialog}
+            className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            次の段階に進める
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
