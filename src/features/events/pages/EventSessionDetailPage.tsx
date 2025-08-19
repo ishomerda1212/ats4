@@ -220,6 +220,7 @@ export function EventSessionDetailPage() {
                 <div className="mb-4">
                   <EventSessionForm
                     eventId={event.id}
+                    eventName={event.name}
                     session={editingSession || undefined}
                     mode={editingSession ? 'edit' : 'create'}
                     onCancel={handleSessionFormCancel}

@@ -3,8 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { EventSession } from '../types/event';
-import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
-import { mockEventSessions } from '@/shared/data/mockEventData';
+import { supabase } from '@/lib/supabase';
 import { generateId } from '@/shared/utils/date';
 import { toast } from '@/hooks/use-toast';
 
@@ -22,25 +21,17 @@ const eventSessionSchema = z.object({
 }, {
   message: "終了日時は開始日時より後に設定してください",
   path: ["endDateTime"],
-}).refine((data) => {
-  if (data.format === 'オンライン' || data.format === 'ハイブリッド') {
-    return data.zoomUrl && data.zoomUrl.trim().length > 0;
-  }
-  return true;
-}, {
-  message: "オンラインまたはハイブリッド形式の場合はZOOM URLを入力してください",
-  path: ["zoomUrl"],
 });
 
 type EventSessionFormData = z.infer<typeof eventSessionSchema>;
 
 export function useEventSessionForm(
   eventId: string,
+  eventName: string, // イベント名を追加
   session?: EventSession,
   mode: 'create' | 'edit' = 'create',
   onSuccess?: () => void
 ) {
-  const [, setEventSessions] = useLocalStorage<EventSession[]>('eventSessions', mockEventSessions);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<EventSessionFormData>({
@@ -66,40 +57,52 @@ export function useEventSessionForm(
     setLoading(true);
     try {
       if (mode === 'create') {
-        const newSession: EventSession = {
-          id: generateId(),
-          eventId,
-          name: `セッション ${Date.now()}`,
-          start: new Date(data.startDateTime),
-          end: new Date(data.endDateTime),
-          venue: data.venue,
-          format: data.format,
-          zoomUrl: data.zoomUrl,
-          notes: data.notes,
-          participants: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        setEventSessions(current => [...current, newSession]);
+        // 新しいセッションを作成
+        const { error } = await supabase
+          .from('event_sessions')
+          .insert({
+            id: crypto.randomUUID(),
+            event_id: eventId,
+            name: eventName, // イベント名を使用
+            start_time: data.startDateTime,
+            end_time: data.endDateTime,
+            venue: data.venue,
+            format: data.format,
+            zoom_url: data.zoomUrl || null,
+            notes: data.notes || null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+
+        if (error) {
+          console.error('Failed to create session:', error);
+          throw error;
+        }
         
         toast({
           title: "日時を追加しました",
           description: "新しい開催日時が正常に追加されました。",
         });
       } else if (session) {
-        const updatedSession: EventSession = {
-          ...session,
-          start: new Date(data.startDateTime),
-          end: new Date(data.endDateTime),
-          venue: data.venue,
-          format: data.format,
-          zoomUrl: data.zoomUrl,
-          notes: data.notes,
-          updatedAt: new Date(),
-        };
-        setEventSessions(current => 
-          current.map(s => s.id === session.id ? updatedSession : s)
-        );
+        // 既存のセッションを更新
+        const { error } = await supabase
+          .from('event_sessions')
+          .update({
+            name: eventName, // イベント名を使用
+            start_time: data.startDateTime,
+            end_time: data.endDateTime,
+            venue: data.venue,
+            format: data.format,
+            zoom_url: data.zoomUrl || null,
+            notes: data.notes || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', session.id);
+
+        if (error) {
+          console.error('Failed to update session:', error);
+          throw error;
+        }
         
         toast({
           title: "日時を更新しました",
@@ -108,7 +111,8 @@ export function useEventSessionForm(
       }
 
       onSuccess?.();
-    } catch {
+    } catch (error) {
+      console.error('Session save error:', error);
       toast({
         title: "エラー",
         description: "セッションの保存に失敗しました。",

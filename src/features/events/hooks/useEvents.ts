@@ -33,36 +33,81 @@ export function useEvents() {
     fetchEvents();
   }, []);
 
-  // LocalStorageから読み込んだデータのDateオブジェクトを復元
-  const normalizeSessions = (sessions: EventSession[]): EventSession[] => {
-    return sessions.map(session => ({
-      ...session,
-      start: session.start instanceof Date ? session.start : new Date(session.start),
-      end: session.end instanceof Date ? session.end : new Date(session.end),
-      createdAt: session.createdAt instanceof Date ? session.createdAt : new Date(session.createdAt),
-      updatedAt: session.updatedAt instanceof Date ? session.updatedAt : new Date(session.updatedAt),
-    }));
-  };
+  // データベースからイベントセッションデータを取得
+  useEffect(() => {
+    const fetchEventSessions = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('event_sessions')
+          .select('*')
+          .order('created_at', { ascending: true });
 
-  const normalizeParticipants = (participants: EventParticipant[]): EventParticipant[] => {
-    return participants.map(participant => ({
-      ...participant,
-      joinedAt: participant.joinedAt ? (participant.joinedAt instanceof Date ? participant.joinedAt : new Date(participant.joinedAt)) : undefined,
-      createdAt: participant.createdAt instanceof Date ? participant.createdAt : new Date(participant.createdAt),
-      updatedAt: participant.updatedAt instanceof Date ? participant.updatedAt : new Date(participant.updatedAt),
-    }));
-  };
+        if (error) {
+          console.error('Failed to fetch event sessions:', error);
+        } else if (data) {
+          // データベースのデータをフロントエンドの型に変換
+          const sessions: EventSession[] = data.map((row: any) => ({
+            id: row.id,
+            eventId: row.event_id,
+            name: row.name,
+            start: new Date(row.start_time),
+            end: new Date(row.end_time),
+            venue: row.venue,
+            format: row.format,
+            zoomUrl: row.zoom_url,
+            notes: row.notes,
+            participants: [], // 参加者は別途取得
+            createdAt: new Date(row.created_at),
+            updatedAt: new Date(row.updated_at),
+          }));
+          setEventSessions(sessions);
+        }
+      } catch (error) {
+        console.error('Failed to fetch event sessions:', error);
+      }
+    };
 
-  // 正規化されたセッションと参加者データ
-  const normalizedSessions = normalizeSessions(eventSessions);
-  const normalizedParticipants = normalizeParticipants(eventParticipants);
+    fetchEventSessions();
+  }, []);
+
+  // データベースからイベント参加者データを取得
+  useEffect(() => {
+    const fetchEventParticipants = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('event_participants')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Failed to fetch event participants:', error);
+        } else if (data) {
+          // データベースのデータをフロントエンドの型に変換
+          const participants: EventParticipant[] = data.map((row: any) => ({
+            id: row.id,
+            sessionId: row.session_id,
+            applicantId: row.applicant_id,
+            status: row.status,
+            joinedAt: row.joined_at ? new Date(row.joined_at) : undefined,
+            createdAt: new Date(row.created_at),
+            updatedAt: new Date(row.updated_at),
+          }));
+          setEventParticipants(participants);
+        }
+      } catch (error) {
+        console.error('Failed to fetch event participants:', error);
+      }
+    };
+
+    fetchEventParticipants();
+  }, []);
 
   const getEventSessions = (eventId: string) => {
-    return normalizedSessions.filter(session => session.eventId === eventId);
+    return eventSessions.filter(session => session.eventId === eventId);
   };
 
   const getParticipantsBySession = (sessionId: string) => {
-    return normalizedParticipants.filter(participant => participant.sessionId === sessionId);
+    return eventParticipants.filter(participant => participant.sessionId === sessionId);
   };
 
   const getEventParticipantCount = (eventId: string) => {
@@ -72,84 +117,265 @@ export function useEvents() {
     }, 0);
   };
 
-  const addEvent = (event: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newEvent: Event = {
-      ...event,
-      id: `event-${Date.now()}`,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    setEvents(current => [...current, newEvent]);
-    return newEvent;
+  const addEvent = async (event: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .insert({
+          id: crypto.randomUUID(),
+          title: event.name,
+          description: event.description,
+          type: event.stage,
+          start_date: new Date().toISOString(), // Event型にはstartDateがないため、現在時刻を使用
+          end_date: new Date().toISOString(), // Event型にはendDateがないため、現在時刻を使用
+          venue: event.venue,
+          max_participants: event.maxParticipants,
+          status: event.status,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Failed to add event:', error);
+        throw error;
+      }
+
+      const newEvent: Event = {
+        ...event,
+        id: data.id,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+      };
+      setEvents(current => [...current, newEvent]);
+      return newEvent;
+    } catch (error) {
+      console.error('Failed to add event:', error);
+      throw error;
+    }
   };
 
-  const updateEvent = (id: string, updates: Partial<Event>) => {
-    setEvents(current =>
-      current.map(event =>
-        event.id === id
-          ? { ...event, ...updates, updatedAt: new Date() }
-          : event
-      )
-    );
+  const updateEvent = async (id: string, updates: Partial<Event>) => {
+    try {
+      const updateData: any = {
+        updated_at: new Date().toISOString(),
+      };
+
+      if (updates.name) updateData.title = updates.name;
+      if (updates.description) updateData.description = updates.description;
+      if (updates.stage) updateData.type = updates.stage;
+      if (updates.venue) updateData.venue = updates.venue;
+      if (updates.maxParticipants) updateData.max_participants = updates.maxParticipants;
+      if (updates.status) updateData.status = updates.status;
+
+      const { error } = await supabase
+        .from('events')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) {
+        console.error('Failed to update event:', error);
+        throw error;
+      }
+
+      setEvents(current =>
+        current.map(event =>
+          event.id === id
+            ? { ...event, ...updates, updatedAt: new Date() }
+            : event
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update event:', error);
+      throw error;
+    }
   };
 
-  const deleteEvent = (id: string) => {
-    setEvents(current => current.filter(event => event.id !== id));
-    // 関連するセッションと参加者も削除
-    const sessionIds = normalizedSessions.filter(session => session.eventId === id).map(s => s.id);
-    setEventSessions(current => current.filter(session => session.eventId !== id));
-    setEventParticipants(current => 
-      current.filter(participant => !sessionIds.includes(participant.sessionId))
-    );
+  const deleteEvent = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Failed to delete event:', error);
+        throw error;
+      }
+
+      setEvents(current => current.filter(event => event.id !== id));
+      // 関連するセッションと参加者も削除
+      const sessionIds = eventSessions.filter(session => session.eventId === id).map(s => s.id);
+      setEventSessions(current => current.filter(session => session.eventId !== id));
+      setEventParticipants(current => 
+        current.filter(participant => !sessionIds.includes(participant.sessionId))
+      );
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+      throw error;
+    }
   };
 
-  const addEventSession = (session: Omit<EventSession, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newSession: EventSession = {
-      ...session,
-      id: `session-${Date.now()}`,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    setEventSessions(current => [...current, newSession]);
-    return newSession;
+  const addEventSession = async (session: Omit<EventSession, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('event_sessions')
+        .insert({
+          id: crypto.randomUUID(),
+          event_id: session.eventId,
+          name: session.name,
+          start_time: session.start.toISOString(),
+          end_time: session.end.toISOString(),
+          venue: session.venue,
+          format: session.format,
+          zoom_url: session.zoomUrl || null,
+          notes: session.notes || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Failed to add event session:', error);
+        throw error;
+      }
+
+      const newSession: EventSession = {
+        ...session,
+        id: data.id,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+      };
+      setEventSessions(current => [...current, newSession]);
+      return newSession;
+    } catch (error) {
+      console.error('Failed to add event session:', error);
+      throw error;
+    }
   };
 
-  const updateEventSession = (id: string, updates: Partial<EventSession>) => {
-    setEventSessions(current =>
-      current.map(session =>
-        session.id === id
-          ? { ...session, ...updates, updatedAt: new Date() }
-          : session
-      )
-    );
+  const updateEventSession = async (id: string, updates: Partial<EventSession>) => {
+    try {
+      const updateData: any = {
+        updated_at: new Date().toISOString(),
+      };
+
+      if (updates.name) updateData.name = updates.name;
+      if (updates.start) updateData.start_time = updates.start.toISOString();
+      if (updates.end) updateData.end_time = updates.end.toISOString();
+      if (updates.venue) updateData.venue = updates.venue;
+      if (updates.format) updateData.format = updates.format;
+      if (updates.zoomUrl !== undefined) updateData.zoom_url = updates.zoomUrl;
+      if (updates.notes !== undefined) updateData.notes = updates.notes;
+
+      const { error } = await supabase
+        .from('event_sessions')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) {
+        console.error('Failed to update event session:', error);
+        throw error;
+      }
+
+      setEventSessions(current =>
+        current.map(session =>
+          session.id === id
+            ? { ...session, ...updates, updatedAt: new Date() }
+            : session
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update event session:', error);
+      throw error;
+    }
   };
 
-  const deleteEventSession = (id: string) => {
-    setEventSessions(current => current.filter(session => session.id !== id));
-    setEventParticipants(current => 
-      current.filter(participant => participant.sessionId !== id)
-    );
+  const deleteEventSession = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('event_sessions')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Failed to delete event session:', error);
+        throw error;
+      }
+
+      setEventSessions(current => current.filter(session => session.id !== id));
+      setEventParticipants(current => 
+        current.filter(participant => participant.sessionId !== id)
+      );
+    } catch (error) {
+      console.error('Failed to delete event session:', error);
+      throw error;
+    }
   };
 
-  const registerParticipant = (participant: Omit<EventParticipant, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newParticipant: EventParticipant = {
-      ...participant,
-      id: `participant-${Date.now()}`,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    setEventParticipants(current => [...current, newParticipant]);
-    return newParticipant;
+  const registerParticipant = async (participant: Omit<EventParticipant, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('event_participants')
+        .insert({
+          id: crypto.randomUUID(),
+          session_id: participant.sessionId,
+          applicant_id: participant.applicantId,
+          status: participant.status,
+          joined_at: participant.joinedAt?.toISOString() || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Failed to register participant:', error);
+        throw error;
+      }
+
+      const newParticipant: EventParticipant = {
+        ...participant,
+        id: data.id,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+      };
+      setEventParticipants(current => [...current, newParticipant]);
+      return newParticipant;
+    } catch (error) {
+      console.error('Failed to register participant:', error);
+      throw error;
+    }
   };
 
-  const updateParticipantStatus = (id: string, status: ParticipationStatus) => {
-    setEventParticipants(current =>
-      current.map(participant =>
-        participant.id === id
-          ? { ...participant, status, updatedAt: new Date() }
-          : participant
-      )
-    );
+  const updateParticipantStatus = async (id: string, status: ParticipationStatus) => {
+    try {
+      const { error } = await supabase
+        .from('event_participants')
+        .update({
+          status,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Failed to update participant status:', error);
+        throw error;
+      }
+
+      setEventParticipants(current =>
+        current.map(participant =>
+          participant.id === id
+            ? { ...participant, status, updatedAt: new Date() }
+            : participant
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update participant status:', error);
+      throw error;
+    }
   };
 
   return {

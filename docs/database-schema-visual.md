@@ -182,6 +182,8 @@ graph TB
 │     format                ENUM           NOT NULL          │ -- 開催形式
 │     zoom_url              VARCHAR(500)                     │ -- ZOOM URL
 │     notes                 TEXT                             │ -- 備考
+│     created_at            TIMESTAMP      NOT NULL          │ -- 作成日時
+│     updated_at            TIMESTAMP      NOT NULL          │ -- 更新日時
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -189,6 +191,42 @@ graph TB
 - `PRIMARY KEY (id)`
 - `INDEX idx_event_id (event_id)`
 - `INDEX idx_start (start)`
+
+**テーブル作成SQL:**
+```sql
+CREATE TABLE IF NOT EXISTS event_sessions (
+  id VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id VARCHAR(36) NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  title VARCHAR(200) NOT NULL,
+  description TEXT NOT NULL,
+  start TIMESTAMP WITH TIME ZONE NOT NULL,
+  end TIMESTAMP WITH TIME ZONE NOT NULL,
+  venue VARCHAR(200) NOT NULL,
+  format VARCHAR(20) NOT NULL CHECK (format IN ('対面', 'オンライン', 'ハイブリッド')),
+  zoom_url VARCHAR(500),
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- インデックスの作成
+CREATE INDEX IF NOT EXISTS idx_event_sessions_event_id ON event_sessions(event_id);
+CREATE INDEX IF NOT EXISTS idx_event_sessions_start ON event_sessions(start);
+
+-- updated_atを自動更新するトリガー
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_event_sessions_updated_at 
+  BEFORE UPDATE ON event_sessions 
+  FOR EACH ROW 
+  EXECUTE FUNCTION update_updated_at_column();
+```
 
 ### 7. イベント参加者テーブル（event_participants）
 
