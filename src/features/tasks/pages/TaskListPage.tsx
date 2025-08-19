@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,20 +16,23 @@ import {
   SortAsc,
   SortDesc,
   Edit,
-  ExternalLink
+  ExternalLink,
+  ChevronDown
 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useTaskManagement } from '../hooks/useTaskManagement';
 import { useApplicants } from '@/features/applicants/hooks/useApplicants';
 import { TaskStatus, TaskInstance, FixedTask } from '../types/task';
 import { Applicant } from '@/features/applicants/types/applicant';
 import { formatDate } from '@/shared/utils/date';
 
-type FilterStatus = 'all' | 'pending' | 'in-progress' | 'completed' | 'overdue' | 'upcoming';
+
 type SortBy = 'dueDate' | 'applicant' | 'stage' | 'status';
 type SortOrder = 'asc' | 'desc';
 
 interface FilterOptions {
-  status: FilterStatus;
+  statuses: string[]; // 複数選択可能なステータス
   source: string;
   stage: string;
   dueDateFrom: string;
@@ -40,9 +43,10 @@ interface FilterOptions {
 export function TaskListPage() {
   const { getDaysUntilDue, getDueStatus, getApplicantTasksByStage, updateTaskStatus, setTaskDueDate } = useTaskManagement();
   const { applicants } = useApplicants();
+  const STATUS_OPTIONS: string[] = ['未着手', '返信待ち', '提出待ち', '完了'];
   
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    status: 'all',
+    statuses: ['未着手', '返信待ち', '提出待ち'], // 初期値で「完了」以外を選択
     source: 'all',
     stage: 'all',
     dueDateFrom: '',
@@ -61,36 +65,52 @@ export function TaskListPage() {
   const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
 
-  // 全タスクを取得
-  const allTasks = useMemo(() => {
-    const tasks: Array<{
-      applicant: Applicant;
-      task: FixedTask & TaskInstance;
-      daysUntilDue?: number;
-      dueStatus?: string;
-    }> = [];
+  // 非同期でタスクを取得
+  const [allTasksData, setAllTasksData] = useState<Array<{
+    applicant: Applicant;
+    task: FixedTask & TaskInstance;
+    daysUntilDue?: number;
+    dueStatus?: string;
+  }>>([]);
 
-    // すべての選考段階のタスクを取得
-    const allStages = ['エントリー', '書類選考', '会社説明会', '適性検査', '職場見学', '仕事体験', '個別面接', '集団面接', 'CEOセミナー', '人事面接', '最終選考', '内定', '不採用'];
+  useEffect(() => {
+    const fetchAllTasks = async () => {
+      const tasks: Array<{
+        applicant: Applicant;
+        task: FixedTask & TaskInstance;
+        daysUntilDue?: number;
+        dueStatus?: string;
+      }> = [];
 
-    applicants.forEach(applicant => {
-      allStages.forEach(stage => {
-        const stageTasks = getApplicantTasksByStage(applicant, stage);
-        stageTasks.forEach(task => {
-          const daysUntilDue = task.dueDate ? getDaysUntilDue(task.dueDate) : undefined;
-          const dueStatus = task.dueDate ? getDueStatus(task.dueDate, task.status) : undefined;
-          
-          tasks.push({
-            applicant,
-            task,
-            daysUntilDue,
-            dueStatus
-          });
-        });
-      });
-    });
+      const allStages = ['エントリー', '書類選考', '会社説明会', '適性検査', '職場見学', '仕事体験', '個別面接', '集団面接', 'CEOセミナー', '人事面接', '最終選考', '内定', '不採用'];
 
-    return tasks;
+      for (const applicant of applicants) {
+        for (const stage of allStages) {
+          try {
+            const stageTasks = await getApplicantTasksByStage(applicant, stage);
+            stageTasks.forEach(task => {
+              const daysUntilDue = task.dueDate ? getDaysUntilDue(task.dueDate) : undefined;
+              const dueStatus = task.dueDate ? getDueStatus(task.dueDate, task.status) : undefined;
+              
+              tasks.push({
+                applicant,
+                task,
+                daysUntilDue,
+                dueStatus
+              });
+            });
+          } catch (error) {
+            console.error(`Failed to fetch tasks for applicant ${applicant.id} stage ${stage}:`, error);
+          }
+        }
+      }
+
+      setAllTasksData(tasks);
+    };
+
+    if (applicants.length > 0) {
+      fetchAllTasks();
+    }
   }, [applicants, getApplicantTasksByStage, getDaysUntilDue, getDueStatus]);
 
   // タスク編集を開始
@@ -126,26 +146,10 @@ export function TaskListPage() {
 
   // フィルタリングとソート
   const filteredAndSortedTasks = useMemo(() => {
-    let filtered = allTasks;
+    let filtered = allTasksData;
 
     // ステータスフィルター
-    switch (filterOptions.status) {
-      case 'pending':
-        filtered = filtered.filter(({ task }) => task.status === '未着手');
-        break;
-      case 'in-progress':
-        filtered = filtered.filter(({ task }) => task.status === '返信待ち');
-        break;
-      case 'completed':
-        filtered = filtered.filter(({ task }) => task.status === '完了');
-        break;
-      case 'overdue':
-        filtered = filtered.filter(({ dueStatus }) => dueStatus === 'overdue');
-        break;
-      case 'upcoming':
-        filtered = filtered.filter(({ dueStatus }) => dueStatus === 'urgent' || dueStatus === 'upcoming');
-        break;
-    }
+    filtered = filtered.filter(({ task }) => filterOptions.statuses.includes(task.status));
 
     // 反響元フィルター
     if (filterOptions.source !== 'all') {
@@ -206,7 +210,7 @@ export function TaskListPage() {
     });
 
     return filtered;
-  }, [allTasks, filterOptions, searchQuery, sortBy, sortOrder]);
+  }, [allTasksData, filterOptions, searchQuery, sortBy, sortOrder]);
 
   const getStatusIcon = (status: TaskStatus) => {
     switch (status) {
@@ -285,22 +289,59 @@ export function TaskListPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="text-sm font-medium mb-2 block">ステータス</label>
-                <Select 
-                  value={filterOptions.status} 
-                  onValueChange={(value: FilterStatus) => setFilterOptions(prev => ({ ...prev, status: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全タスク</SelectItem>
-                    <SelectItem value="pending">未着手</SelectItem>
-                    <SelectItem value="in-progress">返信待ち</SelectItem>
-                    <SelectItem value="completed">完了</SelectItem>
-                    <SelectItem value="overdue">期限切れ</SelectItem>
-                    <SelectItem value="upcoming">期限間近</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className="w-full justify-between"
+                    >
+                      <span className="truncate text-left">
+                        {filterOptions.statuses.length === 0
+                          ? 'ステータスを選択'
+                          : filterOptions.statuses.join('、')}
+                      </span>
+                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[360px] p-0">
+                    <div className="flex items-center justify-start text-xs text-blue-600 gap-4 px-3 py-2 border-b">
+                      <button
+                        type="button"
+                        className="hover:underline"
+                        onClick={() => setFilterOptions(prev => ({ ...prev, statuses: STATUS_OPTIONS }))}
+                      >
+                        すべて選択
+                      </button>
+                      <button
+                        type="button"
+                        className="hover:underline"
+                        onClick={() => setFilterOptions(prev => ({ ...prev, statuses: [] }))}
+                      >
+                        選択解除
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 p-3">
+                      {STATUS_OPTIONS.map((status) => (
+                        <label key={status} className="flex items-center space-x-2 cursor-pointer">
+                          <Checkbox
+                            checked={filterOptions.statuses.includes(status)}
+                            onCheckedChange={(checked) =>
+                              setFilterOptions(prev => ({
+                                ...prev,
+                                statuses:
+                                  checked === true
+                                    ? [...prev.statuses, status]
+                                    : prev.statuses.filter((s) => s !== status),
+                              }))
+                            }
+                          />
+                          <span className="text-sm">{status}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <div>
@@ -436,7 +477,7 @@ export function TaskListPage() {
                     <Button
                       variant="outline"
                       onClick={() => setFilterOptions({
-                        status: 'all',
+                        statuses: ['未着手', '返信待ち', '提出待ち'],
                         source: 'all',
                         stage: 'all',
                         dueDateFrom: '',
