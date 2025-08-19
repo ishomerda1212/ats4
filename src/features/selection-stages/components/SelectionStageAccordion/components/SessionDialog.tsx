@@ -18,7 +18,8 @@ interface SessionDialogProps {
   editingStage: string;
   sessionFormData: {
     selectedSessionId: string;
-    sessionType: string;
+    sessionFormat: string; // 実施形式: 対面/オンライン/ハイブリッド
+    recruiter: string; // 担当者
     result: string;
     // 新しいセッション作成用のフィールド
     newSessionName: string;
@@ -31,7 +32,7 @@ interface SessionDialogProps {
   availableSessions: Session[];
   onSessionSelection: (sessionId: string) => void;
   onSessionFormChange: (field: string, value: string) => void;
-  onSave: () => void;
+  onSave: (isCreatingNewSession: boolean) => void;
 }
 
 // 30分単位の時間オプションを生成
@@ -62,10 +63,18 @@ export function SessionDialog({
   const [startTime, setStartTime] = useState('09:00');
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('10:00');
+  const [activeTab, setActiveTab] = useState('selection'); // 'selection' または 'creation'
 
   // ダイアログが開かれたときに初期値を設定
   useEffect(() => {
     if (isOpen) {
+      // 既存のセッション情報がある場合は、それを使用
+      if (sessionFormData.selectedSessionId) {
+        // 既存のセッションが選択されている場合は、新規作成の初期値を設定しない
+        return;
+      }
+
+      // セッション作成タブの場合のみ初期値を設定
       const now = new Date();
       const today = now.toISOString().split('T')[0];
       const currentTime = `${now.getHours().toString().padStart(2, '0')}:${Math.floor(now.getMinutes() / 30) * 30 === 0 ? '00' : '30'}`;
@@ -83,7 +92,7 @@ export function SessionDialog({
       onSessionFormChange('newSessionStart', `${today}T${currentTime}`);
       onSessionFormChange('newSessionEnd', `${today}T${endTimeStr}`);
     }
-  }, [isOpen, onSessionFormChange]);
+  }, [isOpen, sessionFormData.selectedSessionId, onSessionFormChange]);
 
   // 開始日時が変更されたときに終了日時を自動調整
   useEffect(() => {
@@ -121,21 +130,20 @@ export function SessionDialog({
           {editingStage}のセッション情報を登録するダイアログです。既存のセッションを選択するか、新しいセッションを作成できます。
         </div>
         
-        <Tabs defaultValue="select" className="w-full">
+        <Tabs defaultValue="selection" value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="select" className="flex items-center space-x-2">
+            <TabsTrigger value="selection" className="flex items-center space-x-2">
               <Calendar className="h-4 w-4" />
               <span>セッション選択</span>
             </TabsTrigger>
-            <TabsTrigger value="create" className="flex items-center space-x-2">
+            <TabsTrigger value="creation" className="flex items-center space-x-2">
               <Plus className="h-4 w-4" />
               <span>セッション作成</span>
             </TabsTrigger>
           </TabsList>
 
-          {/* セッション選択タブ */}
-          <TabsContent value="select" className="space-y-4">
-            {/* セッション選択 */}
+          <TabsContent value="selection" className="space-y-4">
+            {/* セッション選択タブの内容 */}
             <div>
               <Label htmlFor="sessionSelect">セッション選択</Label>
               <Select 
@@ -146,25 +154,18 @@ export function SessionDialog({
                   <SelectValue placeholder="セッションを選択してください" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(() => {
-                    if (availableSessions.length === 0) {
-                      return (
-                        <SelectItem value="no-sessions" disabled>
-                          利用可能なセッションがありません
-                        </SelectItem>
-                      );
-                    }
-                    return availableSessions.map(session => (
-                      <SelectItem key={session.id} value={session.id}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{session.name}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {formatDateTime(session.start)} - {session.venue}
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ));
-                  })()}
+                  {availableSessions.map((session) => (
+                    <SelectItem key={session.id} value={session.id}>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-base">
+                          {formatDateTime(session.start)} - {formatDateTime(session.end)}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          {session.venue} • {session.format}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">
@@ -176,22 +177,31 @@ export function SessionDialog({
             <div>
               <Label htmlFor="sessionTypeSelect">実施形式</Label>
               <Select 
-                value={sessionFormData.sessionType} 
-                onValueChange={(value) => onSessionFormChange('sessionType', value)}
+                value={sessionFormData.sessionFormat} 
+                onValueChange={(value) => onSessionFormChange('sessionFormat', value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="実施形式を選択してください" />
                 </SelectTrigger>
                 <SelectContent>
-                  {SESSION_TYPE_OPTIONS.map(option => (
-                    <SelectItem key={option} value={option}>
-                      <div className="flex items-center space-x-2">
-                        {option === '対面' && <UsersIcon className="h-4 w-4" />}
-                        {option === 'オンライン' && <Monitor className="h-4 w-4" />}
-                        <span>{option}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="対面">
+                    <div className="flex items-center space-x-2">
+                      <UsersIcon className="h-4 w-4" />
+                      <span>対面</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="オンライン">
+                    <div className="flex items-center space-x-2">
+                      <Monitor className="h-4 w-4" />
+                      <span>オンライン</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="ハイブリッド">
+                    <div className="flex items-center space-x-2">
+                      <UsersIcon className="h-4 w-4" />
+                      <span>ハイブリッド</span>
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">
@@ -226,85 +236,59 @@ export function SessionDialog({
             </div>
           </TabsContent>
 
-          {/* セッション作成タブ */}
-          <TabsContent value="create" className="space-y-4">
+          <TabsContent value="creation" className="space-y-4">
+            {/* セッション作成タブの内容 */}
             <div className="grid grid-cols-2 gap-4">
-              {/* セッション名 */}
-              <div className="col-span-2">
-                <Label htmlFor="newSessionName">セッション名</Label>
-                <Input
-                  id="newSessionName"
-                  value={sessionFormData.newSessionName}
-                  onChange={(e) => onSessionFormChange('newSessionName', e.target.value)}
-                  placeholder="セッション名を入力してください"
-                />
-              </div>
-
               {/* 開始日時 */}
               <div>
-                <Label htmlFor="newSessionStart">開始日時</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    id="newSessionStartDate"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Select value={startTime} onValueChange={setStartTime}>
-                    <SelectTrigger className="w-24">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {timeOptions.map(time => (
-                        <SelectItem key={time} value={time}>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{time}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  開始日時を選択してください（時間は30分単位）
-                </p>
+                <Label htmlFor="startDate">開始日</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="startTime">開始時刻</Label>
+                <Select value={startTime} onValueChange={setStartTime}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeOptions.map((time) => (
+                      <SelectItem key={time} value={time}>
+                        {time}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* 終了日時 */}
               <div>
-                <Label htmlFor="newSessionEnd">終了日時</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    id="newSessionEndDate"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => handleEndDateTimeChange(e.target.value, endTime)}
-                    className="flex-1"
-                  />
-                  <Select 
-                    value={endTime} 
-                    onValueChange={(value) => handleEndDateTimeChange(endDate, value)}
-                  >
-                    <SelectTrigger className="w-24">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {timeOptions.map(time => (
-                        <SelectItem key={time} value={time}>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{time}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  終了日時を選択してください（時間は30分単位、デフォルトは開始時間の1時間後）
-                </p>
+                <Label htmlFor="endDate">終了日</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="endTime">終了時刻</Label>
+                <Select value={endTime} onValueChange={setEndTime}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {timeOptions.map((time) => (
+                      <SelectItem key={time} value={time}>
+                        {time}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* 会場 */}
@@ -396,7 +380,7 @@ export function SessionDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             キャンセル
           </Button>
-          <Button onClick={onSave}>
+          <Button onClick={() => onSave(activeTab === 'creation')}>
             <Save className="h-4 w-4 mr-2" />
             保存
           </Button>

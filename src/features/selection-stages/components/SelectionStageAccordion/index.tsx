@@ -1,24 +1,26 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect, useCallback } from 'react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { Accordion, AccordionContent, AccordionItem } from '@/components/ui/accordion';
-import { Clock, Plus } from 'lucide-react';
-import { Applicant, SelectionHistory } from '@/features/applicants/types/applicant';
-import { getNextStage } from './utils/stageHelpers';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Calendar, Clock, Plus } from 'lucide-react';
+import { formatDateTime } from '@/shared/utils/date';
+import { STAGES_WITH_SESSION } from '@/shared/utils/constants';
 import { useStageAccordion } from './hooks/useStageAccordion';
 import { useStageOperations } from './hooks/useStageOperations';
-import { useTaskManagement } from '@/features/tasks/hooks/useTaskManagement';
-import { StageCard } from './components/StageCard';
 import { TaskManagementSection } from './components/TaskManagementSection';
 import { SessionBookingForm } from './components/SessionBookingForm';
-import { StageResultForm } from './components/StageResultForm';
-import { TaskEditDialog } from './components/TaskEditDialog';
+import { NextStageDialog } from './components/NextStageDialog';
 import { SessionDialog } from './components/SessionDialog';
 import { ResultDialog } from './components/ResultDialog';
-import { NextStageDialog } from './components/NextStageDialog';
-import { useState, useEffect } from 'react';
+import { TaskEditDialog } from './components/TaskEditDialog';
+import { StageCard } from './components/StageCard';
+import { StageResultForm } from './components/StageResultForm';
+import { getStageSessionInfo, getAvailableSessionsForStage } from './utils/stageHelpers';
 import { FixedTask, TaskInstance, TaskStatus } from '@/features/tasks/types/task';
+import { Event, EventSession } from '@/features/events/types/event';
+import { Applicant, SelectionHistory } from '@/features/applicants/types/applicant';
 import { supabase } from '@/lib/supabase';
-import { STAGES_WITH_SESSION } from '@/shared/utils/constants';
 
 // FixedTaskとTaskInstanceを組み合わせた型
 type TaskWithFixedData = FixedTask & TaskInstance;
@@ -85,10 +87,9 @@ export function SelectionStageAccordion({
     getAvailableSessionsForStageWithData,
     getApplicantTasksForStage,
     setTaskDueDate,
+    updateTaskStatus,
     createNewSession
   } = useStageOperations();
-
-  const { updateTaskStatus } = useTaskManagement();
 
   // 各段階のタスクを非同期で取得
   const fetchStageTasks = async () => {
@@ -113,7 +114,7 @@ export function SelectionStageAccordion({
     if (history.length > 0) {
       fetchStageTasks();
     }
-  }, [history, applicant]); // getApplicantTasksForStageを依存配列から削除
+  }, [history, applicant]);
 
   // タスクステータス更新後の再取得
   const handleTaskStatusUpdate = async (taskInstanceId: string, status: TaskStatus) => {
@@ -270,7 +271,7 @@ export function SelectionStageAccordion({
           availableSessions={getAvailableSessionsForStageWithData(editingStage)}
           onSessionSelection={handleSessionSelection}
           onSessionFormChange={handleSessionFormChange}
-          onSave={() => handleSaveSession(createNewSession)}
+          onSave={(isCreatingNewSession) => handleSaveSession(createNewSession, isCreatingNewSession)}
         />
 
         {/* 書類選考合否変更ダイアログ */}

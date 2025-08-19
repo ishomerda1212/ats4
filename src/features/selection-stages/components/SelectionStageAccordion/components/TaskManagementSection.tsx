@@ -1,8 +1,9 @@
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ClipboardList, Edit } from 'lucide-react';
+import { Edit, Calendar, Clock, Clipboard } from 'lucide-react';
 import { formatDate } from '@/shared/utils/date';
-import { getTaskStatusIcon, getTaskStatusColor } from '../utils/stageHelpers';
+import { getTaskStatusColor } from '../utils/stageHelpers';
 import { FixedTask, TaskInstance } from '@/features/tasks/types/task';
 
 // FixedTaskとTaskInstanceを組み合わせた型
@@ -24,7 +25,7 @@ export function TaskManagementSection({
   return (
     <div className="space-y-3">
       <h4 className="text-sm font-medium flex items-center">
-        <ClipboardList className="h-4 w-4 mr-2" />
+        <Clipboard className="h-4 w-4 mr-2" />
         タスク
       </h4>
       {stageTasks.map((task) => (

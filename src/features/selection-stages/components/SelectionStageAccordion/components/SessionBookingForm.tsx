@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MapPin, Users, Users as UsersIcon, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Users, ExternalLink } from 'lucide-react';
 import { formatDateTime } from '@/shared/utils/date';
 import { STAGES_WITH_SESSION } from '@/shared/utils/constants';
 import { Event, EventSession } from '@/features/events/types/event';
@@ -56,25 +56,17 @@ export function SessionBookingForm({
         <div className="p-3 border rounded-lg bg-gray-50">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h5 className="font-medium text-sm">{sessionInfo.session.name}</h5>
+              <h5 className="font-medium text-base text-blue-600">
+                {formatDateTime(sessionInfo.session.start)} - {formatDateTime(sessionInfo.session.end)}
+              </h5>
               <Badge className="text-xs">
                 {sessionInfo.session.format}
               </Badge>
             </div>
-            <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-              <div className="flex items-center space-x-1">
-                <Calendar className="h-3 w-3" />
-                <span>
-                  {formatDateTime(sessionInfo.session.start)} ~ {formatDateTime(sessionInfo.session.end)}
-                </span>
-              </div>
+            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
               <div className="flex items-center space-x-1">
                 <MapPin className="h-3 w-3" />
                 <span>{sessionInfo.session.venue}</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <UsersIcon className="h-3 w-3" />
-                <span>対面</span>
               </div>
               {sessionInfo.session.maxParticipants && (
                 <div className="flex items-center space-x-1">

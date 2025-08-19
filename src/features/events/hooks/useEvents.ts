@@ -158,7 +158,7 @@ export function useEvents() {
 
   const updateEvent = async (id: string, updates: Partial<Event>) => {
     try {
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         updated_at: new Date().toISOString(),
       };
 
@@ -258,7 +258,7 @@ export function useEvents() {
 
   const updateEventSession = async (id: string, updates: Partial<EventSession>) => {
     try {
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         updated_at: new Date().toISOString(),
       };
 

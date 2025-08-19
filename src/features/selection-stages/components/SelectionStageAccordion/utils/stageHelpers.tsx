@@ -88,14 +88,12 @@ export const getStageSessionInfo = (
   events: Event[], 
   eventSessions: EventSession[]
 ) => {
-  const eventId = stageEventMapping[stage];
-  if (!eventId) return null;
-
-  const event = events.find(e => e.id === eventId);
+  // 選考段階名でイベントを検索（IDではなく名前でマッチング）
+  const event = events.find(e => e.name === stage);
   if (!event) return null;
 
   // 該当するセッションを取得
-  const sessions = eventSessions.filter(session => session.eventId === eventId);
+  const sessions = eventSessions.filter(session => session.eventId === event.id);
   if (sessions.length === 0) return null;
 
   // 最新のセッションを返す（実際の実装では、応募者の参加予定セッションを特定する必要がある）
@@ -113,12 +111,15 @@ export const getAvailableSessionsForStage = (
   events: Event[], 
   eventSessions: EventSession[]
 ) => {
-  const eventId = stageEventMapping[stage];
-  if (!eventId) return [];
-
-  const event = events.find(e => e.id === eventId);
-  if (!event) return [];
+  // 選考段階名でイベントを検索（IDではなく名前でマッチング）
+  const event = events.find(e => e.name === stage);
+  
+  if (!event) {
+    return [];
+  }
 
   // 該当するセッションを取得
-  return eventSessions.filter(session => session.eventId === eventId);
+  const sessions = eventSessions.filter(session => session.eventId === event.id);
+  
+  return sessions;
 };

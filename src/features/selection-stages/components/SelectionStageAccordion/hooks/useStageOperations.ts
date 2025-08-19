@@ -7,7 +7,8 @@ import { getStageSessionInfo, getAvailableSessionsForStage } from '../utils/stag
 export const useStageOperations = () => {
   const { 
     getApplicantTasksByStage,
-    setTaskDueDate
+    setTaskDueDate,
+    updateTaskStatus
   } = useTaskManagement();
 
   const { 
@@ -73,6 +74,7 @@ export const useStageOperations = () => {
     getAvailableSessionsForStageWithData,
     getApplicantTasksForStage,
     setTaskDueDate,
+    updateTaskStatus,
     createNewSession
   };
 };

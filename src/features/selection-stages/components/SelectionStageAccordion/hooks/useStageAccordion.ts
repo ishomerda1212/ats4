@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { TaskInstance, TaskStatus, FixedTask } from '@/features/tasks/types/task';
 import { EventSession } from '@/features/events/types/event';
 import { Applicant } from '@/features/applicants/types/applicant';
@@ -20,11 +20,12 @@ interface SessionCreationData {
 }
 
 // セッション作成関数の型
-type CreateSessionFunction = (sessionData: SessionCreationData) => EventSession;
+type CreateSessionFunction = (sessionData: SessionCreationData) => Promise<EventSession>;
 
 export interface SessionFormData {
   selectedSessionId: string;
-  sessionType: string;
+  sessionFormat: string; // 実施形式: 対面/オンライン/ハイブリッド
+  recruiter: string; // 担当者
   result: string;
   // 新しいセッション作成用のフィールド
   newSessionName: string;
@@ -55,7 +56,8 @@ export const useStageAccordion = (applicant: Applicant, onRefresh?: () => void) 
   const [editingStage, setEditingStage] = useState<string>('');
   const [sessionFormData, setSessionFormData] = useState<SessionFormData>({
     selectedSessionId: '',
-    sessionType: '',
+    sessionFormat: '', // 実施形式: 対面/オンライン/ハイブリッド
+    recruiter: '', // 担当者
     result: '',
     newSessionName: '',
     newSessionStart: '',
@@ -207,73 +209,295 @@ export const useStageAccordion = (applicant: Applicant, onRefresh?: () => void) 
   };
 
   // セッション情報登録ダイアログを開く
-  const handleOpenSessionDialog = (stage: string) => {
+  const handleOpenSessionDialog = async (stage: string) => {
     setEditingStage(stage);
+    
+    try {
+      // 既存のセッション情報を取得
+      const { data: existingHistory, error } = await supabase
+        .from('selection_histories')
+        .select(`
+          id,
+          applicant_id,
+          stage,
+          status,
+          session_id,
+          notes,
+          created_at,
+          updated_at
+        `)
+        .eq('applicant_id', applicant.id)
+        .eq('stage', stage)
+        .single();
+
+      let result = '';
+      let sessionFormat = '';
+      const recruiter = '';
+
+      if (existingHistory && !error && existingHistory.session_id) {
+        // 既存の参加者情報から合否を取得
+        const { data: existingParticipant } = await supabase
+          .from('event_participants')
+          .select('result')
+          .eq('session_id', existingHistory.session_id)
+          .eq('applicant_id', applicant.id)
+          .single();
+
+        if (existingParticipant) {
+          result = existingParticipant.result || '';
+        }
+
+        // 既存のセッション情報から実施形式を取得
+        const { data: existingSession } = await supabase
+          .from('event_sessions')
+          .select('format')
+          .eq('id', existingHistory.session_id)
+          .single();
+
+        if (existingSession) {
+          sessionFormat = existingSession.format || '';
+        }
+      }
+
+      if (existingHistory && !error) {
+        // 既存のセッション情報をフォームに設定
+        setSessionFormData({
+          selectedSessionId: existingHistory.session_id || '',
+          sessionFormat: sessionFormat,
+          recruiter: recruiter,
+          result: result,
+          newSessionName: '',
+          newSessionStart: '',
+          newSessionEnd: '',
+          newSessionVenue: '',
+          newSessionFormat: '',
+          newSessionMaxParticipants: ''
+        });
+      } else {
+        // 新規作成の場合、フォームをリセット
+        setSessionFormData({
+          selectedSessionId: '',
+          sessionFormat: '',
+          recruiter: '',
+          result: '',
+          newSessionName: '',
+          newSessionStart: '',
+          newSessionEnd: '',
+          newSessionVenue: '',
+          newSessionFormat: '',
+          newSessionMaxParticipants: ''
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch existing session data:', error);
+      // エラーが発生した場合も新規作成として扱う
+      setSessionFormData({
+        selectedSessionId: '',
+        sessionFormat: '',
+        recruiter: '',
+        result: '',
+        newSessionName: '',
+        newSessionStart: '',
+        newSessionEnd: '',
+        newSessionVenue: '',
+        newSessionFormat: '',
+        newSessionMaxParticipants: ''
+      });
+    }
+    
     setIsSessionDialogOpen(true);
   };
 
   // セッション情報を保存
-  const handleSaveSession = (createNewSession?: CreateSessionFunction) => {
-    // 新しいセッションを作成する場合
-    if (sessionFormData.newSessionName && createNewSession) {
-      try {
-        const newSession = createNewSession({
-          eventId: `event-${editingStage}`, // 仮のイベントID
-          name: sessionFormData.newSessionName,
+  const handleSaveSession = async (createNewSession?: CreateSessionFunction, isCreatingNewSession: boolean = false) => {
+    try {
+      let sessionId = sessionFormData.selectedSessionId;
+
+      // セッション作成タブで新しいセッションを作成する場合のみ
+      if (isCreatingNewSession && 
+          sessionFormData.newSessionStart && 
+          sessionFormData.newSessionEnd && 
+          sessionFormData.newSessionStart.trim() !== '' && 
+          sessionFormData.newSessionEnd.trim() !== '' && 
+          createNewSession) {
+        // まず、該当するイベントをデータベースから取得
+        const { data: existingEvent, error: eventError } = await supabase
+          .from('events')
+          .select('id')
+          .eq('name', editingStage)
+          .single();
+
+        if (eventError) {
+          console.error('Failed to find event:', eventError);
+          return;
+        }
+
+        if (!existingEvent) {
+          console.error(`Event "${editingStage}" not found in database`);
+          return;
+        }
+
+        // セッション名を自動生成（イベント名 + 開始日時）
+        const startDate = new Date(sessionFormData.newSessionStart);
+        const formattedDate = startDate.toLocaleDateString('ja-JP', { 
+          month: '2-digit', 
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        const autoGeneratedName = `${editingStage} ${formattedDate}`;
+
+        const newSession = await createNewSession({
+          eventId: existingEvent.id, // 既存のイベントIDを使用
+          name: autoGeneratedName,
           start: new Date(sessionFormData.newSessionStart),
           end: new Date(sessionFormData.newSessionEnd),
           venue: sessionFormData.newSessionVenue,
-          format: sessionFormData.newSessionFormat as '対面' | 'オンライン' | 'ハイブリッド',
+          format: sessionFormData.newSessionFormat === 'ハイブリッド' ? 'ハイブリッド' : 
+                  sessionFormData.newSessionFormat === 'オンライン' ? 'オンライン' : '対面',
           maxParticipants: sessionFormData.newSessionMaxParticipants ? parseInt(sessionFormData.newSessionMaxParticipants) : undefined,
-          recruiter: sessionFormData.sessionType || undefined,
+          recruiter: sessionFormData.recruiter || undefined,
         });
         
-        // 新しく作成されたセッションを選択状態にする
-        setSessionFormData(prev => ({
-          ...prev,
-          selectedSessionId: newSession.id
-        }));
-        
+        sessionId = newSession.id;
         console.log('新しいセッションを作成しました:', newSession);
-      } catch (error) {
-        console.error('セッション作成エラー:', error);
+      } else if (!isCreatingNewSession && sessionFormData.selectedSessionId) {
+        // セッション選択の場合：既存のセッションIDを使用
+        sessionId = sessionFormData.selectedSessionId;
+        console.log('既存のセッションを選択しました:', sessionId);
+      } else {
+        console.error('セッションIDが指定されていません');
+        return;
       }
+      
+      // 選考履歴にセッション情報を保存/更新
+      const { data: existingHistory } = await supabase
+        .from('selection_histories')
+        .select('id')
+        .eq('applicant_id', applicant.id)
+        .eq('stage', editingStage)
+        .single();
+
+      if (existingHistory) {
+        // 既存の履歴を更新
+        const updateData: Record<string, unknown> = {
+          session_id: sessionId,
+          updated_at: new Date().toISOString()
+        };
+
+        // recruiterカラムが存在する場合のみ追加
+        if (sessionFormData.recruiter) {
+          updateData.recruiter = sessionFormData.recruiter;
+        }
+
+        const { error: updateError } = await supabase
+          .from('selection_histories')
+          .update(updateData)
+          .eq('id', existingHistory.id);
+
+        if (updateError) {
+          console.error('Failed to update selection history:', updateError);
+          return;
+        }
+      } else {
+        // 既存の履歴がない場合は、セッション情報のみをevent_participantsに保存
+        // 新しい選考履歴は作成しない
+        console.log('既存の選考履歴が見つかりません。セッション情報のみを保存します。');
+      }
+
+      // event_participantsテーブルに参加者情報を保存/更新
+      if (sessionId) {
+        // 既存の参加者レコードを確認
+        const { data: existingParticipant } = await supabase
+          .from('event_participants')
+          .select('id')
+          .eq('session_id', sessionId)
+          .eq('applicant_id', applicant.id)
+          .single();
+
+        const participantData: Record<string, unknown> = {
+          session_id: sessionId,
+          applicant_id: applicant.id,
+          status: '参加済み', // '参加予定'から'参加済み'に変更
+          updated_at: new Date().toISOString()
+        };
+
+        // 合否情報がある場合のみ追加
+        if (sessionFormData.result) {
+          participantData.result = sessionFormData.result;
+        }
+
+        if (existingParticipant) {
+          // 既存の参加者レコードを更新
+          const { error: updateParticipantError } = await supabase
+            .from('event_participants')
+            .update(participantData)
+            .eq('id', existingParticipant.id);
+
+          if (updateParticipantError) {
+            console.error('Failed to update participant record:', updateParticipantError);
+          }
+        } else {
+          // 新しい参加者レコードを作成
+          participantData.created_at = new Date().toISOString();
+          
+          const { error: insertParticipantError } = await supabase
+            .from('event_participants')
+            .insert(participantData);
+
+          if (insertParticipantError) {
+            console.error('Failed to create participant record:', insertParticipantError);
+          }
+        }
+      }
+      
+      console.log('セッション情報を保存しました:', {
+        stage: editingStage,
+        sessionId,
+        recruiter: sessionFormData.recruiter,
+        result: sessionFormData.result
+      });
+      
+      // フォームをリセット
+      setSessionFormData({
+        selectedSessionId: '',
+        sessionFormat: '',
+        recruiter: '',
+        result: '',
+        newSessionName: '',
+        newSessionStart: '',
+        newSessionEnd: '',
+        newSessionVenue: '',
+        newSessionFormat: '',
+        newSessionMaxParticipants: ''
+      });
+      setIsSessionDialogOpen(false);
+      setEditingStage('');
+      
+      // 親コンポーネントに更新を通知
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      console.error('セッション保存エラー:', error);
     }
-    
-    // ここでセッション情報を保存する処理を実装
-    console.log('Saving session data for stage:', editingStage, sessionFormData);
-    
-    // フォームをリセット
-    setSessionFormData({
-      selectedSessionId: '',
-      sessionType: '',
-      result: '',
-      newSessionName: '',
-      newSessionStart: '',
-      newSessionEnd: '',
-      newSessionVenue: '',
-      newSessionFormat: '',
-      newSessionMaxParticipants: ''
-    });
-    setIsSessionDialogOpen(false);
-    setEditingStage('');
   };
 
   // セッション情報フォームの更新
-  const handleSessionFormChange = (field: string, value: string) => {
+  const handleSessionFormChange = useCallback((field: string, value: string) => {
     setSessionFormData(prev => ({
       ...prev,
       [field]: value
     }));
-  };
+  }, []);
 
   // セッション選択時の処理
-  const handleSessionSelection = (sessionId: string) => {
+  const handleSessionSelection = useCallback((sessionId: string) => {
     setSessionFormData(prev => ({
       ...prev,
       selectedSessionId: sessionId
     }));
-  };
+  }, []);
 
   // 書類選考の合否変更ダイアログを開く
   const handleOpenResultDialog = (stageId: string, stageData?: { result?: string }) => {
