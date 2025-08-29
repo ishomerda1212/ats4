@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { Applicant, SelectionHistory } from '@/features/applicants/types/applicant';
+import { performanceMonitor } from '@/shared/utils/performanceMonitor';
 
 // データベースから取得した生データの型
 interface RawApplicant {
@@ -76,22 +77,24 @@ export class ApplicantDataAccess {
    * 全ての応募者を取得
    */
   static async getAllApplicants(): Promise<Applicant[]> {
-    try {
-      const { data, error } = await supabase
-        .from('applicants')
-        .select('*')
-        .order('created_at', { ascending: false });
+    return await performanceMonitor.measure('ApplicantDataAccess.getAllApplicants', async () => {
+      try {
+        const { data, error } = await supabase
+          .from('applicants')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Failed to fetch applicants:', error);
+        if (error) {
+          console.error('Failed to fetch applicants:', error);
+          throw error;
+        }
+
+        return (data as RawApplicant[]).map(transformApplicant);
+      } catch (error) {
+        console.error('Error in getAllApplicants:', error);
         throw error;
       }
-
-      return (data as RawApplicant[]).map(transformApplicant);
-    } catch (error) {
-      console.error('Error in getAllApplicants:', error);
-      throw error;
-    }
+    });
   }
 
   /**

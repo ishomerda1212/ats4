@@ -8,7 +8,8 @@ import { StatusBadge } from '@/shared/components/common/StatusBadge';
 import { formatDate } from '@/shared/utils/date';
 import { TaskStatus } from '@/features/tasks/types/task';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { ApplicantDataAccess } from '@/lib/dataAccess/applicantDataAccess';
+import { TaskDataAccess } from '@/lib/dataAccess/taskDataAccess';
 
 // 次のタスク用の拡張されたTaskInstance型
 interface ExtendedTaskInstance {
@@ -40,81 +41,56 @@ export function ApplicantCard({ applicant }: ApplicantCardProps) {
       setLoading(true);
       
       // 応募者の現在の選考段階を取得
-      const { data: applicantData } = await supabase
-        .from('applicants')
-        .select('current_stage')
-        .eq('id', applicant.id)
-        .single();
+      const currentStage = await ApplicantDataAccess.getCurrentStage(applicant.id);
 
-      if (!applicantData?.current_stage) {
+      if (!currentStage) {
         setNextTask(null);
         return;
       }
 
       // 現在の選考段階のステータスを確認
-      const { data: currentStageHistory } = await supabase
-        .from('selection_histories')
-        .select('status')
-        .eq('applicant_id', applicant.id)
-        .eq('stage', applicantData.current_stage)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+      const currentStageStatus = await ApplicantDataAccess.getCurrentStageStatus(applicant.id, currentStage);
 
       // 現在の選考段階が「完了」の場合は次のタスクを表示しない
-      if (currentStageHistory?.status === '完了') {
+      if (currentStageStatus === '完了') {
         setNextTask(null);
         return;
       }
 
-      // 現在の選考段階のfixed_tasksを取得
-      const { data: fixedTasks } = await supabase
-        .from('fixed_tasks')
-        .select('id')
-        .eq('stage', applicantData.current_stage)
-        .order('order_num', { ascending: true });
-
-      if (!fixedTasks || fixedTasks.length === 0) {
-        setNextTask(null);
-        return;
-      }
-
-      // 現在の選考段階のタスクインスタンスを取得（完了していないもの）
-      const fixedTaskIds = fixedTasks.map(task => task.id);
-      const { data: tasks } = await supabase
-        .from('task_instances')
-        .select(`
-          *,
-          fixed_tasks (
-            title,
-            description,
-            type
-          )
-        `)
-        .eq('applicant_id', applicant.id)
-        .in('task_id', fixedTaskIds)
-        .neq('status', '完了')
-        .order('created_at', { ascending: true });
+      // 応募者オブジェクトを作成（最小限の情報）
+      const applicantObj = { id: applicant.id, currentStage } as Applicant;
+      
+      // 現在の段階のタスクを取得
+      const tasks = await TaskDataAccess.getApplicantTasksByStage(applicantObj, currentStage);
 
       if (tasks && tasks.length > 0) {
-        // 最初の未完了タスクを次のタスクとして設定
-        const nextTaskData = tasks[0];
-        const nextTaskObj = {
-          id: nextTaskData.id,
-          applicantId: nextTaskData.applicant_id,
-          taskId: nextTaskData.task_id,
-          status: nextTaskData.status,
-          dueDate: nextTaskData.due_date ? new Date(nextTaskData.due_date) : undefined,
-          completedAt: nextTaskData.completed_at ? new Date(nextTaskData.completed_at) : undefined,
-          notes: nextTaskData.notes,
-          createdAt: new Date(nextTaskData.created_at),
-          updatedAt: new Date(nextTaskData.updated_at),
-          title: nextTaskData.fixed_tasks?.title || '',
-          description: nextTaskData.fixed_tasks?.description || '',
-          type: nextTaskData.fixed_tasks?.type || 'general'
-        };
-        
-        setNextTask(nextTaskObj);
+        // 未完了のタスクを探す
+        const nextTask = tasks.find(task => 
+          task.status === '未着手' || 
+          task.status === '返信待ち' || 
+          task.status === '提出待ち'
+        );
+
+        if (nextTask) {
+          const nextTaskObj = {
+            id: nextTask.id,
+            applicantId: nextTask.applicantId,
+            taskId: nextTask.taskId,
+            status: nextTask.status,
+            dueDate: nextTask.dueDate,
+            completedAt: nextTask.completedAt,
+            notes: nextTask.notes,
+            createdAt: nextTask.createdAt,
+            updatedAt: nextTask.updatedAt,
+            title: nextTask.title,
+            description: nextTask.description,
+            type: nextTask.type
+          };
+          
+          setNextTask(nextTaskObj);
+        } else {
+          setNextTask(null);
+        }
       } else {
         setNextTask(null);
       }

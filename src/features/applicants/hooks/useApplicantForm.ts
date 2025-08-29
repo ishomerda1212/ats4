@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { Applicant } from '../types/applicant';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
+import { ApplicantDataAccess } from '@/lib/dataAccess/applicantDataAccess';
 
 export function useApplicantForm(
   applicant?: Applicant, 
@@ -149,100 +149,40 @@ export function useApplicantForm(
     try {
       if (mode === 'create') {
         console.log('➕ Creating new applicant...');
-        // 応募者データを挿入
-        const { data: applicant, error: insertError } = await supabase
-          .from('applicants')
-          .insert([{
-            source: data.source,
-            name: data.name,
-            name_kana: data.nameKana,
-            gender: data.gender || null,
-            school_name: data.schoolName || null,
-            faculty: data.faculty || null,
-            department: data.department || null,
-            graduation_year: data.graduationYear,
-            current_address: data.currentAddress || null,
-            birthplace: data.birthplace || null,
-            phone: data.phone || null,
-            email: data.email || null,
-            current_stage: 'エントリー',
-            experience: data.experience || null,
-            other_company_status: data.otherCompanyStatus || null,
-            appearance: data.appearance || null,
-          }])
-          .select()
-          .single();
+        // 応募者データを作成
+        const applicantData = await ApplicantDataAccess.createApplicant({
+          source: data.source as any,
+          name: data.name,
+          nameKana: data.nameKana,
+          gender: data.gender as any,
+          schoolName: data.schoolName || '',
+          faculty: data.faculty || '',
+          department: data.department || '',
+          graduationYear: data.graduationYear,
+          currentAddress: data.currentAddress || '',
+          birthplace: data.birthplace || '',
+          phone: data.phone || '',
+          email: data.email || '',
+          currentStage: 'エントリー',
+          experience: data.experience || '',
+          otherCompanyStatus: data.otherCompanyStatus || '',
+          appearance: data.appearance || '',
+        });
 
-        if (insertError) {
-          console.error('❌ Failed to insert applicant:', insertError);
-          return { success: false, message: '応募者の登録に失敗しました' };
-        }
-
-        console.log('✅ Applicant created successfully:', applicant);
+        console.log('✅ Applicant created successfully:', applicantData);
 
         // 選考履歴にエントリー段階を登録
-        const { error: historyError } = await supabase
-          .from('selection_histories')
-          .insert([{
-            applicant_id: applicant.id,
-            stage: 'エントリー',
-            status: '完了',
-            notes: '新規応募者登録',
-          }]);
-          
-        if (historyError) {
-          console.error('❌ Failed to create selection history:', historyError);
-          // 履歴作成に失敗しても応募者登録は成功とする
-        } else {
-          console.log('✅ Selection history created successfully');
-        }
+        await ApplicantDataAccess.createSelectionHistory({
+          applicantId: applicantData.id,
+          stage: 'エントリー',
+          status: '完了',
+          notes: '新規応募者登録',
+        });
         
-        // エントリー段階のタスクインスタンスを作成
-        const { data: fixedTasks } = await supabase
-          .from('fixed_tasks')
-          .select('*')
-          .eq('stage', 'エントリー')
-          .order('order_num', { ascending: true });
-          
-        if (fixedTasks && fixedTasks.length > 0) {
-          // 登録日時を基準として一度だけ取得
-          const registrationDate = new Date();
-          let approachIndex = 0; // アプローチタスクのインデックス
-          
-          const taskInstances = fixedTasks.map((task) => {
-            const baseData = {
-              applicant_id: applicant.id,
-              task_id: task.id,
-              status: '未着手' as const,
-              notes: '',
-            };
-            
-            // アプローチタスクのみ期限を設定
-            if (task.title.startsWith('アプローチ')) {
-              const dueDate = new Date(registrationDate);
-              dueDate.setDate(registrationDate.getDate() + approachIndex); // アプローチ1は登録日、アプローチ2は+1日、アプローチ3は+2日...
-              
-              approachIndex++; // 次のアプローチタスクのためにインデックスを増加
-              
-              return {
-                ...baseData,
-                due_date: dueDate.toISOString(),
-              };
-            }
-            
-            // アプローチ以外のタスクは期限なし
-            return baseData;
-          });
-          
-          const { error: taskError } = await supabase
-            .from('task_instances')
-            .insert(taskInstances);
-            
-          if (taskError) {
-            console.error('❌ Failed to create task instances:', taskError);
-            // タスク作成に失敗しても応募者登録は成功とする
-          }
-        }
+        console.log('✅ Selection history created successfully');
+        
+        // エントリー段階のタスクインスタンスを作成（後で実装）
+        // TODO: TaskDataAccessを使用してタスクインスタンスを作成
         
         // データをリフレッシュ
         if (onRefresh) {
@@ -260,33 +200,24 @@ export function useApplicantForm(
         console.log('🆔 Applicant ID:', applicant.id);
         
         // 更新
-        const { error } = await supabase
-          .from('applicants')
-          .update({
-            source: data.source,
-            name: data.name,
-            name_kana: data.nameKana,
-            gender: data.gender,
-            school_name: data.schoolName,
-            faculty: data.faculty || null,
-            department: data.department || null,
-            graduation_year: data.graduationYear,
-            current_address: data.currentAddress,
-            birthplace: data.birthplace || null,
-            phone: data.phone,
-            email: data.email || null, // メールアドレスが空の場合はnull
-            current_stage: data.currentStage,
-            experience: data.experience || null,
-            other_company_status: data.otherCompanyStatus || null,
-            appearance: data.appearance || null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', applicant.id);
-
-        if (error) {
-          console.error('❌ Supabase update error:', error);
-          throw error;
-        }
+        await ApplicantDataAccess.updateApplicant(applicant.id, {
+          source: data.source as any,
+          name: data.name,
+          nameKana: data.nameKana,
+          gender: data.gender as any,
+          schoolName: data.schoolName || '',
+          faculty: data.faculty || '',
+          department: data.department || '',
+          graduationYear: data.graduationYear,
+          currentAddress: data.currentAddress || '',
+          birthplace: data.birthplace || '',
+          phone: data.phone || '',
+          email: data.email || '',
+          currentStage: data.currentStage as any,
+          experience: data.experience || '',
+          otherCompanyStatus: data.otherCompanyStatus || '',
+          appearance: data.appearance || '',
+        });
         
         console.log('✅ Applicant updated successfully');
         

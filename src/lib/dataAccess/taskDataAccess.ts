@@ -33,7 +33,7 @@ const transformTaskInstance = (raw: RawTaskInstance): TaskInstance => ({
   taskId: raw.task_id,
   status: raw.status as TaskStatus,
   dueDate: raw.due_date ? new Date(raw.due_date) : undefined,
-  completedAt: raw.completed_at ? new Date(raw.completed_at) : undefined,
+  completedAt: raw.completed_at ? new Date(raw.completed_at) : null,
   notes: raw.notes || '',
   createdAt: new Date(raw.created_at),
   updatedAt: new Date(raw.updated_at),

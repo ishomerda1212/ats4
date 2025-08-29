@@ -88,16 +88,18 @@ export const getStageSessionInfo = (
   events: Event[], 
   eventSessions: EventSession[]
 ) => {
-  // 選考段階名でイベントを検索（安全なマッチング）
-  const event = events.find(e => {
-    // 完全一致を優先
-    if (e.name === stage) return true;
-    // 大文字小文字を無視した比較
-    if (e.name.toLowerCase() === stage.toLowerCase()) return true;
-    // 空白を除去した比較
-    if (e.name.replace(/\s+/g, '') === stage.replace(/\s+/g, '')) return true;
-    return false;
+  // イベントマップを作成（パフォーマンス向上のため）
+  const eventMap = new Map<string, Event>();
+  events.forEach(event => {
+    eventMap.set(event.name, event);
+    eventMap.set(event.name.toLowerCase(), event);
+    eventMap.set(event.name.replace(/\s+/g, ''), event);
   });
+
+  // 選考段階名でイベントを検索（効率的なマッチング）
+  const event = eventMap.get(stage) || 
+                eventMap.get(stage.toLowerCase()) || 
+                eventMap.get(stage.replace(/\s+/g, ''));
   
   if (!event) {
     console.warn(`イベントが見つかりません: ${stage}`);
@@ -123,16 +125,18 @@ export const getAvailableSessionsForStage = (
   events: Event[], 
   eventSessions: EventSession[]
 ) => {
-  // 選考段階名でイベントを検索（安全なマッチング）
-  const event = events.find(e => {
-    // 完全一致を優先
-    if (e.name === stage) return true;
-    // 大文字小文字を無視した比較
-    if (e.name.toLowerCase() === stage.toLowerCase()) return true;
-    // 空白を除去した比較
-    if (e.name.replace(/\s+/g, '') === stage.replace(/\s+/g, '')) return true;
-    return false;
+  // イベントマップを作成（パフォーマンス向上のため）
+  const eventMap = new Map<string, Event>();
+  events.forEach(event => {
+    eventMap.set(event.name, event);
+    eventMap.set(event.name.toLowerCase(), event);
+    eventMap.set(event.name.replace(/\s+/g, ''), event);
   });
+
+  // 選考段階名でイベントを検索（効率的なマッチング）
+  const event = eventMap.get(stage) || 
+                eventMap.get(stage.toLowerCase()) || 
+                eventMap.get(stage.replace(/\s+/g, ''));
   
   if (!event) {
     console.warn(`イベントが見つかりません: ${stage}`);
