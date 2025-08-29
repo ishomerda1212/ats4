@@ -1,3 +1,5 @@
+// 一時的にコメントアウト - 影響チェック用
+/*
 export interface SelectionStageTemplate {
   id: string;
   name: string;
@@ -33,3 +35,4 @@ export interface SelectionStageProgress {
   createdAt: string;
   updatedAt: string;
 }
+*/

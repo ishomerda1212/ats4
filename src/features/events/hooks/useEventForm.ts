@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Event } from '../types/event';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
-import { mockEvents } from '@/shared/data/mockEventData';
 import { generateId } from '@/shared/utils/date';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
@@ -22,7 +21,7 @@ const eventSchema = z.object({
 type EventFormData = z.infer<typeof eventSchema>;
 
 export function useEventForm(event?: Event, mode: 'create' | 'edit' = 'create') {
-  const [, setEvents] = useLocalStorage<Event[]>('events', mockEvents);
+  const [, setEvents] = useLocalStorage<Event[]>('events', []);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 

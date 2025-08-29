@@ -16,13 +16,15 @@ interface SessionBookingFormProps {
   sessionInfo: SessionInfo | null;
   onOpenSessionDialog: (stage: string) => void;
   applicantId?: string; // 応募者IDを追加
+  participationStatus?: string; // 参加状況を追加
 }
 
 export function SessionBookingForm({ 
   stage, 
   sessionInfo, 
   onOpenSessionDialog,
-  applicantId
+  applicantId,
+  participationStatus
 }: SessionBookingFormProps) {
   if (sessionInfo) {
     return (
@@ -57,25 +59,23 @@ export function SessionBookingForm({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <h5 className="font-medium text-base text-blue-600">
-                {formatDateTime(sessionInfo.session.start)} - {formatDateTime(sessionInfo.session.end)}
+                {formatDateTime(sessionInfo.session.start)}
               </h5>
               <Badge className="text-xs">
                 {sessionInfo.session.format}
               </Badge>
             </div>
-            <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-              <div className="flex items-center space-x-1">
-                <MapPin className="h-3 w-3" />
-                <span>{sessionInfo.session.venue}</span>
+            {sessionInfo.session.maxParticipants && (
+              <div className="flex items-center space-x-1 text-sm text-muted-foreground">
+                <Users className="h-3 w-3" />
+                <span>
+                  {sessionInfo.session.currentParticipants || 0}/{sessionInfo.session.maxParticipants}名
+                </span>
               </div>
-              {sessionInfo.session.maxParticipants && (
-                <div className="flex items-center space-x-1">
-                  <Users className="h-3 w-3" />
-                  <span>
-                    {sessionInfo.session.currentParticipants || 0}/{sessionInfo.session.maxParticipants}名
-                  </span>
-                </div>
-              )}
+            )}
+            {/* 参加状況を常に表示 */}
+            <div className="text-xs text-muted-foreground">
+              <span className="font-medium">参加状況:</span> {participationStatus || '未設定'}
             </div>
             {sessionInfo.session.recruiter && (
               <div className="text-xs text-muted-foreground">

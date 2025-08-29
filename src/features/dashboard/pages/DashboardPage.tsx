@@ -3,9 +3,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, MapPin, Users, Video, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { mockEventSessions, mockEvents } from '@/shared/data/mockEventData';
+import { useEvents } from '@/features/events/hooks/useEvents';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
+import { SessionListCard } from '@/shared/components/common/SessionListCard';
 
 type SessionStatus = 'upcoming' | 'ongoing' | 'completed';
 
@@ -27,6 +28,7 @@ interface TodaySession {
 export function DashboardPage() {
   const [timeFilter, setTimeFilter] = useState<'all' | 'morning' | 'afternoon' | 'evening'>('all');
   const [formatFilter, setFormatFilter] = useState<'all' | '対面' | 'オンライン'>('all');
+  const { events, eventSessions, loading } = useEvents();
 
   const todaySessions = useMemo((): TodaySession[] => {
     const today = new Date();
@@ -34,13 +36,13 @@ export function DashboardPage() {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    return mockEventSessions
+    return eventSessions
       .filter(session => {
         const sessionDate = new Date(session.start);
         return sessionDate >= today && sessionDate < tomorrow;
       })
       .map(session => {
-        const event = mockEvents.find(e => e.id === session.eventId);
+        const event = events.find(e => e.id === session.eventId);
         const now = new Date();
         const startTime = new Date(session.start);
         const endTime = new Date(session.end);
@@ -68,7 +70,22 @@ export function DashboardPage() {
         };
       })
       .sort((a, b) => a.start.getTime() - b.start.getTime());
-  }, []);
+  }, [events, eventSessions]);
+
+  // 共通コンポーネント用のセッションデータ
+  const sessionListData = useMemo(() => {
+    return todaySessions.map(session => ({
+      id: session.id,
+      name: session.name,
+      eventName: session.eventName,
+      eventId: session.eventId,
+      start: session.start,
+      venue: session.venue,
+      format: session.format,
+      currentParticipants: session.currentParticipants,
+      maxParticipants: session.maxParticipants
+    }));
+  }, [todaySessions]);
 
   const filteredSessions = useMemo(() => {
     return todaySessions.filter(session => {
@@ -102,6 +119,25 @@ export function DashboardPage() {
 
 
 
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">今日のセッション</h1>
+            <p className="text-muted-foreground">
+              {format(new Date(), 'yyyy年M月d日 (EEEE)', { locale: ja })}
+            </p>
+          </div>
+        </div>
+        <div className="text-center py-8">
+          <div className="animate-spin h-8 w-8 border-b-2 border-blue-600 rounded-full mx-auto"></div>
+          <p className="mt-2 text-muted-foreground">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -196,76 +232,11 @@ export function DashboardPage() {
             </CardContent>
           </Card>
         ) : (
-                     filteredSessions.map((session) => (
-             <Card key={session.id} className="hover:shadow-md transition-shadow">
-               <CardContent className="p-4">
-                 <div className="flex items-center justify-between">
-                   <div className="flex-1">
-                     <div className="flex items-center space-x-3 mb-2">
-                       <div className="flex items-center space-x-2">
-                         <Clock className="h-4 w-4 text-muted-foreground" />
-                         <span className="font-medium">
-                           {format(session.start, 'HH:mm')} - {format(session.end, 'HH:mm')}
-                         </span>
-                       </div>
-                       {getStatusBadge(session.status)}
-                     </div>
-                     
-                     <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-sm text-muted-foreground">
-                       <div className="flex items-center space-x-4 mb-1 sm:mb-0">
-                         <span className="font-medium text-foreground">{session.name}</span>
-                         <span className="hidden sm:inline">•</span>
-                         <span>{session.eventName}</span>
-                       </div>
-                       <div className="flex items-center space-x-4">
-                         <div className="flex items-center space-x-1">
-                           <MapPin className="h-3 w-3" />
-                           <span>{session.venue}</span>
-                         </div>
-                         <span className="hidden sm:inline">•</span>
-                         <div className="flex items-center space-x-1">
-                           {session.format === 'オンライン' ? (
-                             <Video className="h-3 w-3" />
-                           ) : (
-                             <User className="h-3 w-3" />
-                           )}
-                           <span>{session.format}</span>
-                         </div>
-                         {session.maxParticipants && (
-                           <>
-                             <span className="hidden sm:inline">•</span>
-                             <div className="flex items-center space-x-1">
-                               <Users className="h-3 w-3" />
-                               <span>{session.currentParticipants}/{session.maxParticipants}</span>
-                             </div>
-                           </>
-                         )}
-                         {session.recruiter && (
-                           <>
-                             <span className="hidden sm:inline">•</span>
-                             <span>担当: {session.recruiter}</span>
-                           </>
-                         )}
-                       </div>
-                     </div>
-                   </div>
-                   
-                   <div className="flex space-x-2 ml-4">
-                     <Button size="sm" variant="outline" asChild>
-                       <Link to={`/selection-stage/${session.eventId}/session/${session.id}`}>
-                         詳細
-                       </Link>
-                     </Button>
-                     <Button size="sm" variant="outline" asChild>
-                       <Link to={`/selection-stage/${session.eventId}/session/${session.id}/participants`}>
-                         参加者
-                       </Link>
-                     </Button>
-                   </div>
-                 </div>
-               </CardContent>
-             </Card>
-           ))
+          <SessionListCard 
+            sessions={sessionListData}
+            layout="card"
+            showEndTime={true}
+          />
         )}
       </div>
     </div>

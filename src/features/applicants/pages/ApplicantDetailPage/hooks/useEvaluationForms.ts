@@ -1,12 +1,9 @@
 import { useState } from 'react';
 import { EvaluationForm } from '@/features/applicants/types/applicant';
 import { EvaluationFormData } from '../types/applicantDetail';
-import { mockEvaluationForms } from '@/shared/data/mockData';
 
 export function useEvaluationForms(applicantId: string) {
-  const [evaluationForms, setEvaluationForms] = useState<EvaluationForm[]>(
-    mockEvaluationForms.filter(form => form.applicantId === applicantId)
-  );
+  const [evaluationForms, setEvaluationForms] = useState<EvaluationForm[]>([]);
   
   const [showEvaluationForm, setShowEvaluationForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);

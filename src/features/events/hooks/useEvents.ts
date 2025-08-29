@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Event, EventSession, EventParticipant, ParticipationStatus } from '../types/event';
-import { supabase } from '@/lib/supabase';
+import { EventDataAccess } from '@/lib/dataAccess/eventDataAccess';
 
 export function useEvents() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -13,16 +13,8 @@ export function useEvents() {
     const fetchEvents = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('events')
-          .select('*')
-          .order('sort_order', { ascending: true });
-
-        if (error) {
-          console.error('Failed to fetch events:', error);
-        } else if (data) {
-          setEvents(data as Event[]);
-        }
+        const data = await EventDataAccess.getAllEvents();
+        setEvents(data);
       } catch (error) {
         console.error('Failed to fetch events:', error);
       } finally {
@@ -37,31 +29,8 @@ export function useEvents() {
   useEffect(() => {
     const fetchEventSessions = async () => {
       try {
-        const { data, error } = await supabase
-          .from('event_sessions')
-          .select('*')
-          .order('created_at', { ascending: true });
-
-        if (error) {
-          console.error('Failed to fetch event sessions:', error);
-        } else if (data) {
-          // データベースのデータをフロントエンドの型に変換
-          const sessions: EventSession[] = data.map((row: Record<string, unknown>) => ({
-            id: row.id as string,
-            eventId: row.event_id as string,
-            name: row.name as string,
-            start: new Date(row.start_time as string),
-            end: new Date(row.end_time as string),
-            venue: row.venue as string,
-            format: row.format as '対面' | 'オンライン' | 'ハイブリッド',
-            zoomUrl: row.zoom_url as string | undefined,
-            notes: row.notes as string | undefined,
-            participants: [], // 参加者は別途取得
-            createdAt: new Date(row.created_at as string),
-            updatedAt: new Date(row.updated_at as string),
-          }));
-          setEventSessions(sessions);
-        }
+        const data = await EventDataAccess.getAllEventSessions();
+        setEventSessions(data);
       } catch (error) {
         console.error('Failed to fetch event sessions:', error);
       }
@@ -74,33 +43,22 @@ export function useEvents() {
   useEffect(() => {
     const fetchEventParticipants = async () => {
       try {
-        const { data, error } = await supabase
-          .from('event_participants')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Failed to fetch event participants:', error);
-        } else if (data) {
-          // データベースのデータをフロントエンドの型に変換
-          const participants: EventParticipant[] = data.map((row: Record<string, unknown>) => ({
-            id: row.id as string,
-            sessionId: row.session_id as string,
-            applicantId: row.applicant_id as string,
-            status: row.status as '参加' | '申込' | '欠席',
-            joinedAt: row.joined_at ? new Date(row.joined_at as string) : undefined,
-            createdAt: new Date(row.created_at as string),
-            updatedAt: new Date(row.updated_at as string),
-          }));
-          setEventParticipants(participants);
+        // 全てのセッションの参加者を取得
+        const allParticipants: EventParticipant[] = [];
+        for (const session of eventSessions) {
+          const participants = await EventDataAccess.getSessionParticipants(session.id);
+          allParticipants.push(...participants);
         }
+        setEventParticipants(allParticipants);
       } catch (error) {
         console.error('Failed to fetch event participants:', error);
       }
     };
 
-    fetchEventParticipants();
-  }, []);
+    if (eventSessions.length > 0) {
+      fetchEventParticipants();
+    }
+  }, [eventSessions]);
 
   const getEventSessions = (eventId: string) => {
     return eventSessions.filter(session => session.eventId === eventId);
@@ -352,10 +310,11 @@ export function useEvents() {
 
   const updateParticipantStatus = async (id: string, status: ParticipationStatus) => {
     try {
+      // 参加状況をresultフィールドに保存（応募者詳細ページと連動させるため）
       const { error } = await supabase
         .from('event_participants')
         .update({
-          status,
+          result: status, // statusではなくresultに保存
           updated_at: new Date().toISOString(),
         })
         .eq('id', id);
@@ -368,7 +327,7 @@ export function useEvents() {
       setEventParticipants(current =>
         current.map(participant =>
           participant.id === id
-            ? { ...participant, status, updatedAt: new Date() }
+            ? { ...participant, result: status, updatedAt: new Date() }
             : participant
         )
       );

@@ -2,10 +2,7 @@ import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, UserCheck, ClipboardList, Monitor, Video, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, UserCheck, Monitor, Video, ExternalLink } from 'lucide-react';
 import { EventSessionForm } from '../components/EventSessionForm';
 import { useEvents } from '../hooks/useEvents';
 import { useApplicants } from '@/features/applicants/hooks/useApplicants';
@@ -163,27 +160,9 @@ export function EventSessionDetailPage() {
     updateParticipantStatus(participantId, status);
   };
 
-  const handleReportReminderChange = (checked: boolean) => {
-    if (checked && !session.reportReminderDate) {
-      updateEventSession(session.id, {
-        reportReminderDate: new Date().toISOString()
-      });
-    }
-  };
 
-  const handleParticipantReportChange = (checked: boolean) => {
-    if (checked && !session.participantReportDate) {
-      updateEventSession(session.id, {
-        participantReportDate: new Date().toISOString()
-      });
-    }
-  };
 
-  const handleRecruiterChange = (value: string) => {
-    updateEventSession(session.id, {
-      recruiter: value
-    });
-  };
+
 
   // Googleカレンダー登録用URLを生成
   const generateGoogleCalendarUrl = () => {
@@ -227,10 +206,10 @@ export function EventSessionDetailPage() {
         </div>
       </div>
 
-      {/* セッション情報と管理情報を横並びで表示 */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* セッション情報 - 左側 */}
-        <div className="lg:col-span-2">
+      {/* セッション情報 */}
+      <div className="grid grid-cols-1 gap-6">
+        {/* セッション情報 */}
+        <div>
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -261,66 +240,72 @@ export function EventSessionDetailPage() {
                 </div>
               )}
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">開始日時</p>
-                      <p className="text-sm text-muted-foreground">{formatDateTime(session.start)}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">終了日時</p>
-                      <p className="text-sm text-muted-foreground">{formatDateTime(session.end)}</p>
-                    </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">開始日時</p>
+                    <p className="text-sm text-muted-foreground">{formatDateTime(session.start)}</p>
                   </div>
                 </div>
                 
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">開催場所</p>
-                      <p className="text-sm text-muted-foreground">{session.venue}</p>
-                    </div>
+                <div className="flex items-center space-x-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">終了日時</p>
+                    <p className="text-sm text-muted-foreground">{formatDateTime(session.end)}</p>
                   </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Monitor className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">開催形式</p>
-                      <p className="text-sm text-muted-foreground">{session.format || '未設定'}</p>
-                    </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">開催場所</p>
+                    <p className="text-sm text-muted-foreground">{session.venue || '未設定'}</p>
                   </div>
-                  
-                  {session.zoomUrl && (
-                    <div className="flex items-center space-x-2">
-                      <Video className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">ZOOM URL</p>
-                        <a 
-                          href={session.zoomUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-sm text-blue-600 hover:text-blue-800 underline flex items-center"
-                        >
-                          ZOOM参加
-                          <ExternalLink className="h-3 w-3 ml-1" />
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">参加者数</p>
-                      <p className="text-sm text-muted-foreground">{participants.length}名</p>
-                    </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Monitor className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">開催形式</p>
+                    <p className="text-sm text-muted-foreground">{session.format || '未設定'}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Video className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">ZOOM URL</p>
+                    {session.zoomUrl ? (
+                      <a 
+                        href={session.zoomUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:text-blue-800 underline flex items-center"
+                      >
+                        ZOOM参加
+                        <ExternalLink className="h-3 w-3 ml-1" />
+                      </a>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">未設定</p>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">参加者数</p>
+                    <p className="text-sm text-muted-foreground">{participants.length}名</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <UserCheck className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">予約数</p>
+                    <p className="text-sm text-muted-foreground">{registrationCount}名</p>
                   </div>
                 </div>
               </div>
@@ -339,96 +324,9 @@ export function EventSessionDetailPage() {
                 </a>
               </div>
               
-              {session.notes && (
-                <div className="pt-4 mt-4 border-t">
-                  <p className="text-sm font-medium mb-1">備考</p>
-                  <p className="text-sm text-muted-foreground">{session.notes}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* 管理情報 - 右側 */}
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <ClipboardList className="h-4 w-4" />
-                管理情報
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* リクルーター */}
-              <div className="space-y-2">
-                <Label htmlFor="recruiter" className="text-sm">リクルーター</Label>
-                <Input
-                  id="recruiter"
-                  value={session.recruiter || ''}
-                  onChange={(e) => handleRecruiterChange(e.target.value)}
-                  placeholder="リクルーター名を入力"
-                  className="text-sm"
-                />
-              </div>
-
-              {/* チェックボックス */}
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="reportReminder"
-                    checked={!!session.reportReminderDate}
-                    onCheckedChange={handleReportReminderChange}
-                  />
-                  <div className="flex-1">
-                    <Label htmlFor="reportReminder" className="text-sm font-medium">
-                      開催報告とリマインド
-                    </Label>
-                    {session.reportReminderDate && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        完了: {formatDate(session.reportReminderDate)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="participantReport"
-                    checked={!!session.participantReportDate}
-                    onCheckedChange={handleParticipantReportChange}
-                  />
-                  <div className="flex-1">
-                    <Label htmlFor="participantReport" className="text-sm font-medium">
-                      人数報告
-                    </Label>
-                    {session.participantReportDate && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        完了: {formatDate(session.participantReportDate)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* 参加者数統計 */}
-              <div className="pt-3 border-t">
-                <p className="text-sm font-medium mb-2">参加者数統計</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2 bg-blue-50 rounded">
-                    <div className="flex items-center space-x-2">
-                      <UserCheck className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm text-muted-foreground">予約数</span>
-                    </div>
-                    <span className="text-lg font-bold text-blue-600">{registrationCount}名</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-green-50 rounded">
-                    <div className="flex items-center space-x-2">
-                      <Users className="h-4 w-4 text-green-600" />
-                      <span className="text-sm text-muted-foreground">参加数</span>
-                    </div>
-                    <span className="text-lg font-bold text-green-600">{participationCount}名</span>
-                  </div>
-                </div>
+              <div className="pt-4 mt-4 border-t">
+                <p className="text-sm font-medium mb-1">備考</p>
+                <p className="text-sm text-muted-foreground">{session.notes || '未設定'}</p>
               </div>
             </CardContent>
           </Card>

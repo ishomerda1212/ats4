@@ -218,6 +218,7 @@ export function SelectionStageAccordion({
                           sessionInfo={sessionInfo}
                           onOpenSessionDialog={handleOpenSessionDialog}
                           applicantId={applicant.id}
+                          participationStatus={item.status}
                         />
                       )}
 

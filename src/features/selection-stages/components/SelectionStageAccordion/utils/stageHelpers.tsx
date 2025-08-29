@@ -88,9 +88,21 @@ export const getStageSessionInfo = (
   events: Event[], 
   eventSessions: EventSession[]
 ) => {
-  // 選考段階名でイベントを検索（IDではなく名前でマッチング）
-  const event = events.find(e => e.name === stage);
-  if (!event) return null;
+  // 選考段階名でイベントを検索（安全なマッチング）
+  const event = events.find(e => {
+    // 完全一致を優先
+    if (e.name === stage) return true;
+    // 大文字小文字を無視した比較
+    if (e.name.toLowerCase() === stage.toLowerCase()) return true;
+    // 空白を除去した比較
+    if (e.name.replace(/\s+/g, '') === stage.replace(/\s+/g, '')) return true;
+    return false;
+  });
+  
+  if (!event) {
+    console.warn(`イベントが見つかりません: ${stage}`);
+    return null;
+  }
 
   // 該当するセッションを取得
   const sessions = eventSessions.filter(session => session.eventId === event.id);
@@ -111,10 +123,19 @@ export const getAvailableSessionsForStage = (
   events: Event[], 
   eventSessions: EventSession[]
 ) => {
-  // 選考段階名でイベントを検索（IDではなく名前でマッチング）
-  const event = events.find(e => e.name === stage);
+  // 選考段階名でイベントを検索（安全なマッチング）
+  const event = events.find(e => {
+    // 完全一致を優先
+    if (e.name === stage) return true;
+    // 大文字小文字を無視した比較
+    if (e.name.toLowerCase() === stage.toLowerCase()) return true;
+    // 空白を除去した比較
+    if (e.name.replace(/\s+/g, '') === stage.replace(/\s+/g, '')) return true;
+    return false;
+  });
   
   if (!event) {
+    console.warn(`イベントが見つかりません: ${stage}`);
     return [];
   }
 

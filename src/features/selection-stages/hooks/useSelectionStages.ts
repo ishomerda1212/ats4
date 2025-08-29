@@ -1,3 +1,5 @@
+// 一時的にコメントアウト - 影響チェック用
+/*
 import { SelectionStageTemplate, DefaultTask, SelectionStageProgress } from '../types/selectionStage';
 import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 import { generateId } from '@/shared/utils/date';
@@ -215,3 +217,4 @@ export function useSelectionStages() {
     addStageProgress,
   };
 }
+*/

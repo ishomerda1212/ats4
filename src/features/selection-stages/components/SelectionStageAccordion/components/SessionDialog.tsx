@@ -209,15 +209,15 @@ export function SessionDialog({
               </p>
             </div>
 
-            {/* 合否選択 */}
+            {/* 参加状況選択 */}
             <div>
-              <Label htmlFor="resultSelect">合否</Label>
+              <Label htmlFor="resultSelect">参加状況</Label>
               <Select 
                 value={sessionFormData.result} 
                 onValueChange={(value) => onSessionFormChange('result', value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="合否を選択してください" />
+                  <SelectValue placeholder="参加状況を選択してください" />
                 </SelectTrigger>
                 <SelectContent>
                   {(() => {
@@ -231,7 +231,7 @@ export function SessionDialog({
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">
-                {editingStage}の結果を選択してください
+                {editingStage}の参加状況を選択してください
               </p>
             </div>
           </TabsContent>
@@ -348,15 +348,15 @@ export function SessionDialog({
               </div>
             </div>
 
-            {/* 合否選択（作成タブでも共通） */}
+            {/* 参加状況選択（作成タブでも共通） */}
             <div>
-              <Label htmlFor="resultSelect">合否</Label>
+              <Label htmlFor="resultSelect">参加状況</Label>
               <Select 
                 value={sessionFormData.result} 
                 onValueChange={(value) => onSessionFormChange('result', value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="合否を選択してください" />
+                  <SelectValue placeholder="参加状況を選択してください" />
                 </SelectTrigger>
                 <SelectContent>
                   {(() => {
@@ -370,7 +370,7 @@ export function SessionDialog({
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">
-                {editingStage}の結果を選択してください
+                {editingStage}の参加状況を選択してください
               </p>
             </div>
           </TabsContent>

@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { Plus, Calendar, Clock, MapPin, Users, Eye, CalendarPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -9,6 +10,7 @@ import { EventReservationForm, ReservationFormData } from '../components/EventRe
 import { useEvents } from '../hooks/useEvents';
 import { formatDateTime } from '@/shared/utils/date';
 import { useApplicants } from '@/features/applicants/hooks/useApplicants';
+import { SessionListCard } from '@/shared/components/common/SessionListCard';
 
 export function EventListPage() {
   const { 
@@ -23,6 +25,7 @@ export function EventListPage() {
   const { applicants } = useApplicants();
   const [showReservationForm, setShowReservationForm] = useState(false);
   const [reservationLoading, setReservationLoading] = useState(false);
+  const [sessionTab, setSessionTab] = useState('upcoming');
 
   const handleReservationSubmit = async (formData: ReservationFormData) => {
     setReservationLoading(true);
@@ -53,15 +56,27 @@ export function EventListPage() {
 
   const filteredEvents = events;
 
-  // すべてのセッションを取得
+  // すべてのセッションを取得（開始日時でソート）
   const allSessions = events.flatMap(event => {
     const sessions = getEventSessions(event.id);
     return sessions.map(session => ({
       ...session,
       eventName: event.name,
-      eventId: event.id
+      eventId: event.id,
+      currentParticipants: getParticipantsBySession(session.id).length
     }));
-  });
+  }).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+
+  // セッションを分類
+  const { upcomingSessions, pastSessions } = useMemo(() => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    const upcoming = allSessions.filter(session => new Date(session.start) >= today);
+    const past = allSessions.filter(session => new Date(session.start) < today);
+    
+    return { upcomingSessions: upcoming, pastSessions: past };
+  }, [allSessions]);
 
   return (
     <div className="space-y-6">
@@ -130,61 +145,55 @@ export function EventListPage() {
             </span>
           </div>
 
-          <Card>
-            <CardContent className="p-0">
-              <div className="space-y-3 p-4">
-                {allSessions.map((session) => {
-                  const participantCount = getParticipantsBySession(session.id).length;
-                  return (
-                    <div key={session.id} className="flex items-center justify-between p-4 border rounded-lg hover:shadow-sm transition-shadow">
-                      <div className="flex items-center space-x-6 flex-1">
-                        {/* 選考段階名 */}
-                        <div className="flex items-center space-x-2 min-w-[200px]">
-                          <span className="font-medium text-sm">{session.eventName}</span>
-                        </div>
-                        
-                        {/* 日時 */}
-                        <div className="flex items-center space-x-2 min-w-[180px]">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">{formatDateTime(session.start)}</span>
-                        </div>
-                        
-                        {/* 時間 */}
-                        <div className="flex items-center space-x-2 min-w-[120px]">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">
-                            {formatDateTime(session.end)}
-                          </span>
-                        </div>
-                        
-                        {/* 場所 */}
-                        <div className="flex items-center space-x-2 min-w-[150px]">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">{session.venue}</span>
-                        </div>
-                        
-                        {/* 参加者数 */}
-                        <div className="flex items-center space-x-2 min-w-[80px]">
-                          <Users className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{participantCount}名</span>
-                        </div>
-                      </div>
-                      
-                      {/* アクションボタン */}
-                      <div className="flex items-center space-x-2 ml-4">
-                        <Link to={`/selection-stage/${session.eventId}/session/${session.id}`}>
-                          <Button size="sm" variant="outline">
-                            <Eye className="h-3 w-3 mr-1" />
-                            詳細
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+          <Tabs value={sessionTab} onValueChange={setSessionTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="upcoming">
+                今後のセッション ({upcomingSessions.length})
+              </TabsTrigger>
+              <TabsTrigger value="past">
+                過去のセッション ({pastSessions.length})
+              </TabsTrigger>
+              <TabsTrigger value="all">
+                すべて ({allSessions.length})
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="upcoming" className="mt-4">
+              {upcomingSessions.length > 0 ? (
+                <SessionListCard 
+                  sessions={upcomingSessions}
+                  layout="list"
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-lg font-medium">今後のセッションはありません</p>
+                  <p className="text-muted-foreground">新しいセッションを作成してください</p>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="past" className="mt-4">
+              {pastSessions.length > 0 ? (
+                <SessionListCard 
+                  sessions={pastSessions}
+                  layout="list"
+                />
+              ) : (
+                <div className="text-center py-8">
+                  <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-lg font-medium">過去のセッションはありません</p>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="all" className="mt-4">
+              <SessionListCard 
+                sessions={allSessions}
+                layout="list"
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       )}
 

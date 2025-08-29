@@ -1,9 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { TaskInstance, FixedTask, TaskStatus } from '../types/task';
-import { getFixedTasksByStage } from '../data/taskTemplates';
-import { generateId } from '@/shared/utils/date';
-import { Applicant, SelectionStage } from '@/features/applicants/types/applicant';
-import { supabase } from '@/lib/supabase';
+import { Applicant } from '@/features/applicants/types/applicant';
+import { TaskDataAccess } from '@/lib/dataAccess/taskDataAccess';
 
 // FixedTaskとTaskInstanceを組み合わせた型
 type TaskWithFixedData = FixedTask & TaskInstance;
@@ -17,30 +15,9 @@ export const useTaskManagement = () => {
     const fetchTaskInstances = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('task_instances')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Failed to fetch task instances:', error);
-        } else if (data) {
-          // データベースのフィールド名をTypeScriptの型定義に合わせて変換
-          const transformedData = data.map(item => ({
-            id: item.id,
-            applicantId: item.applicant_id,
-            taskId: item.task_id,
-            status: item.status,
-            dueDate: item.due_date ? new Date(item.due_date) : undefined,
-            completedAt: item.completed_at ? new Date(item.completed_at) : undefined,
-            notes: item.notes,
-            createdAt: new Date(item.created_at),
-            updatedAt: new Date(item.updated_at),
-          }));
-          
-          console.log('📊 Transformed task instances:', transformedData);
-          setTaskInstances(transformedData);
-        }
+        const data = await TaskDataAccess.getAllTaskInstances();
+        console.log('📊 Fetched task instances:', data);
+        setTaskInstances(data);
       } catch (error) {
         console.error('Failed to fetch task instances:', error);
       } finally {
@@ -53,89 +30,12 @@ export const useTaskManagement = () => {
 
   // 応募者の特定段階のタスクを取得
   const getApplicantTasksByStage = useCallback(async (applicant: Applicant, stage: string): Promise<TaskWithFixedData[]> => {
-    // データベースからタスクインスタンスを取得
-    const { data: dbTaskInstances, error } = await supabase
-      .from('task_instances')
-      .select('*')
-      .eq('applicant_id', applicant.id);
-      
-    if (error) {
-      console.error('Failed to fetch task instances:', error);
+    try {
+      return await TaskDataAccess.getApplicantTasksByStage(applicant, stage);
+    } catch (error) {
+      console.error('Failed to get applicant tasks by stage:', error);
       return [];
     }
-    
-    // データベースのフィールド名をTypeScriptの型定義に合わせて変換
-    const transformedInstances = dbTaskInstances?.map(item => ({
-      id: item.id,
-      applicantId: item.applicant_id,
-      taskId: item.task_id,
-      status: item.status,
-      dueDate: item.due_date ? new Date(item.due_date) : undefined,
-      completedAt: item.completed_at ? new Date(item.completed_at) : undefined,
-      notes: item.notes,
-      createdAt: new Date(item.created_at),
-      updatedAt: new Date(item.updated_at),
-    })) || [];
-    
-    // データベースからfixed_tasksも取得して、正しいマッチングを行う
-    const { data: dbFixedTasks, error: fixedTasksError } = await supabase
-      .from('fixed_tasks')
-      .select('*')
-      .eq('stage', stage)
-      .order('order_num', { ascending: true });
-      
-    if (fixedTasksError) {
-      console.error('Failed to fetch fixed tasks from database:', fixedTasksError);
-      return [];
-    }
-    
-    return dbFixedTasks.map((dbFixedTask) => {
-      const instance = transformedInstances.find(
-        ti => ti.taskId === dbFixedTask.id
-      );
-      
-      if (instance) {
-        return { 
-          stage: dbFixedTask.stage,
-          title: dbFixedTask.title,
-          description: dbFixedTask.description,
-          type: dbFixedTask.type,
-          order: dbFixedTask.order_num,
-          ...instance 
-        };
-      } else {
-        // 新しいタスクインスタンスを作成（データベースには保存しない）
-        const newInstance: TaskInstance = {
-          id: generateId(),
-          applicantId: applicant.id,
-          taskId: dbFixedTask.id,
-          status: '未着手',
-          dueDate: undefined, // 期限なし
-          notes: '',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        
-        // 日程調整連絡とリマインドの場合は返信待ちステータスを設定
-        if (['日程調整連絡', 'リマインド'].includes(dbFixedTask.type)) {
-          newInstance.status = '返信待ち';
-        }
-        
-        // 提出書類タスクの場合は初期ステータスを設定
-        if (dbFixedTask.type === '提出書類') {
-          newInstance.status = '提出待ち';
-        }
-        
-        return { 
-          stage: dbFixedTask.stage,
-          title: dbFixedTask.title,
-          description: dbFixedTask.description,
-          type: dbFixedTask.type,
-          order: dbFixedTask.order_num,
-          ...newInstance 
-        };
-      }
-    }).sort((a: TaskWithFixedData, b: TaskWithFixedData) => a.order - b.order);
   }, []);
 
   // 応募者のタスクを取得
@@ -188,15 +88,7 @@ export const useTaskManagement = () => {
         updateData.completed_at = new Date().toISOString();
       }
       
-      const { error } = await supabase
-        .from('task_instances')
-        .update(updateData)
-        .eq('id', taskInstanceId);
-        
-      if (error) {
-        console.error('❌ Failed to update task status:', error);
-        throw error;
-      }
+      await TaskDataAccess.updateTaskStatus(taskInstanceId, status);
       
       console.log('✅ Task status updated successfully');
       
@@ -229,18 +121,7 @@ export const useTaskManagement = () => {
       console.log('🔄 Setting task due date:', { taskInstanceId, dueDate });
       
       // データベースにタスク期限を更新
-      const { error } = await supabase
-        .from('task_instances')
-        .update({
-          due_date: dueDate.toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', taskInstanceId);
-        
-      if (error) {
-        console.error('❌ Failed to update task due date:', error);
-        throw error;
-      }
+      await TaskDataAccess.setTaskDueDate(taskInstanceId, dueDate);
       
       console.log('✅ Task due date updated successfully');
       
