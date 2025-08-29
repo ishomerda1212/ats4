@@ -1,9 +1,12 @@
 import { Building2, Users, Calendar, FileText, Clock, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuthContext } from '@/features/auth';
+import { UserMenu } from '@/features/auth/components/UserMenu';
 
 export function Header() {
   const location = useLocation();
+  const { user } = useAuthContext();
 
   const isActive = (path: string) => location.pathname.startsWith(path);
 
@@ -54,7 +57,7 @@ export function Header() {
                   className="flex items-center space-x-2"
                 >
                   <Calendar className="h-4 w-4" />
-                  <span>イベント管理</span>
+                  <span>選考段階管理</span>
                 </Button>
               </Link>
               
@@ -69,6 +72,9 @@ export function Header() {
               </Link>
             </nav>
           </div>
+          
+          {/* ユーザーメニュー */}
+          {user && <UserMenu user={user} />}
         </div>
       </div>
     </header>

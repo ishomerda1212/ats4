@@ -99,7 +99,7 @@ export function EventSessionCard({
                 カレンダー登録
               </Button>
             </a>
-            <Link to={`/event/${session.eventId}/session/${session.id}`}>
+            <Link to={`/selection-stage/${session.eventId}/session/${session.id}`}>
               <Button size="sm" variant="outline">
                 <Eye className="h-3 w-3 mr-1" />
                 詳細

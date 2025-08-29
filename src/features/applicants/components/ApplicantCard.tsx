@@ -32,7 +32,7 @@ interface ApplicantCardProps {
 
 export function ApplicantCard({ applicant }: ApplicantCardProps) {
   const [nextTask, setNextTask] = useState<ExtendedTaskInstance | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   // 次のタスクを取得する関数
   const fetchNextTask = async () => {

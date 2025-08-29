@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Plus, Search, Calendar, Clock, MapPin, Users, Eye, CalendarPlus } from 'lucide-react';
+
+import { Plus, Calendar, Clock, MapPin, Users, Eye, CalendarPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EventCard } from '../components/EventCard';
 import { EventReservationForm, ReservationFormData } from '../components/EventReservationForm';
@@ -21,7 +21,6 @@ export function EventListPage() {
   } = useEvents();
 
   const { applicants } = useApplicants();
-  const [searchTerm, setSearchTerm] = useState('');
   const [showReservationForm, setShowReservationForm] = useState(false);
   const [reservationLoading, setReservationLoading] = useState(false);
 
@@ -52,10 +51,7 @@ export function EventListPage() {
     setShowReservationForm(false);
   };
 
-  const filteredEvents = events.filter(event =>
-    event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    event.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredEvents = events;
 
   // すべてのセッションを取得
   const allSessions = events.flatMap(event => {
@@ -71,8 +67,8 @@ export function EventListPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">イベント管理</h1>
-          <p className="text-muted-foreground mt-1">採用イベントの管理を行います</p>
+          <h1 className="text-3xl font-bold">選考段階管理</h1>
+          <p className="text-muted-foreground mt-1">採用選考段階の管理を行います</p>
         </div>
         
         <div className="flex items-center space-x-3">
@@ -81,40 +77,19 @@ export function EventListPage() {
             onClick={() => setShowReservationForm(true)}
           >
             <CalendarPlus className="h-4 w-4 mr-2" />
-            イベント予約
+            選考段階予約
           </Button>
-          <Link to="/events/create">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              新規イベント作成
-            </Button>
-          </Link>
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>検索・絞り込み</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="イベント名または説明で検索..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </CardContent>
-      </Card>
+
 
       {/* イベント一覧セクション */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold">イベント一覧</h2>
+          <h2 className="text-2xl font-bold">選考段階一覧</h2>
           <span className="text-sm text-muted-foreground">
-            {filteredEvents.length}件のイベント
+            {filteredEvents.length}件の選考段階
           </span>
         </div>
 
@@ -127,12 +102,12 @@ export function EventListPage() {
           <Card>
             <CardContent className="text-center py-8">
               <p className="text-muted-foreground">
-                {searchTerm ? '条件に一致するイベントが見つかりませんでした。' : 'イベントがありません。'}
+                選考段階がありません。
               </p>
             </CardContent>
           </Card>
         ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {filteredEvents.map((event) => (
             <EventCard
               key={event.id}
@@ -163,7 +138,7 @@ export function EventListPage() {
                   return (
                     <div key={session.id} className="flex items-center justify-between p-4 border rounded-lg hover:shadow-sm transition-shadow">
                       <div className="flex items-center space-x-6 flex-1">
-                        {/* イベント名 */}
+                        {/* 選考段階名 */}
                         <div className="flex items-center space-x-2 min-w-[200px]">
                           <span className="font-medium text-sm">{session.eventName}</span>
                         </div>
@@ -197,7 +172,7 @@ export function EventListPage() {
                       
                       {/* アクションボタン */}
                       <div className="flex items-center space-x-2 ml-4">
-                        <Link to={`/event/${session.eventId}/session/${session.id}`}>
+                        <Link to={`/selection-stage/${session.eventId}/session/${session.id}`}>
                           <Button size="sm" variant="outline">
                             <Eye className="h-3 w-3 mr-1" />
                             詳細

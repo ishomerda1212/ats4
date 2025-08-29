@@ -1,11 +1,10 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Applicant, SelectionStage } from '../types/applicant';
-import { useLocalStorage } from '@/shared/hooks/useLocalStorage';
 import { supabase } from '@/lib/supabase';
 
 export function useApplicants() {
   const [applicants, setApplicants] = useState<Applicant[]>([]);
-  const [selectionHistory, setSelectionHistory] = useState<any[]>([]);
+  const [selectionHistory] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStage, setSelectedStage] = useState<SelectionStage | 'all'>('all');
@@ -68,8 +67,12 @@ export function useApplicants() {
   }, [applicants]);
 
   const filteredApplicants = applicantsWithHistory.filter((applicant) => {
-    const matchesSearch = applicant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         applicant.schoolName.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = 
+      applicant.name.toLowerCase().includes(searchLower) ||
+      applicant.schoolName.toLowerCase().includes(searchLower) ||
+      (applicant.phone && applicant.phone.toLowerCase().includes(searchLower)) ||
+      (applicant.email && applicant.email.toLowerCase().includes(searchLower));
     const matchesStage = selectedStage === 'all' || applicant.currentStage === selectedStage;
     
     return matchesSearch && matchesStage;

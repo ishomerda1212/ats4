@@ -3,13 +3,12 @@ import { Event, EventSession, EventParticipant } from '@/features/events/types/e
 import { Applicant } from '@/features/applicants/types/applicant';
 import { ApplicantEventResponse, SessionResponse, EventFormData, SessionFormData } from '../types/applicantForm';
 import { generateId } from '@/shared/utils/date';
-import { supabase } from '@/lib/supabase';
 
 export const useApplicantForm = (applicantId: string, eventId: string) => {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [eventSessions, setEventSessions] = useState<EventSession[]>([]);
+  const [events] = useState<Event[]>([]);
+  const [eventSessions] = useState<EventSession[]>([]);
   const [eventParticipants, setEventParticipants] = useState<EventParticipant[]>([]);
-  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [applicants] = useState<Applicant[]>([]);
   const [applicantResponses, setApplicantResponses] = useState<ApplicantEventResponse[]>([]);
   
   const [loading, setLoading] = useState(true);

@@ -8,6 +8,7 @@ export interface Event extends BaseEntity {
   venue: string;
   maxParticipants: number;
   status: '予定' | '開催中' | '終了' | 'キャンセル';
+  sortOrder?: number;
 }
 
 export interface EventSession extends BaseEntity {

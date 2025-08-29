@@ -252,12 +252,12 @@ export function DashboardPage() {
                    
                    <div className="flex space-x-2 ml-4">
                      <Button size="sm" variant="outline" asChild>
-                       <Link to={`/event/${session.eventId}/session/${session.id}`}>
+                       <Link to={`/selection-stage/${session.eventId}/session/${session.id}`}>
                          詳細
                        </Link>
                      </Button>
                      <Button size="sm" variant="outline" asChild>
-                       <Link to={`/event/${session.eventId}/session/${session.id}/participants`}>
+                       <Link to={`/selection-stage/${session.eventId}/session/${session.id}/participants`}>
                          参加者
                        </Link>
                      </Button>

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, Mail, Phone, MapPin, Calendar, School, Target, Heart, Briefcase, Award, User, CheckSquare } from 'lucide-react';
+import { Edit, Mail, Phone, MapPin, Calendar, School, Briefcase, User, CheckSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Applicant } from '../types/applicant';
 import { TaskInstance } from '@/features/tasks/types/task';

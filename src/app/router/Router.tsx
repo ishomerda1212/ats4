@@ -18,12 +18,20 @@ import { TaskListPage } from '@/features/tasks/pages/TaskListPage';
 import { EmailTemplateManagementPage } from '@/features/tasks/pages/EmailTemplateManagementPage';
 import { ApplicantMailPage } from '@/features/email/pages/ApplicantMailPage';
 import { ReportPage } from '@/features/reports/pages/ReportPage/index';
+import { LoginPage } from '@/features/auth/pages/LoginPage';
+import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 
 export function Router() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        {/* 認証不要のルート */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="applicant-form/:applicantId/:eventId" element={<ApplicantFormPage />} />
+        <Route path="applicant-response/:applicantId/:eventId" element={<ApplicantResponseViewPage />} />
+        
+        {/* 認証が必要なルート */}
+        <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<DashboardPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="applicants" element={<ApplicantListPage />} />
@@ -33,17 +41,15 @@ export function Router() {
           <Route path="applicants/:id/mail" element={<ApplicantMailPage />} />
           <Route path="events" element={<EventListPage />} />
           <Route path="events/create" element={<EventCreatePage />} />
-          <Route path="event/:id" element={<EventDetailPage />} />
-          <Route path="event/:id/edit" element={<EventEditPage />} />
-          <Route path="event/:id/registration" element={<EventRegistrationPage />} />
-          <Route path="event/:id/session/:sessionId" element={<EventSessionDetailPage />} />
-          <Route path="event/:id/session/:sessionId/participants" element={<EventSessionParticipantsPage />} />
+          <Route path="selection-stage/:id" element={<EventDetailPage />} />
+          <Route path="selection-stage/:id/edit" element={<EventEditPage />} />
+          <Route path="selection-stage/:id/registration" element={<EventRegistrationPage />} />
+          <Route path="selection-stage/:id/session/:sessionId" element={<EventSessionDetailPage />} />
+          <Route path="selection-stage/:id/session/:sessionId/participants" element={<EventSessionParticipantsPage />} />
           <Route path="tasks" element={<TaskListPage />} />
           <Route path="email-templates" element={<EmailTemplateManagementPage />} />
           <Route path="reports" element={<ReportPage />} />
         </Route>
-        <Route path="applicant-form/:applicantId/:eventId" element={<ApplicantFormPage />} />
-        <Route path="applicant-response/:applicantId/:eventId" element={<ApplicantResponseViewPage />} />
       </Routes>
     </BrowserRouter>
   );

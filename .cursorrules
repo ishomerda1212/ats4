@@ -1,0 +1,278 @@
+# Cursor AI設定ファイル - ATS4（採用管理システム）
+
+## プロジェクト概要
+このプロジェクトは採用管理システム（ATS4）で、React + TypeScript + Viteを使用しています。
+Featuresパターンに基づいたアーキテクチャを採用し、各機能を独立したモジュールとして管理しています。
+
+## 技術スタック
+- **フロントエンド**: React 18, TypeScript, Vite
+- **UIライブラリ**: Radix UI, Tailwind CSS, shadcn/ui
+- **状態管理**: Zustand
+- **フォーム**: React Hook Form + Zod
+- **ルーティング**: React Router DOM
+- **バックエンド**: Express.js, Supabase
+- **データベース**: PostgreSQL
+
+## アーキテクチャ原則
+
+### Featuresパターンの構造
+```
+src/features/
+├── applicants/          # 応募者管理
+├── events/             # イベント管理
+├── selection-stages/   # 選考段階管理
+├── email/              # メール機能
+├── reports/            # レポート機能
+├── tasks/              # タスク管理
+├── dashboard/          # ダッシュボード
+└── applicant-form/     # 応募フォーム
+```
+
+各featureは以下の構造に従ってください：
+```
+feature-name/
+├── components/         # UIコンポーネント
+├── hooks/             # カスタムフック
+├── pages/             # ページコンポーネント
+├── types/             # 型定義
+├── utils/             # ユーティリティ関数
+└── index.ts           # エクスポート
+```
+
+## コーディング規約
+
+### 1. コンポーネント設計
+- **関数コンポーネント**を使用し、React Hooksを活用
+- **Props型定義**は必ず明示的に行う
+- **コンポーネント名**はPascalCase
+- **ファイル名**はPascalCase（コンポーネント）またはcamelCase（フック、ユーティリティ）
+
+```typescript
+// ✅ 良い例
+interface ApplicantCardProps {
+  applicant: Applicant;
+  onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
+}
+
+export const ApplicantCard: React.FC<ApplicantCardProps> = ({
+  applicant,
+  onEdit,
+  onDelete
+}) => {
+  // コンポーネントロジック
+};
+```
+
+### 2. カスタムフック設計
+- **use**プレフィックスで命名
+- **単一責任**の原則に従う
+- **型安全性**を重視
+
+```typescript
+// ✅ 良い例
+export const useApplicants = () => {
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchApplicants = useCallback(async () => {
+    // 実装
+  }, []);
+
+  return {
+    applicants,
+    loading,
+    error,
+    fetchApplicants
+  };
+};
+```
+
+### 3. 型定義
+- **インターフェース**を優先使用
+- **厳密な型定義**を行う
+- **共通型**は`shared/types`に配置
+
+```typescript
+// ✅ 良い例
+export interface Applicant {
+  id: string;
+  name: string;
+  nameKana: string;
+  email: string;
+  phone: string;
+  currentStage: SelectionStage;
+  status: ApplicantStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type SelectionStage = 
+  | '書類選考'
+  | '一次面接'
+  | '二次面接'
+  | '最終面接'
+  | '内定'
+  | '辞退';
+
+export type ApplicantStatus = 
+  | '応募中'
+  | '選考中'
+  | '内定'
+  | '辞退'
+  | '不採用';
+```
+
+### 4. 状態管理
+- **Zustand**を使用したグローバル状態管理
+- **ローカル状態**はuseState/useReducer
+- **サーバー状態**はカスタムフックで管理
+
+### 5. フォーム処理
+- **React Hook Form** + **Zod**を使用
+- **バリデーション**はZodスキーマで定義
+- **エラーハンドリング**を適切に実装
+
+```typescript
+// ✅ 良い例
+const applicantSchema = z.object({
+  name: z.string().min(1, '名前は必須です'),
+  email: z.string().email('有効なメールアドレスを入力してください'),
+  phone: z.string().regex(/^[0-9-]+$/, '有効な電話番号を入力してください')
+});
+
+type ApplicantFormData = z.infer<typeof applicantSchema>;
+```
+
+## ベストプラクティス
+
+### 1. パフォーマンス
+- **React.memo**を適切に使用
+- **useCallback**と**useMemo**で不要な再レンダリングを防ぐ
+- **コード分割**を活用
+
+### 2. エラーハンドリング
+- **ErrorBoundary**を使用
+- **適切なエラーメッセージ**を表示
+- **ローディング状態**を管理
+
+### 3. アクセシビリティ
+- **ARIA属性**を適切に使用
+- **キーボードナビゲーション**をサポート
+- **セマンティックHTML**を使用
+
+### 4. 国際化
+- **日本語**をデフォルト言語として使用
+- **日付フォーマット**は`date-fns`を使用
+- **数値フォーマット**は適切に実装
+
+## ファイル命名規則
+
+### コンポーネント
+- `ApplicantCard.tsx` - 応募者カードコンポーネント
+- `EventForm.tsx` - イベントフォームコンポーネント
+- `SelectionStageList.tsx` - 選考段階リストコンポーネント
+
+### フック
+- `useApplicants.ts` - 応募者データ管理フック
+- `useEventForm.ts` - イベントフォーム管理フック
+- `useEmailService.ts` - メールサービスフック
+
+### ページ
+- `ApplicantListPage.tsx` - 応募者一覧ページ
+- `EventCreatePage.tsx` - イベント作成ページ
+- `DashboardPage.tsx` - ダッシュボードページ
+
+## データベース設計原則
+
+### 1. テーブル命名
+- **スネークケース**を使用
+- **複数形**で命名
+- **プレフィックス**は使用しない
+
+### 2. カラム命名
+- **スネークケース**を使用
+- **意味のある名前**を使用
+- **外部キー**は`{table_name}_id`形式
+
+## API設計原則
+
+### 1. RESTful API
+- **適切なHTTPメソッド**を使用
+- **一貫したURL構造**を維持
+- **適切なステータスコード**を返す
+
+### 2. レスポンス形式
+```typescript
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  error?: {
+    code: string;
+    message: string;
+    details?: any;
+  };
+}
+```
+
+## セキュリティ考慮事項
+
+### 1. 認証・認可
+- **JWT**を使用した認証
+- **適切な権限チェック**を実装
+- **セッション管理**を適切に行う
+
+### 2. データ保護
+- **個人情報**の適切な取り扱い
+- **暗号化**の実装
+- **ログ出力**の制御
+
+## テスト戦略
+
+### 1. 単体テスト
+- **コンポーネントテスト**を実装
+- **フックテスト**を実装
+- **ユーティリティ関数テスト**を実装
+
+### 2. 統合テスト
+- **API統合テスト**を実装
+- **E2Eテスト**を実装
+
+## デプロイメント
+
+### 1. 環境設定
+- **開発環境**、**ステージング環境**、**本番環境**を分離
+- **環境変数**を適切に管理
+- **CI/CD**パイプラインを構築
+
+### 2. 監視・ログ
+- **エラー監視**を実装
+- **パフォーマンス監視**を実装
+- **アクセスログ**を記録
+
+## 開発ワークフロー
+
+### 1. ブランチ戦略
+- **main** - 本番環境
+- **develop** - 開発環境
+- **feature/*** - 機能開発
+- **hotfix/*** - 緊急修正
+
+### 2. コミットメッセージ
+```
+feat: 応募者一覧機能を追加
+fix: メール送信エラーを修正
+docs: API仕様書を更新
+style: コンポーネントスタイルを調整
+refactor: コードをリファクタリング
+test: テストケースを追加
+```
+
+## 参考資料
+- [React公式ドキュメント](https://react.dev/)
+- [TypeScript公式ドキュメント](https://www.typescriptlang.org/)
+- [Vite公式ドキュメント](https://vitejs.dev/)
+- [Tailwind CSS公式ドキュメント](https://tailwindcss.com/)
+- [Radix UI公式ドキュメント](https://www.radix-ui.com/)

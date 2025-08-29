@@ -16,7 +16,7 @@ export function useEvents() {
         const { data, error } = await supabase
           .from('events')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('sort_order', { ascending: true });
 
         if (error) {
           console.error('Failed to fetch events:', error);
@@ -46,19 +46,19 @@ export function useEvents() {
           console.error('Failed to fetch event sessions:', error);
         } else if (data) {
           // データベースのデータをフロントエンドの型に変換
-          const sessions: EventSession[] = data.map((row: any) => ({
-            id: row.id,
-            eventId: row.event_id,
-            name: row.name,
-            start: new Date(row.start_time),
-            end: new Date(row.end_time),
-            venue: row.venue,
-            format: row.format,
-            zoomUrl: row.zoom_url,
-            notes: row.notes,
+          const sessions: EventSession[] = data.map((row: Record<string, unknown>) => ({
+            id: row.id as string,
+            eventId: row.event_id as string,
+            name: row.name as string,
+            start: new Date(row.start_time as string),
+            end: new Date(row.end_time as string),
+            venue: row.venue as string,
+            format: row.format as '対面' | 'オンライン' | 'ハイブリッド',
+            zoomUrl: row.zoom_url as string | undefined,
+            notes: row.notes as string | undefined,
             participants: [], // 参加者は別途取得
-            createdAt: new Date(row.created_at),
-            updatedAt: new Date(row.updated_at),
+            createdAt: new Date(row.created_at as string),
+            updatedAt: new Date(row.updated_at as string),
           }));
           setEventSessions(sessions);
         }
@@ -83,14 +83,14 @@ export function useEvents() {
           console.error('Failed to fetch event participants:', error);
         } else if (data) {
           // データベースのデータをフロントエンドの型に変換
-          const participants: EventParticipant[] = data.map((row: any) => ({
-            id: row.id,
-            sessionId: row.session_id,
-            applicantId: row.applicant_id,
-            status: row.status,
-            joinedAt: row.joined_at ? new Date(row.joined_at) : undefined,
-            createdAt: new Date(row.created_at),
-            updatedAt: new Date(row.updated_at),
+          const participants: EventParticipant[] = data.map((row: Record<string, unknown>) => ({
+            id: row.id as string,
+            sessionId: row.session_id as string,
+            applicantId: row.applicant_id as string,
+            status: row.status as '参加' | '申込' | '欠席',
+            joinedAt: row.joined_at ? new Date(row.joined_at as string) : undefined,
+            createdAt: new Date(row.created_at as string),
+            updatedAt: new Date(row.updated_at as string),
           }));
           setEventParticipants(participants);
         }

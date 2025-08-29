@@ -20,7 +20,7 @@ export function EventEditPage() {
   if (!event) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">イベントが見つかりませんでした。</p>
+        <p className="text-muted-foreground">選考段階が見つかりませんでした。</p>
       </div>
     );
   }
@@ -28,7 +28,7 @@ export function EventEditPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">イベント編集</h1>
+        <h1 className="text-3xl font-bold">選考段階編集</h1>
         <p className="text-muted-foreground mt-1">{event.name}の情報を編集します</p>
       </div>
 

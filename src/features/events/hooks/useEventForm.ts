@@ -63,7 +63,7 @@ export function useEventForm(event?: Event, mode: 'create' | 'edit' = 'create') 
         setEvents(current => [...current, newEvent]);
         
         toast({
-          title: "イベントを作成しました",
+          title: "選考段階を作成しました",
           description: `${data.name}が正常に作成されました。`,
         });
 
@@ -84,7 +84,7 @@ export function useEventForm(event?: Event, mode: 'create' | 'edit' = 'create') 
         );
         
         toast({
-          title: "イベントを更新しました",
+          title: "選考段階を更新しました",
           description: `${data.name}が正常に更新されました。`,
         });
 

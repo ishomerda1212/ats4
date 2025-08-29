@@ -1,5 +1,5 @@
 import { useParams, Link, useSearchParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,11 +7,15 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, UserCheck, ClipboardList, Monitor, Video, ExternalLink } from 'lucide-react';
 import { EventSessionForm } from '../components/EventSessionForm';
-import { ParticipantList } from '../components/ParticipantList';
 import { useEvents } from '../hooks/useEvents';
 import { useApplicants } from '@/features/applicants/hooks/useApplicants';
+import { useTaskManagement } from '@/features/tasks/hooks/useTaskManagement';
 import { formatDateTime, formatDate } from '@/shared/utils/date';
 import { EventSession, ParticipationStatus } from '../types/event';
+import { STAGE_TASKS } from '@/shared/utils/constants';
+import { SelectionStage } from '@/features/applicants/types/applicant';
+import { TaskInstance, FixedTask } from '@/features/tasks/types/task';
+import { ApplicantTaskTable } from '@/shared/components/common/ApplicantTaskTable';
 
 export function EventSessionDetailPage() {
   const params = useParams<{ id: string; sessionId: string }>();
@@ -33,8 +37,10 @@ export function EventSessionDetailPage() {
   } = useEvents();
   
   const { applicants } = useApplicants();
+  const { getApplicantTasksByStage } = useTaskManagement();
   const [showSessionForm, setShowSessionForm] = useState(false);
   const [editingSession, setEditingSession] = useState<EventSession | null>(null);
+  const [participantTasks, setParticipantTasks] = useState<Record<string, any[]>>({});
 
   // URLパラメータのデバッグ
   console.log('URL Params Debug:', {
@@ -48,6 +54,32 @@ export function EventSessionDetailPage() {
   const sessions = event ? getEventSessions(event.id) : [];
   const session = sessions.find(s => s.id === sessionId);
   const participants = session ? getParticipantsBySession(session.id) : [];
+
+  // 選考段階名を取得（event.nameをSelectionStageとして扱う）
+  const stageName = event?.name as SelectionStage;
+
+  // 参加者のタスクデータを取得
+  useEffect(() => {
+    if (participants.length > 0 && stageName) {
+      const fetchParticipantTasks = async () => {
+        const tasksData: Record<string, any[]> = {};
+        
+        for (const participant of participants) {
+          const applicant = applicants.find(a => a.id === participant.applicantId);
+          if (applicant) {
+            const tasks = await getApplicantTasksByStage(applicant, stageName);
+            tasksData[participant.applicantId] = tasks;
+          }
+        }
+        
+        setParticipantTasks(tasksData);
+      };
+      
+      fetchParticipantTasks();
+    }
+  }, [participants, applicants, stageName, getApplicantTasksByStage]);
+
+
 
   // デバッグ情報
   console.log('EventSessionDetailPage Debug:', {
@@ -94,10 +126,10 @@ export function EventSessionDetailPage() {
             <p className="mt-1">2. ページを再読み込み</p>
           </div>
         </div>
-        <Link to={`/event/${eventId}`}>
+        <Link to={`/selection-stage/${eventId}`}>
           <Button className="mt-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            イベント詳細に戻る
+            選考段階詳細に戻る
           </Button>
         </Link>
       </div>
@@ -107,8 +139,8 @@ export function EventSessionDetailPage() {
   const handleDeleteSession = () => {
     if (window.confirm('このセッションを削除しますか？')) {
       deleteEventSession(session.id);
-      // 削除後はイベント詳細ページに戻る
-              window.location.href = `/event/${eventId}`;
+      // 削除後は選考段階詳細ページに戻る
+              window.location.href = `/selection-stage/${eventId}`;
     }
   };
 
@@ -182,10 +214,10 @@ export function EventSessionDetailPage() {
             </Button>
           </Link>
         ) : (
-          <Link to={`/event/${eventId}`}>
+          <Link to={`/selection-stage/${eventId}`}>
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              イベント詳細に戻る
+              選考段階詳細に戻る
             </Button>
           </Link>
         )}
@@ -408,11 +440,16 @@ export function EventSessionDetailPage() {
         <h2 className="text-2xl font-bold">参加者一覧 ({participants.length}名)</h2>
       </div>
       
-      <ParticipantList
-        participants={participants}
+      <ApplicantTaskTable
         applicants={applicants}
-        session={session}
+        stageName={stageName}
+        applicantTasks={participantTasks}
+        title="参加者一覧"
+        showParticipationStatus={true}
         onStatusChange={handleStatusChange}
+        participants={participants}
+        sessionId={session?.id}
+        eventId={session?.eventId}
       />
     </div>
   );

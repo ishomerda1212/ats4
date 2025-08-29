@@ -1,0 +1,1 @@
+export { ApplicantTaskTable } from './ApplicantTaskTable';

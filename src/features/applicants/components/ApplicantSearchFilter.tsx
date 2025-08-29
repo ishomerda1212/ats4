@@ -21,14 +21,19 @@ export function ApplicantSearchFilter({
 }: ApplicantSearchFilterProps) {
   return (
     <div className="space-y-4">
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="応募者名または学校名で検索..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10"
-        />
+      <div className="space-y-2">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="応募者名、学校名、電話番号、メールアドレスで検索..."
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          応募者名、学校名、電話番号、メールアドレスのいずれかで検索できます
+        </p>
       </div>
       
       <div className="flex flex-wrap gap-2">
