@@ -20,6 +20,12 @@ import { ApplicantMailPage } from '@/features/email/pages/ApplicantMailPage';
 import { ReportPage } from '@/features/reports/pages/ReportPage/index';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
+import { SystemConfigIndexPage } from '@/features/system-config/pages/SystemConfigIndexPage';
+import { StageConfigPage } from '@/features/system-config/pages/StageConfigPage';
+import { TaskConfigPage } from '@/features/system-config/pages/TaskConfigPage';
+import { StatusConfigPage } from '@/features/system-config/pages/StatusConfigPage';
+import { AllTasksConfigPage } from '@/features/system-config/pages/AllTasksConfigPage';
+import { AllStatusesConfigPage } from '@/features/system-config/pages/AllStatusesConfigPage';
 
 export function Router() {
   return (
@@ -49,6 +55,12 @@ export function Router() {
           <Route path="tasks" element={<TaskListPage />} />
           <Route path="email-templates" element={<EmailTemplateManagementPage />} />
           <Route path="reports" element={<ReportPage />} />
+          <Route path="system-config" element={<SystemConfigIndexPage />} />
+          <Route path="system-config/stages" element={<StageConfigPage />} />
+          <Route path="system-config/stages/:stageId/tasks" element={<TaskConfigPage />} />
+          <Route path="system-config/stages/:stageId/statuses" element={<StatusConfigPage />} />
+          <Route path="system-config/tasks" element={<AllTasksConfigPage />} />
+          <Route path="system-config/statuses" element={<AllStatusesConfigPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

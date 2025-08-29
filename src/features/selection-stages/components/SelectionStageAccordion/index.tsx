@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Clock, Plus } from 'lucide-react';
 import { formatDateTime } from '@/shared/utils/date';
-import { STAGES_WITH_SESSION } from '@/shared/utils/constants';
 import { useStageAccordion } from './hooks/useStageAccordion';
 import { useStageOperations } from './hooks/useStageOperations';
 import { TaskManagementSection } from './components/TaskManagementSection';
@@ -16,11 +15,14 @@ import { ResultDialog } from './components/ResultDialog';
 import { TaskEditDialog } from './components/TaskEditDialog';
 import { StageCard } from './components/StageCard';
 import { StageResultForm } from './components/StageResultForm';
-import { getStageSessionInfo, getAvailableSessionsForStage } from './utils/stageHelpers';
+import { getStageSessionInfo } from './utils/stageHelpers';
 import { FixedTask, TaskInstance, TaskStatus } from '@/features/tasks/types/task';
 import { Event, EventSession } from '@/features/events/types/event';
 import { Applicant, SelectionHistory } from '@/features/applicants/types/applicant';
 import { supabase } from '@/lib/supabase';
+import { useEvents } from '@/features/events/hooks/useEvents';
+import { requiresSessionFromEvent } from '@/shared/utils/constants';
+import { UnifiedParticipationDataAccess } from '@/lib/dataAccess/unifiedParticipationDataAccess';
 
 // FixedTaskとTaskInstanceを組み合わせた型
 type TaskWithFixedData = FixedTask & TaskInstance;
@@ -41,6 +43,10 @@ export function SelectionStageAccordion({
   const [stageTasksMap, setStageTasksMap] = useState<Record<string, TaskWithFixedData[]>>({});
   const [loading, setLoading] = useState(false);
   const [openAccordionItem, setOpenAccordionItem] = useState<string | undefined>(undefined);
+  const [participationStatuses, setParticipationStatuses] = useState<Record<string, string>>({});
+
+  // イベントデータを取得
+  const { events, loading: eventsLoading, getParticipantsBySession } = useEvents();
 
   const {
     // タスク編集関連
@@ -90,6 +96,60 @@ export function SelectionStageAccordion({
     updateTaskStatus,
     createNewSession
   } = useStageOperations();
+
+  // 段階名からイベントを取得する関数
+  const getEventByStageName = useCallback((stageName: string): Event | undefined => {
+    return events.find(event => event.name === stageName);
+  }, [events]);
+
+  // 応募者の参加状況を取得する関数
+  const getApplicantParticipationStatus = useCallback(async (applicantId: string, stageName: string): Promise<string> => {
+    try {
+      // console.log('🔍 getApplicantParticipationStatus called:', { applicantId, stageName });
+      const participation = await UnifiedParticipationDataAccess.getApplicantParticipationByStage(applicantId, stageName);
+      // console.log('✅ Participation result:', participation);
+      return participation?.status || '未設定';
+    } catch (error) {
+      console.error('Failed to fetch participation status:', error);
+      return '未設定';
+    }
+  }, []);
+
+  // 段階がセッションを必要とするかチェックする関数
+  const stageRequiresSession = useCallback((stageName: string): boolean => {
+    const event = getEventByStageName(stageName);
+    return event ? requiresSessionFromEvent(event) : false;
+  }, [getEventByStageName]);
+
+  // 参加状況を取得するuseEffect
+  useEffect(() => {
+    const fetchParticipationStatuses = async () => {
+      const statuses: Record<string, string> = {};
+      
+      for (const item of history) {
+        if (stageRequiresSession(item.stage)) {
+          const status = await getApplicantParticipationStatus(applicant.id, item.stage);
+          statuses[item.stage] = status;
+          
+          // デバッグ情報（開発環境でのみ出力）
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`選考履歴 - ${item.stage}:`, {
+              applicantId: applicant.id,
+              stageName: item.stage,
+              status,
+              dataSource: 'UnifiedParticipationDataAccess.getApplicantParticipationByStage'
+            });
+          }
+        }
+      }
+      
+      setParticipationStatuses(statuses);
+    };
+    
+    if (history.length > 0) {
+      fetchParticipationStatuses();
+    }
+  }, [history, applicant.id, stageRequiresSession, getApplicantParticipationStatus]);
 
   // 各段階のタスクを非同期で取得
   const fetchStageTasks = async () => {
@@ -166,6 +226,19 @@ export function SelectionStageAccordion({
     }
   };
 
+  // イベントデータが読み込み中の場合はローディング表示
+  if (eventsLoading) {
+    return (
+      <Card>
+        <CardContent>
+          <p className="text-muted-foreground text-center py-8">
+            イベント情報を読み込み中...
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -204,21 +277,30 @@ export function SelectionStageAccordion({
           >
             {history.map((item) => {
               const stageTasks = stageTasksMap[item.stage] || [];
-              const sessionInfo = getStageSessionInfoForStage(item.stage);
+              const event = getEventByStageName(item.stage);
+              
+              // イベントに対応するセッションを取得
+              let sessionInfo = null;
+              if (event) {
+                const sessions = getAvailableSessionsForStageWithData(item.stage);
+                const session = sessions.length > 0 ? sessions[0] : null; // 最初のセッションを使用
+                sessionInfo = { event, session };
+              }
               
               return (
                 <AccordionItem key={item.id} value={item.id}>
-                  <StageCard item={item} sessionInfo={sessionInfo} />
+                  <StageCard item={item} sessionInfo={sessionInfo} event={event} />
                   <AccordionContent>
                     <div className="space-y-4 pt-4">
                       {/* セッション情報 */}
-                      {STAGES_WITH_SESSION.includes(item.stage as any) && (
+                      {stageRequiresSession(item.stage) && (
                         <SessionBookingForm
                           stage={item.stage}
                           sessionInfo={sessionInfo}
                           onOpenSessionDialog={handleOpenSessionDialog}
                           applicantId={applicant.id}
-                          participationStatus={item.status}
+                          participationStatus={participationStatuses[item.stage] || '未設定'}
+                          event={event}
                         />
                       )}
 

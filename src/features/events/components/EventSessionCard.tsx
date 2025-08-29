@@ -17,19 +17,74 @@ export function EventSessionCard({
 }: EventSessionCardProps) {
   // Googleカレンダー登録用URLを生成
   const generateGoogleCalendarUrl = () => {
-    // session.startとsession.endが文字列の場合はDateオブジェクトに変換
-    const startDate = (session.start instanceof Date ? session.start : new Date(session.start)).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    const endDate = (session.end instanceof Date ? session.end : new Date(session.end)).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    
-    const params = new URLSearchParams({
-      action: 'TEMPLATE',
-      text: session.name,
-      dates: `${startDate}/${endDate}`,
-      details: `${session.notes || ''}\n\n会場: ${session.venue}\n開催形式: ${session.format}${session.zoomUrl ? `\nZOOM URL: ${session.zoomUrl}` : ''}`,
-      location: session.venue,
-    });
+    try {
+      // console.log('Generating Google Calendar URL for session:', {
+      //   sessionDate: session.sessionDate,
+      //   startTime: session.startTime,
+      //   endTime: session.endTime,
+      //   name: session.name
+      // });
 
-    return `https://www.google.com/calendar/render?${params.toString()}`;
+      // sessionDateがDateオブジェクトでない場合は変換
+      const sessionDate = session.sessionDate instanceof Date 
+        ? session.sessionDate 
+        : new Date(session.sessionDate);
+      
+      // 無効な日時の場合はエラーを返す
+      if (isNaN(sessionDate.getTime())) {
+        console.error('Invalid sessionDate:', session.sessionDate);
+        return '#';
+      }
+
+      // startTimeとendTimeが文字列でない場合はエラーを返す
+      if (typeof session.startTime !== 'string' || typeof session.endTime !== 'string') {
+        console.error('Invalid time format:', { startTime: session.startTime, endTime: session.endTime });
+        return '#';
+      }
+      
+      // 時刻を解析
+      const [startHour, startMinute] = session.startTime.split(':').map(Number);
+      const [endHour, endMinute] = session.endTime.split(':').map(Number);
+      
+      if (isNaN(startHour) || isNaN(startMinute) || isNaN(endHour) || isNaN(endMinute)) {
+        console.error('Invalid time values:', { startTime: session.startTime, endTime: session.endTime });
+        return '#';
+      }
+      
+      // 開始日時と終了日時を構築
+      const startDateTime = new Date(sessionDate);
+      startDateTime.setHours(startHour, startMinute, 0, 0);
+      
+      const endDateTime = new Date(sessionDate);
+      endDateTime.setHours(endHour, endMinute, 0, 0);
+      
+      console.log('Calculated date times:', {
+        startDateTime: startDateTime.toISOString(),
+        endDateTime: endDateTime.toISOString()
+      });
+      
+      // Googleカレンダー用のフォーマットに変換
+      const startDate = startDateTime.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      const endDate = endDateTime.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      
+      const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: session.name,
+        dates: `${startDate}/${endDate}`,
+        details: `${session.notes || ''}\n\n会場: ${session.venue}\n開催形式: ${session.format}${session.zoomUrl ? `\nZOOM URL: ${session.zoomUrl}` : ''}`,
+        location: session.venue,
+      });
+
+      const url = `https://www.google.com/calendar/render?${params.toString()}`;
+      // console.log('Generated Google Calendar URL:', url);
+      
+      return url;
+    } catch (error) {
+      console.error('Error generating Google Calendar URL:', error, {
+        session: session
+      });
+      return '#';
+    }
   };
 
   return (
@@ -40,14 +95,14 @@ export function EventSessionCard({
             {/* 日時 */}
             <div className="flex items-center space-x-2 min-w-[180px]">
               <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">{formatDateTime(session.start)}</span>
+              <span className="font-medium">{formatDateTime(session.sessionDate)}</span>
             </div>
             
             {/* 時間 */}
             <div className="flex items-center space-x-2 min-w-[120px]">
               <Clock className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
-                {formatDateTime(session.end)}
+                {session.startTime} - {session.endTime}
               </span>
             </div>
             

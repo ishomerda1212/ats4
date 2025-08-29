@@ -1,49 +1,167 @@
+import { Event } from '@/features/events/types/event';
+import { 
+  getStageGroupFromEvent, 
+  requiresSessionFromEvent, 
+  getEventColor,
+  getEventDuration,
+  getEventSessionTypes,
+  getStageGroupDisplayName as getStageGroupDisplayNameFromConstants
+} from '@/shared/utils/constants';
 import { TaskStatus } from '@/features/tasks/types/task';
-import { Clock, CheckCircle } from 'lucide-react';
+import { CheckCircle, Clock } from 'lucide-react';
 
-// 選考段階とイベントの対応関係
-export const stageEventMapping: Record<string, string> = {
-  'エントリー': 'event-entry',
-  '書類選考': 'event-document-screening',
-  '会社説明会': 'event-company-info',
-  '適性検査体験': 'event-aptitude-test',
-  '職場見学': 'event-workplace-tour',
-  '仕事体験': 'event-job-experience',
-  '人事面接': 'event-individual-interview',
-  '集団面接': 'event-group-interview',
-  'CEOセミナー': 'event-ceo-seminar',
-  '最終選考': 'event-final-selection',
-  '内定面談': 'event-offer'
-};
-
-// 選考段階の順序を定義
+// 段階の順序（後方互換性のため保持）
 export const stageOrder = [
   'エントリー',
-  '書類選考', 
+  '書類選考',
   '会社説明会',
+  '適性検査',
   '適性検査体験',
   '職場見学',
   '仕事体験',
+  '個別面接',
   '人事面接',
   '集団面接',
-  'CEOセミナー',
   '最終選考',
-  '内定面談'
-];
+  'CEOセミナー',
+  '内定面談',
+  '不採用'
+] as const;
 
 /**
- * 次の選考段階を取得する
+ * イベントから段階のセッション情報を取得
  */
-export const getNextStage = (currentStage: string): string | null => {
-  const currentIndex = stageOrder.indexOf(currentStage);
-  if (currentIndex === -1 || currentIndex === stageOrder.length - 1) {
-    return null;
-  }
-  return stageOrder[currentIndex + 1];
+export const getStageSessionInfo = (event: Event) => {
+  const requiresSession = requiresSessionFromEvent(event);
+  const sessionTypes = getEventSessionTypes(event);
+  const estimatedDuration = getEventDuration(event);
+  
+  return {
+    requiresSession,
+    sessionTypes,
+    estimatedDuration,
+    hasMultipleSessionTypes: sessionTypes.length > 1
+  };
 };
 
 /**
- * タスクステータスのアイコンを取得する
+ * 段階グループ別にイベントを分類
+ */
+export const groupEventsByStageGroup = (events: Event[]): Record<string, Event[]> => {
+  const groups: Record<string, Event[]> = {};
+  
+  events.forEach(event => {
+    const stageGroup = getStageGroupFromEvent(event);
+    if (!groups[stageGroup]) {
+      groups[stageGroup] = [];
+    }
+    groups[stageGroup].push(event);
+  });
+  
+  return groups;
+};
+
+/**
+ * 段階グループの順序を取得
+ */
+export const getStageGroupOrder = (stageGroup: string): number => {
+  const order: Record<string, number> = {
+    'エントリー': 1,
+    'インターンシップ': 2,
+    '選考': 3,
+    'その他': 4
+  };
+  
+  return order[stageGroup] || 999;
+};
+
+/**
+ * 段階グループでソート
+ */
+export const sortByStageGroup = (events: Event[]): Event[] => {
+  return events.sort((a, b) => {
+    const aGroup = getStageGroupFromEvent(a);
+    const bGroup = getStageGroupFromEvent(b);
+    const aOrder = getStageGroupOrder(aGroup);
+    const bOrder = getStageGroupOrder(bGroup);
+    
+    if (aOrder !== bOrder) {
+      return aOrder - bOrder;
+    }
+    
+    return a.sortOrder - b.sortOrder;
+  });
+};
+
+/**
+ * 段階グループの色を取得
+ */
+export const getStageGroupColor = (stageGroup: string): string => {
+  const colors: Record<string, string> = {
+    'エントリー': 'blue',
+    'インターンシップ': 'green',
+    '選考': 'purple',
+    'その他': 'gray'
+  };
+  
+  return colors[stageGroup] || 'blue';
+};
+
+/**
+ * 段階グループの表示名を取得
+ */
+export const getStageGroupDisplayName = (stageGroup: string): string => {
+  return getStageGroupDisplayNameFromConstants(stageGroup);
+};
+
+/**
+ * イベントがアクティブかチェック
+ */
+export const isEventActive = (event: Event): boolean => {
+  return event.stageConfig?.is_active !== false;
+};
+
+/**
+ * アクティブなイベントのみを取得
+ */
+export const getActiveEvents = (events: Event[]): Event[] => {
+  return events.filter(isEventActive);
+};
+
+/**
+ * セッションが必要なイベントを取得
+ */
+export const getEventsRequiringSession = (events: Event[]): Event[] => {
+  return events.filter(requiresSessionFromEvent);
+};
+
+/**
+ * イベントの色クラスを取得
+ */
+export const getEventColorClass = (event: Event): string => {
+  return getEventColor(event);
+};
+
+/**
+ * タスクステータスの色クラスを取得
+ */
+export const getTaskStatusColor = (status: TaskStatus): string => {
+  switch (status) {
+    case '完了':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+    case '返信待ち':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+    case '提出待ち':
+      return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+    case '未着手':
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+  }
+};
+
+/**
+ * タスクステータスのアイコンを取得
  */
 export const getTaskStatusIcon = (status: TaskStatus) => {
   switch (status) {
@@ -58,93 +176,4 @@ export const getTaskStatusIcon = (status: TaskStatus) => {
     default:
       return <Clock className="h-3 w-3 text-gray-400" />;
   }
-};
-
-/**
- * タスクステータスの色クラスを取得する
- */
-export const getTaskStatusColor = (status: TaskStatus) => {
-  switch (status) {
-    case '完了':
-      return 'bg-green-100 text-green-800';
-    case '返信待ち':
-      return 'bg-yellow-100 text-yellow-800';
-    case '提出待ち':
-      return 'bg-orange-100 text-orange-800';
-    case '未着手':
-      return 'bg-gray-100 text-gray-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-};
-
-import { Event, EventSession } from '@/features/events/types/event';
-
-/**
- * 選考段階に対応するイベントとセッションを取得する
- */
-export const getStageSessionInfo = (
-  stage: string, 
-  events: Event[], 
-  eventSessions: EventSession[]
-) => {
-  // イベントマップを作成（パフォーマンス向上のため）
-  const eventMap = new Map<string, Event>();
-  events.forEach(event => {
-    eventMap.set(event.name, event);
-    eventMap.set(event.name.toLowerCase(), event);
-    eventMap.set(event.name.replace(/\s+/g, ''), event);
-  });
-
-  // 選考段階名でイベントを検索（効率的なマッチング）
-  const event = eventMap.get(stage) || 
-                eventMap.get(stage.toLowerCase()) || 
-                eventMap.get(stage.replace(/\s+/g, ''));
-  
-  if (!event) {
-    console.warn(`イベントが見つかりません: ${stage}`);
-    return null;
-  }
-
-  // 該当するセッションを取得
-  const sessions = eventSessions.filter(session => session.eventId === event.id);
-  if (sessions.length === 0) return null;
-
-  // 最新のセッションを返す（実際の実装では、応募者の参加予定セッションを特定する必要がある）
-  return {
-    event,
-    session: sessions[0]
-  };
-};
-
-/**
- * 選考段階に対応するイベントのセッション一覧を取得する
- */
-export const getAvailableSessionsForStage = (
-  stage: string, 
-  events: Event[], 
-  eventSessions: EventSession[]
-) => {
-  // イベントマップを作成（パフォーマンス向上のため）
-  const eventMap = new Map<string, Event>();
-  events.forEach(event => {
-    eventMap.set(event.name, event);
-    eventMap.set(event.name.toLowerCase(), event);
-    eventMap.set(event.name.replace(/\s+/g, ''), event);
-  });
-
-  // 選考段階名でイベントを検索（効率的なマッチング）
-  const event = eventMap.get(stage) || 
-                eventMap.get(stage.toLowerCase()) || 
-                eventMap.get(stage.replace(/\s+/g, ''));
-  
-  if (!event) {
-    console.warn(`イベントが見つかりません: ${stage}`);
-    return [];
-  }
-
-  // 該当するセッションを取得
-  const sessions = eventSessions.filter(session => session.eventId === event.id);
-  
-  return sessions;
 };

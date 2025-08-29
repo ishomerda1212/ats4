@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { TaskInstance, FixedTask, TaskStatus } from '@/features/tasks/types/task';
 import { Applicant } from '@/features/applicants/types/applicant';
+import { performanceMonitor } from '@/shared/utils/performanceMonitor';
 
 // データベースから取得した生データの型
 interface RawTaskInstance {
@@ -55,67 +56,163 @@ export class TaskDataAccess {
    * 全てのタスクインスタンスを取得
    */
   static async getAllTaskInstances(): Promise<TaskInstance[]> {
-    try {
-      const { data, error } = await supabase
-        .from('task_instances')
-        .select('*')
-        .order('created_at', { ascending: false });
+    return await performanceMonitor.measure('TaskDataAccess.getAllTaskInstances', async () => {
+      try {
+        const { data, error } = await supabase
+          .from('task_instances')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Failed to fetch task instances:', error);
+        if (error) {
+          console.error('Failed to fetch task instances:', error);
+          throw error;
+        }
+
+        return (data as RawTaskInstance[]).map(transformTaskInstance);
+      } catch (error) {
+        console.error('Error in getAllTaskInstances:', error);
         throw error;
       }
-
-      return (data as RawTaskInstance[]).map(transformTaskInstance);
-    } catch (error) {
-      console.error('Error in getAllTaskInstances:', error);
-      throw error;
-    }
+    });
   }
 
   /**
    * 応募者のタスクインスタンスを取得
    */
   static async getTaskInstancesByApplicant(applicantId: string): Promise<TaskInstance[]> {
-    try {
-      const { data, error } = await supabase
-        .from('task_instances')
-        .select('*')
-        .eq('applicant_id', applicantId);
+    return await performanceMonitor.measure('TaskDataAccess.getTaskInstancesByApplicant', async () => {
+      try {
+        const { data, error } = await supabase
+          .from('task_instances')
+          .select('*')
+          .eq('applicant_id', applicantId);
 
-      if (error) {
-        console.error('Failed to fetch task instances for applicant:', error);
+        if (error) {
+          console.error('Failed to fetch task instances for applicant:', error);
+          throw error;
+        }
+
+        return (data as RawTaskInstance[]).map(transformTaskInstance);
+      } catch (error) {
+        console.error('Error in getTaskInstancesByApplicant:', error);
         throw error;
       }
-
-      return (data as RawTaskInstance[]).map(transformTaskInstance);
-    } catch (error) {
-      console.error('Error in getTaskInstancesByApplicant:', error);
-      throw error;
-    }
+    });
   }
 
   /**
    * 特定段階の固定タスクを取得
    */
   static async getFixedTasksByStage(stage: string): Promise<FixedTask[]> {
-    try {
-      const { data, error } = await supabase
-        .from('fixed_tasks')
-        .select('*')
-        .eq('stage', stage)
-        .order('order_num', { ascending: true });
+    return await performanceMonitor.measure('TaskDataAccess.getFixedTasksByStage', async () => {
+      try {
+        const { data, error } = await supabase
+          .from('fixed_tasks')
+          .select('*')
+          .eq('stage', stage)
+          .order('order_num', { ascending: true });
 
-      if (error) {
-        console.error('Failed to fetch fixed tasks for stage:', error);
+        if (error) {
+          console.error('Failed to fetch fixed tasks for stage:', error);
+          throw error;
+        }
+
+        return (data as RawFixedTask[]).map(transformFixedTask);
+      } catch (error) {
+        console.error('Error in getFixedTasksByStage:', error);
         throw error;
       }
+    });
+  }
 
-      return (data as RawFixedTask[]).map(transformFixedTask);
-    } catch (error) {
-      console.error('Error in getFixedTasksByStage:', error);
-      throw error;
-    }
+  /**
+   * 全段階の固定タスクを一度に取得（N+1クエリ問題の解決）
+   */
+  static async getAllFixedTasks(): Promise<FixedTask[]> {
+    return await performanceMonitor.measure('TaskDataAccess.getAllFixedTasks', async () => {
+      try {
+        const { data, error } = await supabase
+          .from('fixed_tasks')
+          .select('*')
+          .order('order_num', { ascending: true });
+
+        if (error) {
+          console.error('Failed to fetch all fixed tasks:', error);
+          throw error;
+        }
+
+        return (data as RawFixedTask[]).map(transformFixedTask);
+      } catch (error) {
+        console.error('Error in getAllFixedTasks:', error);
+        throw error;
+      }
+    });
+  }
+
+  /**
+   * 応募者の全段階のタスクを一度に取得（N+1クエリ問題の解決）
+   */
+  static async getApplicantTasksForAllStages(
+    applicant: Applicant,
+    stages: string[]
+  ): Promise<Map<string, (FixedTask & TaskInstance)[]>> {
+    return await performanceMonitor.measure('TaskDataAccess.getApplicantTasksForAllStages', async () => {
+      try {
+        // 並行してデータを取得（2回のクエリのみ）
+        const [allTaskInstances, allFixedTasks] = await Promise.all([
+          this.getTaskInstancesByApplicant(applicant.id),
+          this.getAllFixedTasks()
+        ]);
+
+        // タスクインスタンスをマップ化
+        const instanceMap = new Map(
+          allTaskInstances.map(instance => [instance.taskId, instance])
+        );
+
+        // 段階別にタスクを分類
+        const tasksByStage = new Map<string, (FixedTask & TaskInstance)[]>();
+
+        for (const stage of stages) {
+          const stageFixedTasks = allFixedTasks.filter(task => task.stage === stage);
+          
+          const stageTasks = stageFixedTasks.map(fixedTask => {
+            const instance = instanceMap.get(fixedTask.id);
+            
+            if (instance) {
+              return { ...fixedTask, ...instance };
+            } else {
+              // 新しいタスクインスタンスを作成（データベースには保存しない）
+              const newInstance: TaskInstance = {
+                id: `temp-${Date.now()}-${Math.random()}`,
+                applicantId: applicant.id,
+                taskId: fixedTask.id,
+                status: '未着手',
+                dueDate: undefined,
+                notes: '',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              };
+
+              // 特定のタスクタイプに応じて初期ステータスを設定
+              if (['日程調整連絡', 'リマインド'].includes(fixedTask.type)) {
+                newInstance.status = '返信待ち';
+              } else if (fixedTask.type === '提出書類') {
+                newInstance.status = '提出待ち';
+              }
+
+              return { ...fixedTask, ...newInstance };
+            }
+          }).sort((a, b) => a.order - b.order);
+
+          tasksByStage.set(stage, stageTasks);
+        }
+
+        return tasksByStage;
+      } catch (error) {
+        console.error('Error in getApplicantTasksForAllStages:', error);
+        throw error;
+      }
+    });
   }
 
   /**
@@ -125,119 +222,127 @@ export class TaskDataAccess {
     applicant: Applicant, 
     stage: string
   ): Promise<(FixedTask & TaskInstance)[]> {
-    try {
-      // 並行してデータを取得
-      const [taskInstances, fixedTasks] = await Promise.all([
-        this.getTaskInstancesByApplicant(applicant.id),
-        this.getFixedTasksByStage(stage)
-      ]);
+    return await performanceMonitor.measure('TaskDataAccess.getApplicantTasksByStage', async () => {
+      try {
+        // 並行してデータを取得
+        const [taskInstances, fixedTasks] = await Promise.all([
+          this.getTaskInstancesByApplicant(applicant.id),
+          this.getFixedTasksByStage(stage)
+        ]);
 
-      // タスクインスタンスをマップ化
-      const instanceMap = new Map(
-        taskInstances.map(instance => [instance.taskId, instance])
-      );
+        // タスクインスタンスをマップ化
+        const instanceMap = new Map(
+          taskInstances.map(instance => [instance.taskId, instance])
+        );
 
-      // FixedTaskとTaskInstanceを組み合わせ
-      return fixedTasks.map(fixedTask => {
-        const instance = instanceMap.get(fixedTask.id);
-        
-        if (instance) {
-          return { ...fixedTask, ...instance };
-        } else {
-          // 新しいタスクインスタンスを作成（データベースには保存しない）
-          const newInstance: TaskInstance = {
-            id: `temp-${Date.now()}-${Math.random()}`,
-            applicantId: applicant.id,
-            taskId: fixedTask.id,
-            status: '未着手',
-            dueDate: undefined,
-            notes: '',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          };
+        // FixedTaskとTaskInstanceを組み合わせ
+        return fixedTasks.map(fixedTask => {
+          const instance = instanceMap.get(fixedTask.id);
+          
+          if (instance) {
+            return { ...fixedTask, ...instance };
+          } else {
+            // 新しいタスクインスタンスを作成（データベースには保存しない）
+            const newInstance: TaskInstance = {
+              id: `temp-${Date.now()}-${Math.random()}`,
+              applicantId: applicant.id,
+              taskId: fixedTask.id,
+              status: '未着手',
+              dueDate: undefined,
+              notes: '',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
 
-          // 特定のタスクタイプに応じて初期ステータスを設定
-          if (['日程調整連絡', 'リマインド'].includes(fixedTask.type)) {
-            newInstance.status = '返信待ち';
-          } else if (fixedTask.type === '提出書類') {
-            newInstance.status = '提出待ち';
+            // 特定のタスクタイプに応じて初期ステータスを設定
+            if (['日程調整連絡', 'リマインド'].includes(fixedTask.type)) {
+              newInstance.status = '返信待ち';
+            } else if (fixedTask.type === '提出書類') {
+              newInstance.status = '提出待ち';
+            }
+
+            return { ...fixedTask, ...newInstance };
           }
-
-          return { ...fixedTask, ...newInstance };
-        }
-      }).sort((a, b) => a.order - b.order);
-    } catch (error) {
-      console.error('Error in getApplicantTasksByStage:', error);
-      throw error;
-    }
+        }).sort((a, b) => a.order - b.order);
+      } catch (error) {
+        console.error('Error in getApplicantTasksByStage:', error);
+        throw error;
+      }
+    });
   }
 
   /**
    * タスクステータスを更新
    */
   static async updateTaskStatus(taskInstanceId: string, status: TaskStatus): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('task_instances')
-        .update({
-          status,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', taskInstanceId);
+    return await performanceMonitor.measure('TaskDataAccess.updateTaskStatus', async () => {
+      try {
+        const { error } = await supabase
+          .from('task_instances')
+          .update({
+            status,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', taskInstanceId);
 
-      if (error) {
-        console.error('Failed to update task status:', error);
+        if (error) {
+          console.error('Failed to update task status:', error);
+          throw error;
+        }
+      } catch (error) {
+        console.error('Error in updateTaskStatus:', error);
         throw error;
       }
-    } catch (error) {
-      console.error('Error in updateTaskStatus:', error);
-      throw error;
-    }
+    });
   }
 
   /**
    * タスクの期限を設定
    */
   static async setTaskDueDate(taskInstanceId: string, dueDate: Date): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('task_instances')
-        .update({
-          due_date: dueDate.toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', taskInstanceId);
+    return await performanceMonitor.measure('TaskDataAccess.setTaskDueDate', async () => {
+      try {
+        const { error } = await supabase
+          .from('task_instances')
+          .update({
+            due_date: dueDate.toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', taskInstanceId);
 
-      if (error) {
-        console.error('Failed to set task due date:', error);
+        if (error) {
+          console.error('Failed to set task due date:', error);
+          throw error;
+        }
+      } catch (error) {
+        console.error('Error in setTaskDueDate:', error);
         throw error;
       }
-    } catch (error) {
-      console.error('Error in setTaskDueDate:', error);
-      throw error;
-    }
+    });
   }
 
   /**
    * タスクのメモを更新
    */
   static async updateTaskNotes(taskInstanceId: string, notes: string): Promise<void> {
-    try {
-      const { error } = await supabase
-        .from('task_instances')
-        .update({
-          notes,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', taskInstanceId);
+    return await performanceMonitor.measure('TaskDataAccess.updateTaskNotes', async () => {
+      try {
+        const { error } = await supabase
+          .from('task_instances')
+          .update({
+            notes,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', taskInstanceId);
 
-      if (error) {
-        console.error('Failed to update task notes:', error);
+        if (error) {
+          console.error('Failed to update task notes:', error);
+          throw error;
+        }
+      } catch (error) {
+        console.error('Error in updateTaskNotes:', error);
         throw error;
       }
-    } catch (error) {
-      console.error('Error in updateTaskNotes:', error);
-      throw error;
-    }
+    });
   }
 }

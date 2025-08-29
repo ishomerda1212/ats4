@@ -53,22 +53,36 @@ export const useTaskManagement = () => {
            null;
   }, [getApplicantTasks]);
 
-  // 次のタスクを取得（全段階）
+  // 次のタスクを取得（全段階）- N+1クエリ問題を解決
   const getNextTaskAllStages = useCallback(async (applicant: Applicant): Promise<TaskWithFixedData | null> => {
-    const allStages = ['エントリー', '書類選考', '会社説明会', '適性検査体験', '職場見学', '仕事体験', '人事面接', '集団面接', 'CEOセミナー', '人事面接', '最終選考', '内定面談', '不採用'];
+    const allStages = ['エントリー', '書類選考', '会社説明会', '適性検査体験', '職場見学', '仕事体験', '人事面接', '集団面接', 'CEOセミナー', '最終選考', '内定面談', '不採用'];
     
-    for (const stage of allStages) {
-      const tasks = await getApplicantTasksByStage(applicant, stage);
-      const nextTask = tasks.find(task => task.status === '未着手') || 
-                      tasks.find(task => task.status === '返信待ち') ||
-                      tasks.find(task => task.status === '提出待ち');
-      if (nextTask) {
-        return nextTask;
+    try {
+      console.log('🚀 Fetching tasks for all stages using batch query...');
+      
+      // バッチ取得を使用して全段階のタスクを一度に取得
+      const tasksByStage = await TaskDataAccess.getApplicantTasksForAllStages(applicant, allStages);
+      
+      // 各段階で次のタスクを探す
+      for (const stage of allStages) {
+        const stageTasks = tasksByStage.get(stage) || [];
+        const nextTask = stageTasks.find(task => task.status === '未着手') || 
+                        stageTasks.find(task => task.status === '返信待ち') ||
+                        stageTasks.find(task => task.status === '提出待ち');
+        
+        if (nextTask) {
+          console.log(`✅ Found next task in stage: ${stage}`, nextTask);
+          return nextTask;
+        }
       }
+      
+      console.log('ℹ️ No next task found in any stage');
+      return null;
+    } catch (error) {
+      console.error('❌ Error fetching tasks for all stages:', error);
+      return null;
     }
-    
-    return null;
-  }, [getApplicantTasksByStage]);
+  }, []);
 
   // タスクステータスを更新
   const updateTaskStatus = useCallback(async (
@@ -137,8 +151,6 @@ export const useTaskManagement = () => {
       throw error;
     }
   }, []);
-
-
 
   // 期限が近いタスクを取得
   const getUpcomingTasks = useCallback((days: number = 7) => {

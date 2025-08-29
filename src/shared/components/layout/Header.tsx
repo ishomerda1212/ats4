@@ -1,4 +1,4 @@
-import { Building2, Users, Calendar, FileText, Clock, Home } from 'lucide-react';
+import { Building2, Users, Calendar, FileText, Clock, Home, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthContext } from '@/features/auth';
@@ -68,6 +68,16 @@ export function Header() {
                 >
                   <FileText className="h-4 w-4" />
                   <span>レポート</span>
+                </Button>
+              </Link>
+              
+              <Link to="/system-config">
+                <Button 
+                  variant={isActive('/system-config') ? 'default' : 'ghost'}
+                  className="flex items-center space-x-2"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span>システム設定</span>
                 </Button>
               </Link>
             </nav>

@@ -1,39 +1,73 @@
-import { BaseEntity } from '@/shared/types/common';
 import { SelectionStage } from '@/features/applicants/types/applicant';
 
-export interface Event extends BaseEntity {
+// イベント（選考段階の定義）
+export interface Event {
+  id: string;
   name: string;
   description: string;
   stage: SelectionStage;
   venue: string;
   maxParticipants: number;
-  status: '予定' | '開催中' | '終了' | 'キャンセル';
-  sortOrder?: number;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  sortOrder: number;
+  stageConfig: {
+    stage_group?: string;
+    is_active?: boolean;
+    requires_session?: boolean;
+    session_types?: string[];
+    estimated_duration?: number;
+    color_scheme?: string;
+    description?: string;
+  };
 }
 
-export interface EventSession extends BaseEntity {
+// イベントセッション（具体的な開催日時）
+export interface EventSession {
+  id: string;
   eventId: string;
   name: string;
-  start: Date;
-  end: Date;
+  sessionDate: Date;
+  startTime: string;
+  endTime: string;
   venue: string;
-  format: '対面' | 'オンライン' | 'ハイブリッド'; // 開催形式
-  zoomUrl?: string; // ZOOM URL
-  participants: EventParticipant[];
+  format: '対面' | 'オンライン' | 'ハイブリッド';
+  maxParticipants: number;
+  zoomUrl?: string;
   notes?: string;
   recruiter?: string;
-  reportReminderDate?: string;
-  participantReportDate?: string;
-  maxParticipants?: number; // 参加者上限数（未設定の場合は無制限）
-  currentParticipants?: number; // 現在の参加者数
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export type ParticipationStatus = '参加' | '不参加' | '未定' | '申込' | '欠席';
-
-export interface EventParticipant extends BaseEntity {
+export interface EventParticipant {
+  id: string;
   sessionId: string;
   applicantId: string;
   status: ParticipationStatus;
-  joinedAt?: Date;
+  result?: string;
+  notes: string;
+  createdAt: Date;
   updatedAt: Date;
 }
+
+export type ParticipationStatus = 
+  | '参加'
+  | '参加済み'
+  | 'キャンセル'
+  | '辞退'
+  | '無断欠席'
+  | '合格'
+  | '不合格'
+  | '保留'
+  | '内定'
+  | '不内定'
+  | '確定'
+  | '未承諾'
+  | '承諾'
+  | '申込'
+  | '欠席'
+  | '不参加'
+  | '未定';

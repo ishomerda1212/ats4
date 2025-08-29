@@ -23,9 +23,15 @@ export function useApplicants() {
     }
   }, []);
 
+  // 初回のみデータを取得するフラグ
+  const [isInitialized, setIsInitialized] = useState(false);
+
   useEffect(() => {
-    fetchApplicants();
-  }, [fetchApplicants]);
+    if (!isInitialized) {
+      fetchApplicants();
+      setIsInitialized(true);
+    }
+  }, [isInitialized, fetchApplicants]);
 
   // 応募者データ（履歴は後で実装）
   const applicantsWithHistory = useMemo(() => {

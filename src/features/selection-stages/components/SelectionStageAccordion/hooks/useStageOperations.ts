@@ -2,7 +2,7 @@ import { useTaskManagement } from '@/features/tasks/hooks/useTaskManagement';
 import { useEvents } from '@/features/events/hooks/useEvents';
 import { Applicant } from '@/features/applicants/types/applicant';
 import { EventSession } from '@/features/events/types/event';
-import { getStageSessionInfo, getAvailableSessionsForStage } from '../utils/stageHelpers';
+import { getStageSessionInfo } from '../utils/stageHelpers';
 
 export const useStageOperations = () => {
   const { 
@@ -12,23 +12,31 @@ export const useStageOperations = () => {
   } = useTaskManagement();
 
   const { 
-    events, 
-    eventSessions, 
-    addEventSession 
+    events,
+    eventSessions,
+    createEventSession
   } = useEvents();
 
   /**
    * 選考段階に対応するイベントとセッションを取得する
    */
   const getStageSessionInfoForStage = (stage: string) => {
-    return getStageSessionInfo(stage, events, eventSessions);
+    const event = events.find(e => e.name === stage);
+    if (!event) {
+      return null;
+    }
+    return getStageSessionInfo(event);
   };
 
   /**
    * 選考段階に対応するイベントのセッション一覧を取得する
    */
   const getAvailableSessionsForStageWithData = (stage: string) => {
-    return getAvailableSessionsForStage(stage, events, eventSessions);
+    const event = events.find(e => e.name === stage);
+    if (!event) {
+      return [];
+    }
+    return eventSessions.filter(session => session.eventId === event.id);
   };
 
   /**
@@ -51,20 +59,20 @@ export const useStageOperations = () => {
     maxParticipants?: number;
     recruiter?: string;
   }) => {
-    const newSession: Omit<EventSession, 'id' | 'createdAt' | 'updatedAt'> = {
+    const newSession: Partial<EventSession> = {
       eventId: sessionData.eventId,
       name: sessionData.name,
-      start: sessionData.start,
-      end: sessionData.end,
+      sessionDate: sessionData.start,
+      startTime: sessionData.start.toTimeString().slice(0, 5),
+      endTime: sessionData.end.toTimeString().slice(0, 5),
       venue: sessionData.venue,
       format: sessionData.format,
-      maxParticipants: sessionData.maxParticipants,
+      maxParticipants: sessionData.maxParticipants || 0,
       recruiter: sessionData.recruiter,
-      participants: [],
-      notes: '',
+      status: '予定'
     };
 
-    return addEventSession(newSession);
+    return createEventSession(newSession);
   };
 
   return {

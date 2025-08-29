@@ -222,6 +222,11 @@ export function SessionDialog({
                 <SelectContent>
                   {(() => {
                     const resultOptions = STAGE_RESULT_OPTIONS[editingStage as keyof typeof STAGE_RESULT_OPTIONS] || [];
+                    console.log('参加状況オプション:', {
+                      editingStage,
+                      resultOptions,
+                      currentValue: sessionFormData.result
+                    });
                     return resultOptions.map(option => (
                       <SelectItem key={option} value={option}>
                         {option}
@@ -233,6 +238,15 @@ export function SessionDialog({
               <p className="text-xs text-muted-foreground mt-1">
                 {editingStage}の参加状況を選択してください
               </p>
+              {/* デバッグ情報（開発環境でのみ表示） */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mt-2 p-2 bg-gray-100 rounded text-xs">
+                  <p><strong>デバッグ情報:</strong></p>
+                  <p>現在の値: {sessionFormData.result || '(空)'}</p>
+                  <p>段階: {editingStage}</p>
+                  <p>利用可能オプション: {STAGE_RESULT_OPTIONS[editingStage as keyof typeof STAGE_RESULT_OPTIONS]?.join(', ') || '(なし)'}</p>
+                </div>
+              )}
             </div>
           </TabsContent>
 

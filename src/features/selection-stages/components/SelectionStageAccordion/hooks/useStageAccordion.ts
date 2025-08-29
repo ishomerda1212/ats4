@@ -235,16 +235,27 @@ export const useStageAccordion = (applicant: Applicant, onRefresh?: () => void) 
       const recruiter = '';
 
       if (existingHistory && !error && existingHistory.session_id) {
-        // 既存の参加者情報から合否を取得
+        // 既存の参加者情報から参加状況を取得（statusカラムを使用）
         const { data: existingParticipant } = await supabase
           .from('event_participants')
-          .select('result')
+          .select('status')
           .eq('session_id', existingHistory.session_id)
           .eq('applicant_id', applicant.id)
           .single();
 
         if (existingParticipant) {
-          result = existingParticipant.result || '';
+          result = existingParticipant.status || '';
+          console.log('参加状況データ取得:', {
+            sessionId: existingHistory.session_id,
+            applicantId: applicant.id,
+            status: existingParticipant.status,
+            result: result
+          });
+        } else {
+          console.log('参加者データが見つかりません:', {
+            sessionId: existingHistory.session_id,
+            applicantId: applicant.id
+          });
         }
 
         // 既存のセッション情報から実施形式を取得
@@ -410,7 +421,7 @@ export const useStageAccordion = (applicant: Applicant, onRefresh?: () => void) 
         // 既存の参加者レコードを確認
         const { data: existingParticipant } = await supabase
           .from('event_participants')
-          .select('id')
+          .select('id, status')
           .eq('session_id', sessionId)
           .eq('applicant_id', applicant.id)
           .single();
@@ -418,7 +429,7 @@ export const useStageAccordion = (applicant: Applicant, onRefresh?: () => void) 
         const participantData: Record<string, unknown> = {
           session_id: sessionId,
           applicant_id: applicant.id,
-          status: '参加済み', // '参加予定'から'参加済み'に変更
+          status: sessionFormData.result || '参加', // フォームの参加状況を使用（デフォルトは「参加」）
           updated_at: new Date().toISOString()
         };
 

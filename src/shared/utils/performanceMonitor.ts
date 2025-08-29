@@ -7,27 +7,20 @@ interface PerformanceMetric {
   operation: string;
   duration: number;
   timestamp: Date;
-  success: boolean;
-  error?: string;
+  source: string;
 }
 
 class PerformanceMonitor {
   private metrics: PerformanceMetric[] = [];
-  private isEnabled: boolean = true;
+  private isEnabled = true;
 
   /**
-   * パフォーマンス監視を有効/無効にする
-   */
-  setEnabled(enabled: boolean): void {
-    this.isEnabled = enabled;
-  }
-
-  /**
-   * 操作の実行時間を測定する
+   * パフォーマンス測定を実行
    */
   async measure<T>(
     operation: string,
-    fn: () => Promise<T>
+    fn: () => Promise<T>,
+    source?: string
   ): Promise<T> {
     if (!this.isEnabled) {
       return await fn();
@@ -38,80 +31,43 @@ class PerformanceMonitor {
 
     try {
       const result = await fn();
-      const duration = performance.now() - startTime;
+      const endTime = performance.now();
+      const duration = endTime - startTime;
 
-      this.recordMetric({
+      const metric: PerformanceMetric = {
         operation,
         duration,
         timestamp: startTimestamp,
-        success: true,
-      });
+        source: source || 'unknown'
+      };
+
+      this.metrics.push(metric);
+
+      // ログ出力を有効化（デバッグ用）
+      console.log(`Performance: ${operation} - ${duration.toFixed(2)}ms`);
+      
+      // データアクセス操作の場合は詳細ログを出力
+      if (operation.includes('DataAccess')) {
+        console.log(`DataAccess Operation: ${operation}`);
+        console.log(`Source: ${source || 'unknown'}`);
+        console.log(`Duration: ${duration.toFixed(2)}ms`);
+        console.log(`Timestamp: ${startTimestamp.toISOString()}`);
+      }
 
       return result;
     } catch (error) {
-      const duration = performance.now() - startTime;
+      const endTime = performance.now();
+      const duration = endTime - startTime;
 
-      this.recordMetric({
-        operation,
-        duration,
-        timestamp: startTimestamp,
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      });
-
+      console.error(`Performance Error: ${operation} - ${duration.toFixed(2)}ms`, error);
       throw error;
     }
   }
 
   /**
-   * メトリクスを記録する
+   * メトリクスを取得
    */
-  private recordMetric(metric: PerformanceMetric): void {
-    this.metrics.push(metric);
-
-    // メトリクスが1000件を超えたら古いものを削除
-    if (this.metrics.length > 1000) {
-      this.metrics = this.metrics.slice(-500);
-    }
-
-    // 開発環境ではコンソールに出力
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`📊 Performance: ${metric.operation} - ${metric.duration.toFixed(2)}ms`);
-    }
-  }
-
-  /**
-   * 特定の操作の平均実行時間を取得
-   */
-  getAverageDuration(operation: string): number {
-    const operationMetrics = this.metrics.filter(m => m.operation === operation);
-    
-    if (operationMetrics.length === 0) {
-      return 0;
-    }
-
-    const totalDuration = operationMetrics.reduce((sum, m) => sum + m.duration, 0);
-    return totalDuration / operationMetrics.length;
-  }
-
-  /**
-   * 特定の操作の成功率を取得
-   */
-  getSuccessRate(operation: string): number {
-    const operationMetrics = this.metrics.filter(m => m.operation === operation);
-    
-    if (operationMetrics.length === 0) {
-      return 0;
-    }
-
-    const successCount = operationMetrics.filter(m => m.success).length;
-    return (successCount / operationMetrics.length) * 100;
-  }
-
-  /**
-   * 全メトリクスを取得
-   */
-  getAllMetrics(): PerformanceMetric[] {
+  getMetrics(): PerformanceMetric[] {
     return [...this.metrics];
   }
 
@@ -123,97 +79,60 @@ class PerformanceMonitor {
   }
 
   /**
-   * パフォーマンスレポートを生成
+   * 統計情報を取得
    */
-  generateReport(): {
+  getStats(): {
     totalOperations: number;
     averageDuration: number;
-    successRate: number;
-    operations: Array<{
-      operation: string;
-      count: number;
-      averageDuration: number;
-      successRate: number;
-    }>;
+    slowestOperation: PerformanceMetric | null;
+    fastestOperation: PerformanceMetric | null;
   } {
     if (this.metrics.length === 0) {
       return {
         totalOperations: 0,
         averageDuration: 0,
-        successRate: 0,
-        operations: [],
+        slowestOperation: null,
+        fastestOperation: null
       };
     }
 
-    const totalDuration = this.metrics.reduce((sum, m) => sum + m.duration, 0);
-    const totalSuccess = this.metrics.filter(m => m.success).length;
-
-    // 操作別の統計を計算
-    const operationStats = new Map<string, {
-      count: number;
-      totalDuration: number;
-      successCount: number;
-    }>();
-
-    this.metrics.forEach(metric => {
-      const stats = operationStats.get(metric.operation) || {
-        count: 0,
-        totalDuration: 0,
-        successCount: 0,
-      };
-
-      stats.count++;
-      stats.totalDuration += metric.duration;
-      if (metric.success) {
-        stats.successCount++;
-      }
-
-      operationStats.set(metric.operation, stats);
-    });
-
-    const operations = Array.from(operationStats.entries()).map(([operation, stats]) => ({
-      operation,
-      count: stats.count,
-      averageDuration: stats.totalDuration / stats.count,
-      successRate: (stats.successCount / stats.count) * 100,
-    }));
+    const durations = this.metrics.map(m => m.duration);
+    const averageDuration = durations.reduce((a, b) => a + b, 0) / durations.length;
+    const slowestOperation = this.metrics.reduce((a, b) => a.duration > b.duration ? a : b);
+    const fastestOperation = this.metrics.reduce((a, b) => a.duration < b.duration ? a : b);
 
     return {
       totalOperations: this.metrics.length,
-      averageDuration: totalDuration / this.metrics.length,
-      successRate: (totalSuccess / this.metrics.length) * 100,
-      operations: operations.sort((a, b) => b.count - a.count), // 実行回数順にソート
+      averageDuration,
+      slowestOperation,
+      fastestOperation
     };
   }
 
   /**
-   * パフォーマンスレポートをコンソールに出力
+   * 有効/無効を切り替え
    */
-  logReport(): void {
-    const report = this.generateReport();
-    
-    console.group('📊 Performance Report');
-    console.log(`Total Operations: ${report.totalOperations}`);
-    console.log(`Average Duration: ${report.averageDuration.toFixed(2)}ms`);
-    console.log(`Success Rate: ${report.successRate.toFixed(1)}%`);
-    
-    if (report.operations.length > 0) {
-      console.group('Operations Breakdown:');
-      report.operations.forEach(op => {
-        console.log(
-          `${op.operation}: ${op.count} calls, ` +
-          `${op.averageDuration.toFixed(2)}ms avg, ` +
-          `${op.successRate.toFixed(1)}% success`
-        );
-      });
-      console.groupEnd();
+  setEnabled(enabled: boolean): void {
+    this.isEnabled = enabled;
+  }
+
+  /**
+   * 統計情報をログ出力
+   */
+  logStats(): void {
+    const stats = this.getStats();
+    console.log('=== Performance Statistics ===');
+    console.log(`Total Operations: ${stats.totalOperations}`);
+    console.log(`Average Duration: ${stats.averageDuration.toFixed(2)}ms`);
+    if (stats.slowestOperation) {
+      console.log(`Slowest Operation: ${stats.slowestOperation.operation} (${stats.slowestOperation.duration.toFixed(2)}ms)`);
     }
-    
-    console.groupEnd();
+    if (stats.fastestOperation) {
+      console.log(`Fastest Operation: ${stats.fastestOperation.operation} (${stats.fastestOperation.duration.toFixed(2)}ms)`);
+    }
   }
 }
 
-// シングルトンインスタンス
 export const performanceMonitor = new PerformanceMonitor();
 
 /**

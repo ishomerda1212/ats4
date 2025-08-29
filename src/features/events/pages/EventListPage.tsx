@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,6 +26,7 @@ export function EventListPage() {
   const [showReservationForm, setShowReservationForm] = useState(false);
   const [reservationLoading, setReservationLoading] = useState(false);
   const [sessionTab, setSessionTab] = useState('upcoming');
+  const [participantCounts, setParticipantCounts] = useState<Record<string, number>>({});
 
   const handleReservationSubmit = async (formData: ReservationFormData) => {
     setReservationLoading(true);
@@ -54,6 +55,29 @@ export function EventListPage() {
     setShowReservationForm(false);
   };
 
+  // 参加者数を非同期で取得
+  useEffect(() => {
+    const fetchParticipantCounts = async () => {
+      const counts: Record<string, number> = {};
+      
+      for (const event of events) {
+        try {
+          const count = await getEventParticipantCount(event.id);
+          counts[event.id] = count;
+        } catch (error) {
+          console.error(`Failed to fetch participant count for event ${event.id}:`, error);
+          counts[event.id] = 0;
+        }
+      }
+      
+      setParticipantCounts(counts);
+    };
+    
+    if (events.length > 0) {
+      fetchParticipantCounts();
+    }
+  }, [events, getEventParticipantCount]);
+
   const filteredEvents = events;
 
   // すべてのセッションを取得（開始日時でソート）
@@ -63,17 +87,18 @@ export function EventListPage() {
       ...session,
       eventName: event.name,
       eventId: event.id,
-      currentParticipants: getParticipantsBySession(session.id).length
+      start: session.sessionDate, // SessionListCardが期待するプロパティ
+      currentParticipants: 0 // 一時的に0を設定、後で非同期で更新
     }));
-  }).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+  }).sort((a, b) => new Date(a.sessionDate).getTime() - new Date(b.sessionDate).getTime());
 
   // セッションを分類
   const { upcomingSessions, pastSessions } = useMemo(() => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
-    const upcoming = allSessions.filter(session => new Date(session.start) >= today);
-    const past = allSessions.filter(session => new Date(session.start) < today);
+    const upcoming = allSessions.filter(session => new Date(session.sessionDate) >= today);
+    const past = allSessions.filter(session => new Date(session.sessionDate) < today);
     
     return { upcomingSessions: upcoming, pastSessions: past };
   }, [allSessions]);
@@ -127,7 +152,7 @@ export function EventListPage() {
             <EventCard
               key={event.id}
               event={event}
-              participantCount={getEventParticipantCount(event.id)}
+              participantCount={participantCounts[event.id] || 0}
               sessionCount={getEventSessions(event.id).length}
             />
           ))}

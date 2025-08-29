@@ -6,13 +6,14 @@ import { ArrowLeft, Edit, Trash2, Calendar, Clock, MapPin, Users, UserCheck, Mon
 import { EventSessionForm } from '../components/EventSessionForm';
 import { useEvents } from '../hooks/useEvents';
 import { useApplicants } from '@/features/applicants/hooks/useApplicants';
-import { useTaskManagement } from '@/features/tasks/hooks/useTaskManagement';
+// import { useTaskManagement } from '@/features/tasks/hooks/useTaskManagement';
 import { formatDateTime, formatDate } from '@/shared/utils/date';
 import { EventSession, ParticipationStatus } from '../types/event';
 import { STAGE_TASKS } from '@/shared/utils/constants';
 import { SelectionStage } from '@/features/applicants/types/applicant';
 import { TaskInstance, FixedTask } from '@/features/tasks/types/task';
 import { ApplicantTaskTable } from '@/shared/components/common/ApplicantTaskTable';
+import { UnifiedParticipationDataAccess } from '@/lib/dataAccess/unifiedParticipationDataAccess';
 
 export function EventSessionDetailPage() {
   const params = useParams<{ id: string; sessionId: string }>();
@@ -26,7 +27,6 @@ export function EventSessionDetailPage() {
   const {
     events,
     getEventSessions,
-    getParticipantsBySession,
     updateParticipantStatus,
     deleteEventSession,
     updateEventSession,
@@ -34,66 +34,97 @@ export function EventSessionDetailPage() {
   } = useEvents();
   
   const { applicants } = useApplicants();
-  const { getApplicantTasksByStage } = useTaskManagement();
+  // const { getApplicantTasksByStage } = useTaskManagement();
   const [showSessionForm, setShowSessionForm] = useState(false);
   const [editingSession, setEditingSession] = useState<EventSession | null>(null);
-  const [participantTasks, setParticipantTasks] = useState<Record<string, any[]>>({});
+  // const [participantTasks, setParticipantTasks] = useState<Record<string, any[]>>({});
 
-  // URLパラメータのデバッグ
-  console.log('URL Params Debug:', {
-    params,
-    eventId,
-    sessionId,
-    eventsFromHook: events.length
-  });
+  // URLパラメータのデバッグ（一時的に無効化）
+  // console.log('URL Params Debug:', {
+  //   params,
+  //   eventId,
+  //   sessionId,
+  //   eventsFromHook: events.length
+  // });
 
   const event = events.find(e => e.id === eventId);
   const sessions = event ? getEventSessions(event.id) : [];
   const session = sessions.find(s => s.id === sessionId);
-  const participants = session ? getParticipantsBySession(session.id) : [];
+  const [participants, setParticipants] = useState<any[]>([]);
 
   // 選考段階名を取得（event.nameをSelectionStageとして扱う）
   const stageName = event?.name as SelectionStage;
 
-  // 参加者のタスクデータを取得
+  // 参加者データを取得
   useEffect(() => {
-    if (participants.length > 0 && stageName) {
-      const fetchParticipantTasks = async () => {
-        const tasksData: Record<string, any[]> = {};
-        
-        for (const participant of participants) {
-          const applicant = applicants.find(a => a.id === participant.applicantId);
-          if (applicant) {
-            const tasks = await getApplicantTasksByStage(applicant, stageName);
-            tasksData[participant.applicantId] = tasks;
-          }
+    if (session && session.id) {
+      // console.log('🔄 Fetching participants - session ID:', session.id);
+      
+      const fetchParticipants = async () => {
+        try {
+          // セッションの参加者を取得（これだけで十分）
+          const participantsData = await UnifiedParticipationDataAccess.getSessionParticipants(session.id);
+          // console.log('📊 Participants found:', participantsData.length);
+          
+          // 二重取得を削除 - セッション参加者データをそのまま使用
+          setParticipants(participantsData);
+        } catch (error) {
+          console.error('Failed to fetch participants:', error);
+          setParticipants([]);
         }
-        
-        setParticipantTasks(tasksData);
       };
       
-      fetchParticipantTasks();
+      fetchParticipants();
     }
-  }, [participants, applicants, stageName, getApplicantTasksByStage]);
+  }, [session?.id]);
+
+  // 参加者のタスクデータを取得（一時的に無効化）
+  // useEffect(() => {
+  //   if (participants.length > 0 && stageName) {
+  //     const fetchParticipantTasks = async () => {
+  //       const tasksData: Record<string, any[]> = {};
+  //       
+  //       for (const participant of participants) {
+  //         const applicant = applicants.find(a => a.id === participant.applicantId);
+  //         if (applicant) {
+  //           const tasks = await getApplicantTasksByStage(applicant, stageName);
+  //           tasksData[participant.applicantId] = tasks;
+  //         }
+  //       }
+  //       
+  //       setParticipantTasks(tasksData);
+  //     };
+  //     
+  //     fetchParticipantTasks();
+  //   }
+  // }, [participants, applicants, stageName, getApplicantTasksByStage]);
 
 
 
-  // デバッグ情報
-  console.log('EventSessionDetailPage Debug:', {
-    eventId,
-    sessionId,
-    eventsCount: events.length,
-    event,
-    sessionsCount: sessions.length,
-    session,
-    participantsCount: participants.length,
-    allSessions: sessions.map(s => ({ id: s.id, name: s.name })),
-    allEvents: events.map(e => ({ id: e.id, name: e.name }))
-  });
+  // デバッグ情報（一時的に無効化）
+  // console.log('EventSessionDetailPage Debug:', {
+  //   eventId,
+  //   sessionId,
+  //   eventsCount: events.length,
+  //   event,
+  //   sessionsCount: sessions.length,
+  //   session,
+  //   participantsCount: participants.length,
+  //   allSessions: sessions.map(s => ({ id: s.id, name: s.name })),
+  //   allEvents: events.map(e => ({ id: e.id, name: e.name }))
+  // });
 
   // 参加者数のカウント
   const registrationCount = participants.filter(p => p.status === '申込').length;
   const participationCount = participants.filter(p => p.status === '参加').length;
+
+  // デバッグ情報（開発環境でのみ表示）
+  const debugInfo = process.env.NODE_ENV === 'development' ? {
+    sessionId: session?.id,
+    participantsCount: participants.length,
+    dataSource: 'UnifiedParticipationDataAccess.getSessionParticipants',
+    lastUpdated: new Date().toISOString()
+  } : null;
 
   if (loading) {
     return (
@@ -156,8 +187,18 @@ export function EventSessionDetailPage() {
     setEditingSession(null);
   };
 
-  const handleStatusChange = (participantId: string, status: ParticipationStatus) => {
-    updateParticipantStatus(participantId, status);
+  const handleStatusChange = async (participantId: string, status: ParticipationStatus) => {
+    try {
+      await updateParticipantStatus(participantId, status);
+      
+      // 参加状況更新後に参加者データを再取得
+      if (session && session.id) {
+        const updatedParticipants = await UnifiedParticipationDataAccess.getSessionParticipants(session.id);
+        setParticipants(updatedParticipants);
+      }
+    } catch (error) {
+      console.error('Failed to update participant status:', error);
+    }
   };
 
 
@@ -166,19 +207,77 @@ export function EventSessionDetailPage() {
 
   // Googleカレンダー登録用URLを生成
   const generateGoogleCalendarUrl = () => {
-    // session.startとsession.endが文字列の場合はDateオブジェクトに変換
-    const startDate = (session.start instanceof Date ? session.start : new Date(session.start)).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    const endDate = (session.end instanceof Date ? session.end : new Date(session.end)).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    
-    const params = new URLSearchParams({
-      action: 'TEMPLATE',
-      text: session.name,
-      dates: `${startDate}/${endDate}`,
-      details: `${session.notes || ''}\n\n会場: ${session.venue}\n開催形式: ${session.format}${session.zoomUrl ? `\nZOOM URL: ${session.zoomUrl}` : ''}`,
-      location: session.venue,
-    });
+    try {
+      // デバッグ情報を追加（一時的に無効化）
+      // console.log('Session data for Google Calendar:', {
+      //   sessionDate: session.sessionDate,
+      //   startTime: session.startTime,
+      //   endTime: session.endTime,
+      //   sessionDateType: typeof session.sessionDate,
+      //   startTimeType: typeof session.startTime,
+      //   endTimeType: typeof session.endTime
+      // });
 
-    return `https://www.google.com/calendar/render?${params.toString()}`;
+      // sessionDateがDateオブジェクトでない場合は変換
+      const sessionDate = session.sessionDate instanceof Date 
+        ? session.sessionDate 
+        : new Date(session.sessionDate);
+      
+      // 無効な日時の場合はエラーを返す
+      if (isNaN(sessionDate.getTime())) {
+        console.error('Invalid sessionDate:', session.sessionDate);
+        return '#';
+      }
+
+      // startTimeとendTimeが文字列でない場合はエラーを返す
+      if (typeof session.startTime !== 'string' || typeof session.endTime !== 'string') {
+        console.error('Invalid time format:', { startTime: session.startTime, endTime: session.endTime });
+        return '#';
+      }
+      
+      // 時刻を解析
+      const [startHour, startMinute] = session.startTime.split(':').map(Number);
+      const [endHour, endMinute] = session.endTime.split(':').map(Number);
+      
+      if (isNaN(startHour) || isNaN(startMinute) || isNaN(endHour) || isNaN(endMinute)) {
+        console.error('Invalid time values:', { startTime: session.startTime, endTime: session.endTime });
+        return '#';
+      }
+      
+      // 開始日時と終了日時を構築
+      const startDateTime = new Date(sessionDate);
+      startDateTime.setHours(startHour, startMinute, 0, 0);
+      
+      const endDateTime = new Date(sessionDate);
+      endDateTime.setHours(endHour, endMinute, 0, 0);
+      
+      // console.log('Calculated date times:', {
+      //   startDateTime: startDateTime.toISOString(),
+      //   endDateTime: endDateTime.toISOString()
+      // });
+      
+      // Googleカレンダー用のフォーマットに変換
+      const startDate = startDateTime.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      const endDate = endDateTime.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      
+      const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: session.name,
+        dates: `${startDate}/${endDate}`,
+        details: `${session.notes || ''}\n\n会場: ${session.venue}\n開催形式: ${session.format}${session.zoomUrl ? `\nZOOM URL: ${session.zoomUrl}` : ''}`,
+        location: session.venue,
+      });
+
+      const url = `https://www.google.com/calendar/render?${params.toString()}`;
+      // console.log('Generated Google Calendar URL:', url);
+      
+      return url;
+    } catch (error) {
+      console.error('Error generating Google Calendar URL:', error, {
+        session: session
+      });
+      return '#';
+    }
   };
 
   return (
@@ -245,7 +344,7 @@ export function EventSessionDetailPage() {
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">開始日時</p>
-                    <p className="text-sm text-muted-foreground">{formatDateTime(session.start)}</p>
+                    <p className="text-sm text-muted-foreground">{formatDateTime(session.sessionDate)}</p>
                   </div>
                 </div>
                 
@@ -253,7 +352,7 @@ export function EventSessionDetailPage() {
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">終了日時</p>
-                    <p className="text-sm text-muted-foreground">{formatDateTime(session.end)}</p>
+                    <p className="text-sm text-muted-foreground">{formatDateTime(session.sessionDate)}</p>
                   </div>
                 </div>
                 
@@ -317,12 +416,24 @@ export function EventSessionDetailPage() {
                   target="_blank" 
                   rel="noopener noreferrer"
                 >
-                  <Button variant="outline" className="w-full">
+                  <Button className="w-full">
                     <Calendar className="h-4 w-4 mr-2" />
                     Googleカレンダーに登録
                   </Button>
                 </a>
               </div>
+
+              {/* デバッグ情報（開発環境でのみ表示） */}
+              {debugInfo && (
+                <div className="pt-4 mt-4 border-t">
+                  <details className="text-xs text-muted-foreground">
+                    <summary className="cursor-pointer">デバッグ情報</summary>
+                    <pre className="mt-2 p-2 bg-gray-100 rounded text-xs overflow-auto">
+                      {JSON.stringify(debugInfo, null, 2)}
+                    </pre>
+                  </details>
+                </div>
+              )}
               
               <div className="pt-4 mt-4 border-t">
                 <p className="text-sm font-medium mb-1">備考</p>
@@ -341,11 +452,15 @@ export function EventSessionDetailPage() {
       <ApplicantTaskTable
         applicants={applicants}
         stageName={stageName}
-        applicantTasks={participantTasks}
+        applicantTasks={{}}
         title="参加者一覧"
         showParticipationStatus={true}
         onStatusChange={handleStatusChange}
-        participants={participants}
+        participants={participants.map(p => ({
+          id: p.id,
+          applicantId: p.applicantId,
+          status: p.status
+        }))}
         sessionId={session?.id}
         eventId={session?.eventId}
       />

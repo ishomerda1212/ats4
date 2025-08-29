@@ -1,357 +1,302 @@
-import { useState, useEffect } from 'react';
-import { Event, EventSession, EventParticipant, ParticipationStatus } from '../types/event';
+import { useState, useCallback, useEffect } from 'react';
+import { Event, EventSession } from '../types/event';
 import { EventDataAccess } from '@/lib/dataAccess/eventDataAccess';
+import { UnifiedParticipationDataAccess } from '@/lib/dataAccess/unifiedParticipationDataAccess';
+import { 
+  groupEventsByStageGroup, 
+  getEventsRequiringSession, 
+  getActiveEvents,
+  getStageGroups,
+  sortByStageGroup
+} from '@/shared/utils/stageConfigUtils';
+import { supabase } from '@/lib/supabase';
 
-export function useEvents() {
+export const useEvents = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [eventSessions, setEventSessions] = useState<EventSession[]>([]);
-  const [eventParticipants, setEventParticipants] = useState<EventParticipant[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // データベースからイベントデータを取得
-  useEffect(() => {
-    const fetchEvents = async () => {
-      setLoading(true);
-      try {
-        const data = await EventDataAccess.getAllEvents();
-        setEvents(data);
-      } catch (error) {
-        console.error('Failed to fetch events:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEvents();
-  }, []);
-
-  // データベースからイベントセッションデータを取得
-  useEffect(() => {
-    const fetchEventSessions = async () => {
-      try {
-        const data = await EventDataAccess.getAllEventSessions();
-        setEventSessions(data);
-      } catch (error) {
-        console.error('Failed to fetch event sessions:', error);
-      }
-    };
-
-    fetchEventSessions();
-  }, []);
-
-  // データベースからイベント参加者データを取得
-  useEffect(() => {
-    const fetchEventParticipants = async () => {
-      try {
-        // 全てのセッションの参加者を取得
-        const allParticipants: EventParticipant[] = [];
-        for (const session of eventSessions) {
-          const participants = await EventDataAccess.getSessionParticipants(session.id);
-          allParticipants.push(...participants);
-        }
-        setEventParticipants(allParticipants);
-      } catch (error) {
-        console.error('Failed to fetch event participants:', error);
-      }
-    };
-
-    if (eventSessions.length > 0) {
-      fetchEventParticipants();
+  // 全てのイベントを取得
+  const fetchEvents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await EventDataAccess.getAllEvents();
+      setEvents(data);
+    } catch (err) {
+      console.error('Failed to fetch events:', err);
+      setError('イベントの取得に失敗しました');
+    } finally {
+      setLoading(false);
     }
+  }, []);
+
+  // 全てのイベントセッションを取得
+  const fetchEventSessions = useCallback(async () => {
+    try {
+      const data = await EventDataAccess.getAllEventSessions();
+      setEventSessions(data);
+    } catch (err) {
+      console.error('Failed to fetch event sessions:', err);
+    }
+  }, []);
+
+  // アクティブなイベントを取得
+  const fetchActiveEvents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await EventDataAccess.getActiveEvents();
+      setEvents(data);
+    } catch (err) {
+      console.error('Failed to fetch active events:', err);
+      setError('アクティブなイベントの取得に失敗しました');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 特定の段階グループのイベントを取得
+  const fetchEventsByStageGroup = useCallback(async (stageGroup: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await EventDataAccess.getEventsByStageGroup(stageGroup);
+      setEvents(data);
+    } catch (err) {
+      console.error('Failed to fetch events by stage group:', err);
+      setError('段階グループのイベント取得に失敗しました');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // セッションが必要なイベントを取得
+  const fetchEventsRequiringSession = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await EventDataAccess.getEventsRequiringSession();
+      setEvents(data);
+    } catch (err) {
+      console.error('Failed to fetch events requiring session:', err);
+      setError('セッションが必要なイベントの取得に失敗しました');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 段階グループ一覧を取得
+  const fetchStageGroups = useCallback(async (): Promise<string[]> => {
+    try {
+      return await EventDataAccess.getStageGroups();
+    } catch (err) {
+      console.error('Failed to fetch stage groups:', err);
+      throw err;
+    }
+  }, []);
+
+  // 特定のイベントを取得
+  const fetchEventById = useCallback(async (id: string): Promise<Event | null> => {
+    try {
+      return await EventDataAccess.getEventById(id);
+    } catch (err) {
+      console.error('Failed to fetch event by id:', err);
+      throw err;
+    }
+  }, []);
+
+  // イベント名でイベントを取得
+  const fetchEventByName = useCallback(async (name: string): Promise<Event | null> => {
+    try {
+      return await EventDataAccess.getEventByName(name);
+    } catch (err) {
+      console.error('Failed to fetch event by name:', err);
+      throw err;
+    }
+  }, []);
+
+  // イベントを作成
+  const createEvent = useCallback(async (eventData: Partial<Event>): Promise<Event> => {
+    try {
+      const newEvent = await EventDataAccess.createEvent(eventData);
+      setEvents(prev => [...prev, newEvent]);
+      return newEvent;
+    } catch (err) {
+      console.error('Failed to create event:', err);
+      throw err;
+    }
+  }, []);
+
+  // イベントセッションを作成
+  const createEventSession = useCallback(async (sessionData: Partial<EventSession>): Promise<EventSession> => {
+    try {
+      const newSession = await EventDataAccess.createEventSession(sessionData);
+      setEventSessions(prev => [...prev, newSession]);
+      return newSession;
+    } catch (err) {
+      console.error('Failed to create event session:', err);
+      throw err;
+    }
+  }, []);
+
+  // 特定のイベントのセッションを取得
+  const getEventSessions = useCallback((eventId: string): EventSession[] => {
+    return eventSessions.filter(session => session.eventId === eventId);
   }, [eventSessions]);
 
-  const getEventSessions = (eventId: string) => {
-    return eventSessions.filter(session => session.eventId === eventId);
-  };
+  // 特定のセッションの参加者を取得
+  const getParticipantsBySession = useCallback(async (sessionId: string) => {
+    try {
+      const participants = await UnifiedParticipationDataAccess.getSessionParticipants(sessionId);
+      return participants;
+    } catch (err) {
+      console.error('Failed to fetch session participants:', err);
+      return [];
+    }
+  }, []);
 
-  const getParticipantsBySession = (sessionId: string) => {
-    return eventParticipants.filter(participant => participant.sessionId === sessionId);
-  };
-
-  const getEventParticipantCount = (eventId: string) => {
+  // イベントの参加者数を取得
+  const getEventParticipantCount = useCallback(async (eventId: string): Promise<number> => {
     const sessions = getEventSessions(eventId);
-    return sessions.reduce((total, session) => {
-      return total + getParticipantsBySession(session.id).length;
-    }, 0);
-  };
-
-  const addEvent = async (event: Omit<Event, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      const { data, error } = await supabase
-        .from('events')
-        .insert({
-          id: crypto.randomUUID(),
-          title: event.name,
-          description: event.description,
-          type: event.stage,
-          start_date: new Date().toISOString(), // Event型にはstartDateがないため、現在時刻を使用
-          end_date: new Date().toISOString(), // Event型にはendDateがないため、現在時刻を使用
-          venue: event.venue,
-          max_participants: event.maxParticipants,
-          status: event.status,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Failed to add event:', error);
-        throw error;
-      }
-
-      const newEvent: Event = {
-        ...event,
-        id: data.id,
-        createdAt: new Date(data.created_at),
-        updatedAt: new Date(data.updated_at),
-      };
-      setEvents(current => [...current, newEvent]);
-      return newEvent;
-    } catch (error) {
-      console.error('Failed to add event:', error);
-      throw error;
+    let totalCount = 0;
+    
+    for (const session of sessions) {
+      const participants = await UnifiedParticipationDataAccess.getSessionParticipants(session.id);
+      totalCount += participants.length;
     }
-  };
+    
+    return totalCount;
+  }, [getEventSessions]);
 
-  const updateEvent = async (id: string, updates: Partial<Event>) => {
+  // 参加者を登録
+  const registerParticipant = useCallback(async (data: {
+    sessionId: string;
+    applicantId: string;
+    status: string;
+  }) => {
     try {
-      const updateData: Record<string, unknown> = {
-        updated_at: new Date().toISOString(),
-      };
-
-      if (updates.name) updateData.title = updates.name;
-      if (updates.description) updateData.description = updates.description;
-      if (updates.stage) updateData.type = updates.stage;
-      if (updates.venue) updateData.venue = updates.venue;
-      if (updates.maxParticipants) updateData.max_participants = updates.maxParticipants;
-      if (updates.status) updateData.status = updates.status;
-
-      const { error } = await supabase
-        .from('events')
-        .update(updateData)
-        .eq('id', id);
-
-      if (error) {
-        console.error('Failed to update event:', error);
-        throw error;
-      }
-
-      setEvents(current =>
-        current.map(event =>
-          event.id === id
-            ? { ...event, ...updates, updatedAt: new Date() }
-            : event
-        )
+      await EventDataAccess.updateParticipantStatus(
+        data.sessionId,
+        data.applicantId,
+        data.status
       );
-    } catch (error) {
-      console.error('Failed to update event:', error);
-      throw error;
+    } catch (err) {
+      console.error('Failed to register participant:', err);
+      throw err;
     }
-  };
+  }, []);
 
-  const deleteEvent = async (id: string) => {
+  // 参加者ステータスを更新
+  const updateParticipantStatus = useCallback(async (participantId: string, status: string) => {
     try {
-      const { error } = await supabase
-        .from('events')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Failed to delete event:', error);
-        throw error;
-      }
-
-      setEvents(current => current.filter(event => event.id !== id));
-      // 関連するセッションと参加者も削除
-      const sessionIds = eventSessions.filter(session => session.eventId === id).map(s => s.id);
-      setEventSessions(current => current.filter(session => session.eventId !== id));
-      setEventParticipants(current => 
-        current.filter(participant => !sessionIds.includes(participant.sessionId))
-      );
-    } catch (error) {
-      console.error('Failed to delete event:', error);
-      throw error;
-    }
-  };
-
-  const addEventSession = async (session: Omit<EventSession, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      const { data, error } = await supabase
-        .from('event_sessions')
-        .insert({
-          id: crypto.randomUUID(),
-          event_id: session.eventId,
-          name: session.name,
-          start_time: session.start.toISOString(),
-          end_time: session.end.toISOString(),
-          venue: session.venue,
-          format: session.format,
-          zoom_url: session.zoomUrl || null,
-          notes: session.notes || null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Failed to add event session:', error);
-        throw error;
-      }
-
-      const newSession: EventSession = {
-        ...session,
-        id: data.id,
-        createdAt: new Date(data.created_at),
-        updatedAt: new Date(data.updated_at),
-      };
-      setEventSessions(current => [...current, newSession]);
-      return newSession;
-    } catch (error) {
-      console.error('Failed to add event session:', error);
-      throw error;
-    }
-  };
-
-  const updateEventSession = async (id: string, updates: Partial<EventSession>) => {
-    try {
-      const updateData: Record<string, unknown> = {
-        updated_at: new Date().toISOString(),
-      };
-
-      if (updates.name) updateData.name = updates.name;
-      if (updates.start) updateData.start_time = updates.start.toISOString();
-      if (updates.end) updateData.end_time = updates.end.toISOString();
-      if (updates.venue) updateData.venue = updates.venue;
-      if (updates.format) updateData.format = updates.format;
-      if (updates.zoomUrl !== undefined) updateData.zoom_url = updates.zoomUrl;
-      if (updates.notes !== undefined) updateData.notes = updates.notes;
-
-      const { error } = await supabase
-        .from('event_sessions')
-        .update(updateData)
-        .eq('id', id);
-
-      if (error) {
-        console.error('Failed to update event session:', error);
-        throw error;
-      }
-
-      setEventSessions(current =>
-        current.map(session =>
-          session.id === id
-            ? { ...session, ...updates, updatedAt: new Date() }
-            : session
-        )
-      );
-    } catch (error) {
-      console.error('Failed to update event session:', error);
-      throw error;
-    }
-  };
-
-  const deleteEventSession = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('event_sessions')
-        .delete()
-        .eq('id', id);
-
-      if (error) {
-        console.error('Failed to delete event session:', error);
-        throw error;
-      }
-
-      setEventSessions(current => current.filter(session => session.id !== id));
-      setEventParticipants(current => 
-        current.filter(participant => participant.sessionId !== id)
-      );
-    } catch (error) {
-      console.error('Failed to delete event session:', error);
-      throw error;
-    }
-  };
-
-  const registerParticipant = async (participant: Omit<EventParticipant, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      const { data, error } = await supabase
+      // UnifiedParticipationDataAccessを使用して参加状況を更新
+      // participantIdは実際にはsessionIdとapplicantIdの組み合わせである必要があります
+      // 現在の実装では、sessionIdとapplicantIdを取得する必要があります
+      
+      // まず、参加者IDからセッションIDと応募者IDを取得
+      const { data: participant, error: fetchError } = await supabase
         .from('event_participants')
-        .insert({
-          id: crypto.randomUUID(),
-          session_id: participant.sessionId,
-          applicant_id: participant.applicantId,
-          status: participant.status,
-          joined_at: participant.joinedAt?.toISOString() || null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .select()
+        .select('session_id, applicant_id, stage_name')
+        .eq('id', participantId)
         .single();
 
-      if (error) {
-        console.error('Failed to register participant:', error);
-        throw error;
+      if (fetchError) {
+        console.error('Failed to fetch participant:', fetchError);
+        throw fetchError;
       }
 
-      const newParticipant: EventParticipant = {
-        ...participant,
-        id: data.id,
-        createdAt: new Date(data.created_at),
-        updatedAt: new Date(data.updated_at),
-      };
-      setEventParticipants(current => [...current, newParticipant]);
-      return newParticipant;
-    } catch (error) {
-      console.error('Failed to register participant:', error);
-      throw error;
-    }
-  };
-
-  const updateParticipantStatus = async (id: string, status: ParticipationStatus) => {
-    try {
-      // 参加状況をresultフィールドに保存（応募者詳細ページと連動させるため）
-      const { error } = await supabase
-        .from('event_participants')
-        .update({
-          result: status, // statusではなくresultに保存
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id);
-
-      if (error) {
-        console.error('Failed to update participant status:', error);
-        throw error;
-      }
-
-      setEventParticipants(current =>
-        current.map(participant =>
-          participant.id === id
-            ? { ...participant, result: status, updatedAt: new Date() }
-            : participant
-        )
+      // UnifiedParticipationDataAccessを使用して更新
+      await UnifiedParticipationDataAccess.updateSessionParticipantStatus(
+        participant.session_id,
+        participant.applicant_id,
+        status
       );
-    } catch (error) {
-      console.error('Failed to update participant status:', error);
-      throw error;
+    } catch (err) {
+      console.error('Failed to update participant status:', err);
+      throw err;
     }
-  };
+  }, []);
+
+  // イベントセッションを削除
+  const deleteEventSession = useCallback(async (sessionId: string) => {
+    try {
+      // 仮の実装 - 実際のデータベースから削除する必要があります
+      console.log('Deleting event session:', sessionId);
+      setEventSessions(prev => prev.filter(session => session.id !== sessionId));
+    } catch (err) {
+      console.error('Failed to delete event session:', err);
+      throw err;
+    }
+  }, []);
+
+  // イベントセッションを更新
+  const updateEventSession = useCallback(async (sessionId: string, sessionData: Partial<EventSession>) => {
+    try {
+      // 仮の実装 - 実際のデータベースから更新する必要があります
+      console.log('Updating event session:', sessionId, sessionData);
+      setEventSessions(prev => prev.map(session => 
+        session.id === sessionId ? { ...session, ...sessionData } : session
+      ));
+    } catch (err) {
+      console.error('Failed to update event session:', err);
+      throw err;
+    }
+  }, []);
+
+  // 段階グループ別にイベントを分類
+  const eventsByStageGroup = groupEventsByStageGroup(events);
+  
+  // セッションが必要なイベント
+  const eventsRequiringSession = getEventsRequiringSession(events);
+  
+  // アクティブなイベント
+  const activeEvents = getActiveEvents(events);
+  
+  // 段階グループ一覧
+  const stageGroups = getStageGroups(events);
+  
+  // ソートされたイベント
+  const sortedEvents = sortByStageGroup(events);
+
+  // 初回のみデータを取得するフラグ
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    if (!isInitialized) {
+      fetchEvents();
+      fetchEventSessions();
+      setIsInitialized(true);
+    }
+  }, [isInitialized, fetchEvents, fetchEventSessions]);
 
   return {
     events,
     eventSessions,
-    eventParticipants,
     loading,
+    error,
+    fetchEvents,
+    fetchEventSessions,
+    fetchActiveEvents,
+    fetchEventsByStageGroup,
+    fetchEventsRequiringSession,
+    fetchStageGroups,
+    fetchEventById,
+    fetchEventByName,
+    createEvent,
+    createEventSession,
     getEventSessions,
     getParticipantsBySession,
     getEventParticipantCount,
-    addEvent,
-    updateEvent,
-    deleteEvent,
-    addEventSession,
-    updateEventSession,
-    deleteEventSession,
     registerParticipant,
     updateParticipantStatus,
+    deleteEventSession,
+    updateEventSession,
+    eventsByStageGroup,
+    eventsRequiringSession,
+    activeEvents,
+    stageGroups,
+    sortedEvents
   };
-}
+};
